@@ -1,0 +1,18 @@
+[user]
+	name = Jeremy Clough
+	email = jeremy@talesin.net
+[core]
+	excludesfile = /Users/jeremy/.gitignore_global
+	autocrlf = input
+[difftool "sourcetree"]
+	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
+	trustExitCode = true
+[push]
+	default = simple
+[branch]
+	autosetuprebase = always
+[alias]
+	lg = log --color --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
