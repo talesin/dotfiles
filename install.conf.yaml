@@ -8,7 +8,13 @@
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
     ~/.spacemacs: spacemacs
-    ~/.zprezto: zprezto
+    ~/.zprezto: prezto
+    ~/.zlogin: zlogin
+    ~/.zlogout: zlogout
+    ~/.zpreztorc: zpreztorc
+    ~/.zprofile: zprofile
+    ~/.zshenv: zshenv
+    ~/.zshrc: zshrc
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
