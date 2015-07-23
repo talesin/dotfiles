@@ -6,8 +6,9 @@
     ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.byobu: byobu/
-    ~/.zshrc: zshrc
     ~/.gitconfig: gitconfig
+    ~/.spacemacs: spacemacs
+    ~/.zprezto: zprezto
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
