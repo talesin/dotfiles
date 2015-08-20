@@ -45,6 +45,11 @@ case "$(uname -s)" in
     fi
 
     if [ `which -s docker-machine` 2>/dev/null ]; then
+      if [ `docker-machine status default` != "Running" ]; then
+        echo "Starting docker machine default"
+        docker-machine start default
+      fi
+
       eval "$(docker-machine env default)"
 
     elif [ `which -s boot2docker` 2>/dev/null ]; then
