@@ -44,7 +44,10 @@ case "$(uname -s)" in
       export PATH="$HOME/bin:$HOME/.rvm/bin:$PATH" # Add RVM to PATH for scripting
     fi
 
-    if [ `which -s boot2docker` 2>/dev/null ]; then
+    if [ `which -s docker-machine` 2>/dev/null ]; then
+      eval "$(docker-machine env default)"
+
+    elif [ `which -s boot2docker` 2>/dev/null ]; then
       if [ `boot2docker status` != "running" ]; then
         echo "Starting boot2docker"
         boot2docker up
@@ -66,3 +69,5 @@ case "$(uname -s)" in
   ;;
 
 esac
+
+
