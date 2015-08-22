@@ -35,6 +35,9 @@ case "$(uname -s)" in
     export BREW_PREFIX=$(brew --prefix)
     export BYOBU_PREFIX=$BREW_PREFIX
 
+    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+    export CPPFLAGS="-I/usr/local/opt/openssl/include"
+
     if [ -f $BREW_PREFIX/nvm.sh ]; then
       export NVM_DIR=~/.nvm
       source $BREW_PREFIX/nvm.sh
@@ -72,6 +75,9 @@ case "$(uname -s)" in
     if [ -e /usr/local/share/zsh/site-functions/_aws ]; then
       source /usr/local/share/zsh/site-functions/_aws
     fi
+
+    fpath=(/usr/local/share/zsh-completions $fpath)
+
   ;;
 
   Linux)

@@ -1,6 +1,6 @@
 [user]
 	name = Jeremy Clough
-	email = jclough@seek.com.au
+	email = jeremy@talesin.net
 [core]
 	excludesfile = /Users/jeremy/.gitignore_global
 	autocrlf = input
