@@ -16,6 +16,7 @@ alias 'cd...'='cd ...'
 
 export PATH="~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin"
 export EDITOR=vim
+export VISUAL="$EDITOR"
 
 case "$(uname -s)" in
   Darwin)
@@ -67,6 +68,10 @@ case "$(uname -s)" in
 
     #export LC_BYOBU=1
     export PATH="/usr/local/sbin:$PATH"
+
+    if [ -e /usr/local/share/zsh/site-functions/_aws ]; then
+      source /usr/local/share/zsh/site-functions/_aws
+    fi
   ;;
 
   Linux)
@@ -74,5 +79,4 @@ case "$(uname -s)" in
   ;;
 
 esac
-
 
