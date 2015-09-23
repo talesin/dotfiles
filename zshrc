@@ -78,6 +78,11 @@ case "$(uname -s)" in
 
     fpath=(/usr/local/share/zsh-completions $fpath)
 
+    if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+       export SCALA_HOME="/usr/local/share/scala"
+       export PATH="$PATH:$SCALA_HOME/bin"
+    fi
+
   ;;
 
   Linux)

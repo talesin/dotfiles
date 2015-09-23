@@ -20,4 +20,10 @@ fi
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
-_byobu_sourced=1 . /usr/bin/byobu-launch
+
+if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+    export SCALA_HOME="/usr/local/share/scala"
+    export PATH="$PATH:$SCALA_HOME/bin"
+fi
+
+_byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true
