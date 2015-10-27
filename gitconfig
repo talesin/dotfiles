@@ -2,7 +2,7 @@
 	name = Jeremy Clough
 	email = jclough@seek.com.au
 [core]
-	excludesfile = /Users/jeremy/.gitignore_global
+	excludesfile = /Users/jclough/.gitignore_global
 	autocrlf = input
 [difftool "kdiff3"]
 	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$LOCAL\" \"$REMOTE\"
@@ -27,3 +27,9 @@
 	trustExitCode = false
 [mergetool]
 	keepBackup = false
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true

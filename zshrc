@@ -14,9 +14,12 @@ alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
-export PATH="~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin"
+export PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:$PATH"
 export EDITOR=vim
 export VISUAL="$EDITOR"
+
+autoload edit-command-line; zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
 
 case "$(uname -s)" in
   Darwin)
