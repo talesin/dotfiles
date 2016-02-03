@@ -1,8 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_cnt =7
 let g:netrw_dirhist_1='/Users/jeremy/Documents/SEEK/vagrant-dsc/lib/vagrant-dsc'
 let g:netrw_dirhist_2='/Users/jeremy/Documents/SEEK/components/adcentre/Vagrant'
 let g:netrw_dirhist_3='/Users/jeremy/Documents/SEEK/vagrant/vagrant-jobseeker'
 let g:netrw_dirhist_4='/Users/jeremy/Documents/SEEK/components/adcentre/Vagrant'
 let g:netrw_dirhist_5='/Applications/Visual Studio Code.app/Contents/Resources/app'
 let g:netrw_dirhist_6='/home/jclough/.config'
+let g:netrw_dirhist_7='/Users/jclough/Documents/Projects/on-call-bot/.paket'
