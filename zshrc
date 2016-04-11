@@ -14,7 +14,7 @@ alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
-export PATH="~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin"
+export PATH="~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:$PATH"
 export EDITOR=vim
 export VISUAL="$EDITOR"
 
@@ -38,9 +38,9 @@ case "$(uname -s)" in
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
 
-    if [ -f $BREW_PREFIX/nvm.sh ]; then
-      export NVM_DIR=~/.nvm
-      source $BREW_PREFIX/nvm.sh
+    if [ -f $HOME/.nvm/nvm.sh ]; then
+      export NVM_DIR=$HOME/.nvm
+      source $NVM_DIR/nvm.sh
       nvm use stable > /dev/null
     fi
 
