@@ -22,3 +22,7 @@ fi
 if [ -d "${HOME}/Documents/Projects/awssamlcliauth" ]; then
   alias awsauth='${HOME}/Documents/Projects/awssamlcliauth/auth.sh; [[ -r "$HOME/.aws/sessiontoken" ]] && . "$HOME/.aws/sessiontoken"'
 fi
+
+if [ -d "/usr/local/share/dotnet" ]; then
+  export PATH="${PATH}:/usr/local/share/dotnet"
+fi
