@@ -26,3 +26,7 @@ fi
 if [ -d "/usr/local/share/dotnet" ]; then
   export PATH="${PATH}:/usr/local/share/dotnet"
 fi
+
+function sublime() {
+  /Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text $@ 2>/dev/null &
+}

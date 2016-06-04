@@ -1,15 +1,18 @@
-export PATH=$HOME/.cabal/bin:$PATH
+if [ -d "/usr/local/bin" ] ; then
+  export PATH="/usr/local/bin:$PATH"
+fi
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+  export PATH="$HOME/bin:$PATH"
+fi
 
-case "$(uname -s)" in
-        Darwin)
-                export NVM_DIR=~/.nvm
-                source $(brew --prefix nvm)/nvm.sh
-                nvm use stable
-        ;;
+ if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+  export SCALA_HOME="/usr/local/share/scala"
+  export PATH="$PATH:$SCALA_HOME/bin"
+ fi
 
-        Linux)
-                echo "Linux"
-        ;;
-esac
+ which -s stack >/dev/null
+ if [ $? -eq 0 ]; then
+  export PATH=`stack path --bin-path 2>/dev/null`
+ fi
