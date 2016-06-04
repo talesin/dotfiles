@@ -10,12 +10,13 @@ if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprofile"
 fi
 
-if [ -d "{HOME}/.local/bin" ]; then
+if [ -d "${HOME}/.local/bin" ]; then
   export PATH="${HOME}/.local/bin:${PATH}"
 fi
 
-if [ -d "$HOME/Library/Haskell/bin" ]; then
-  export PATH="$PATH:$HOME/Library/Haskell/bin"
+which -s stack >/dev/null
+if [ $? -eq 0 ]; then
+  export PATH=`stack path --bin-path 2>/dev/null`
 fi
 
 if [ -d "${HOME}/Documents/Projects/awssamlcliauth" ]; then
