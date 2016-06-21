@@ -9,6 +9,7 @@
 # Browser
 #
 
+
 if [[ "$OSTYPE" == darwin* ]]; then
   export BROWSER='open'
 fi
@@ -72,3 +73,4 @@ if [[ ! -d "$TMPDIR" ]]; then
 fi
 
 TMPPREFIX="${TMPDIR%/}/zsh"
+_byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true

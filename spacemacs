@@ -17,17 +17,18 @@
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; auto-completion
+     auto-completion
      ;; better-defaults
      emacs-lisp
-     ;; git
-     ;; markdown
+     git
+     markdown
      ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     ;; syntax-checking
+      (shell :variables
+             shell-default-height 30
+             shell-default-position 'bottom)
+     syntax-checking
      fsharp
+     scala
      version-control
      )
    ;; List of additional packages that will be installed without being
@@ -161,6 +162,8 @@ before layers configuration."
   "Configuration function.
  This function is called at the very end of Spacemacs initialization after
 layers configuration."
+ (global-hl-line-mode -1) ; Disable current line highlight
+ (global-linum-mode) ; Show line numbers by default
 )
 
 ;; Do not write anything past this comment. This is where Emacs will

@@ -1,6 +1,7 @@
 # vi: set expandtab:
 # vi: noai:ts=2:sw=2
 # Source Prezto.
+
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
@@ -38,6 +39,9 @@ case "$(uname -s)" in
     export BREW_PREFIX=$(brew --prefix)
     export BYOBU_PREFIX=$BREW_PREFIX
 
+    export LDFLAGS="-L/usr/local/opt/openssl/lib"
+    export CPPFLAGS="-I/usr/local/opt/openssl/include"
+
     export NVM_DIR=~/.nvm
     if [ -f $NVM_DIR/nvm.sh ]; then
       source $NVM_DIR/nvm.sh
@@ -55,18 +59,6 @@ case "$(uname -s)" in
       fi
 
       eval "$(docker-machine env default)"
-
-    elif [ `which -s boot2docker` 2>/dev/null ]; then
-      if [ `boot2docker status` != "running" ]; then
-        echo "Starting boot2docker"
-        boot2docker up
-      fi
-
-      $(boot2docker shellinit 2> /dev/null)
-
-      docker-ip() {
-        boot2docker ip 2> /dev/null
-      }
     fi
 
     #export LC_BYOBU=1
@@ -75,6 +67,8 @@ case "$(uname -s)" in
     if [ -e /usr/local/share/zsh/site-functions/_aws ]; then
       source /usr/local/share/zsh/site-functions/_aws
     fi
+
+    fpath=(/usr/local/share/zsh-completions $fpath)
   ;;
 
   Linux)
@@ -82,4 +76,6 @@ case "$(uname -s)" in
   ;;
 
 esac
+
+#export LC_BYOBU=0
 

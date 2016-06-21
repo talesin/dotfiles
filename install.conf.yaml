@@ -8,6 +8,7 @@
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
     ~/.spacemacs: spacemacs
+    ~/.emacs.d: emacs
     ~/.zprezto: prezto
     ~/.zlogin: zlogin
     ~/.zlogout: zlogout
