@@ -38,9 +38,9 @@ case "$(uname -s)" in
     export BREW_PREFIX=$(brew --prefix)
     export BYOBU_PREFIX=$BREW_PREFIX
 
-    if [ -f $BREW_PREFIX/nvm.sh ]; then
-      export NVM_DIR=~/.nvm
-      source $BREW_PREFIX/nvm.sh
+    export NVM_DIR=~/.nvm
+    if [ -f $NVM_DIR/nvm.sh ]; then
+      source $NVM_DIR/nvm.sh
       nvm use stable > /dev/null
     fi
 
