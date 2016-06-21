@@ -35,4 +35,8 @@ if [ $? -eq 0 ]; then
   export PATH=`stack path --bin-path 2>/dev/null`
 fi
 
+if [ -d "${HOME}/.local/bin" ]; then
+  export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
 _byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true

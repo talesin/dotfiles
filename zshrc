@@ -1,6 +1,7 @@
 # vi: set expandtab:
 # vi: noai:ts=2:sw=2
 # Source Prezto.
+
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
@@ -55,18 +56,6 @@ case "$(uname -s)" in
       fi
 
       eval "$(docker-machine env default)"
-
-    elif [ `which -s boot2docker` 2>/dev/null ]; then
-      if [ `boot2docker status` != "running" ]; then
-        echo "Starting boot2docker"
-        boot2docker up
-      fi
-
-      $(boot2docker shellinit 2> /dev/null)
-
-      docker-ip() {
-        boot2docker ip 2> /dev/null
-      }
     fi
 
     #export LC_BYOBU=1
@@ -77,12 +66,6 @@ case "$(uname -s)" in
     fi
 
     fpath=(/usr/local/share/zsh-completions $fpath)
-
-    if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
-       export SCALA_HOME="/usr/local/share/scala"
-       export PATH="$PATH:$SCALA_HOME/bin"
-    fi
-
   ;;
 
   Linux)
@@ -90,4 +73,6 @@ case "$(uname -s)" in
   ;;
 
 esac
+
+#export LC_BYOBU=0
 
