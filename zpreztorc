@@ -35,7 +35,7 @@ zstyle ':prezto:load' pmodule \
   'git' \
   'syntax-highlighting' \
   'prompt'
-  
+
 
 #
 # Editor
@@ -158,4 +158,3 @@ zstyle ':prezto:module:terminal:tab-title' format '%m: %s'
 
 # Integrate with iTerm2.
 zstyle ':prezto:module:tmux:iterm' integrate 'yes'
-
