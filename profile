@@ -39,4 +39,9 @@ if [ -d "${HOME}/.local/bin" ]; then
   export PATH="${HOME}/.local/bin:${PATH}"
 fi
 
+if [ -d "/usr/local/share/dotnet" ]; then
+  export PATH="${PATH}:/usr/local/share/dotnet"
+fi
+
+
 _byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true

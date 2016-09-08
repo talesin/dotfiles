@@ -42,16 +42,6 @@ case "$(uname -s)" in
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
 
-    export NVM_DIR=~/.nvm
-    if [ -f $NVM_DIR/nvm.sh ]; then
-      source $NVM_DIR/nvm.sh
-      nvm use stable > /dev/null
-    fi
-
-    if [ -e $HOME/.rvm ]; then
-      export PATH="$HOME/bin:$HOME/.rvm/bin:$PATH" # Add RVM to PATH for scripting
-    fi
-
     if [ `which -s docker-machine` 2>/dev/null ]; then
       if [ `docker-machine status default` != "Running" ]; then
         echo "Starting docker machine default"
@@ -78,4 +68,3 @@ case "$(uname -s)" in
 esac
 
 #export LC_BYOBU=0
-
