@@ -54,5 +54,7 @@ if [ -z $ZSHENV ]; then
     /Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron $@ 2>/dev/null &
   }
 
+  #launchctl setenv PATH $PATH
+
   ZSHENV=1
 fi
