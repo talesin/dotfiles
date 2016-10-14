@@ -47,7 +47,7 @@ if [ -z $ZSHENV ]; then
   }
 
   function vscode() {
-    /Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron $@ 2>/dev/null &
+    /Applications/Visual\ Studio\ Code.app/Contents/MacOS/Electron $@ 2>/dev/null &
   }
 
   ZSHENV=1
