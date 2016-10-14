@@ -16,3 +16,7 @@ fi
  if [ $? -eq 0 ]; then
   export PATH=`stack path --bin-path 2>/dev/null`
  fi
+
+ if [ -d "/usr/local/share/dotnet" ]; then
+   export PATH="${PATH}:/usr/local/share/dotnet"
+ fi

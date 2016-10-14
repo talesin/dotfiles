@@ -50,5 +50,10 @@ if [ -z $ZSHENV ]; then
     /Applications/Visual\ Studio\ Code.app/Contents/MacOS/Electron $@ 2>/dev/null &
   }
 
+  function vscode_() {
+  }
+
+  #launchctl setenv PATH $PATH
+
   ZSHENV=1
 fi
