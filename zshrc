@@ -42,14 +42,14 @@ case "$(uname -s)" in
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
 
-    if [ `which -s docker-machine` 2>/dev/null ]; then
-      if [ `docker-machine status default` != "Running" ]; then
-        echo "Starting docker machine default"
-        docker-machine start default
-      fi
-
-      eval "$(docker-machine env default)"
-    fi
+    # if [ `which -s docker-machine` 2>/dev/null ]; then
+    #   if [ `docker-machine status default` != "Running" ]; then
+    #     echo "Starting docker machine default"
+    #     docker-machine start default
+    #   fi
+    #
+    #   eval "$(docker-machine env default)"
+    # fi
 
     #export LC_BYOBU=1
     export PATH="/usr/local/sbin:$PATH"
