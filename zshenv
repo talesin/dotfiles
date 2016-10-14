@@ -51,7 +51,6 @@ if [ -z $ZSHENV ]; then
   }
 
   function vscode_() {
-    /Applications/Visual\ Studio\ Code\ -\ Insiders.app/Contents/MacOS/Electron $@ 2>/dev/null &
   }
 
   #launchctl setenv PATH $PATH
