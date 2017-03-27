@@ -20,3 +20,5 @@ fi
  if [ -d "/usr/local/share/dotnet" ]; then
    export PATH="${PATH}:/usr/local/share/dotnet"
  fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
