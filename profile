@@ -43,5 +43,10 @@ if [ -d "/usr/local/share/dotnet" ]; then
   export PATH="${PATH}:/usr/local/share/dotnet"
 fi
 
+if [ -d "/Library/Frameworks/Mono.framework/Versions/Current/bin" ]; then
+  export PATH="${PATH}:/Library/Frameworks/Mono.framework/Versions/Current/bin"
+fi
 
 _byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true
+
+launchctl setenv PATH $PATH

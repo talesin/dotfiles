@@ -42,6 +42,10 @@ if [ -z $ZSHENV ]; then
     export PATH="${PATH}:/usr/local/share/dotnet"
   fi
 
+  if ! [[ "$PATH" -regex-match "(^|:)/Library/Frameworks/Mono.framework/Versions/Current/bin(/?)(:|$)" ]] && [ -d "/Library/Frameworks/Mono.framework/Versions/Current/bin" ]; then
+    export PATH="${PATH}:/Library/Frameworks/Mono.framework/Versions/Current/bin"
+  fi
+
   function sublime() {
     /Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text $@ 2>/dev/null &
   }
