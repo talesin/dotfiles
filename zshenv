@@ -57,6 +57,8 @@ if [ -z $ZSHENV ]; then
   function vscode_() {
   }
 
+  alias airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport
+
   #launchctl setenv PATH $PATH
 
   ZSHENV=1
