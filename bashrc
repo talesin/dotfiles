@@ -21,4 +21,4 @@ fi
    export PATH="${PATH}:/usr/local/share/dotnet"
  fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+#[ -f ~/.fzf.bash ] && source ~/.fzf.bash

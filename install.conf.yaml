@@ -2,7 +2,8 @@
 
 - link:
     ~/.dotfiles: ''
-    ~/.vim: vim/
+#    ~/.vim: vim/
+    ~/.SpaceVim.d: SpaceVim.d/
 #    ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.byobu: byobu/
@@ -18,9 +19,9 @@
     ~/.zshrc: zshrc
     ~/.profile: profile
     ~/.bash_profile: bash_profile
-    ~/.fzf.bash: fzf.bash
-    ~/.fzf.zsh: fzf.zsh
-    ~/.spacevim: spacevim
+#    ~/.fzf.bash: fzf.bash
+#    ~/.fzf.zsh: fzf.zsh
+#    ~/.spacevim: spacevim
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

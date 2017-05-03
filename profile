@@ -25,6 +25,10 @@ if [ -d "$HOME/bin" ] ; then
     export PATH="$HOME/bin:$PATH"
 fi
 
+if ! [ -z "$JAVA_HOME" ]; then
+    export JAVA_HOME=`/usr/libexec/java_home`
+fi
+
 if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
     export SCALA_HOME="/usr/local/share/scala"
     export PATH="$PATH:$SCALA_HOME/bin"
@@ -45,6 +49,10 @@ fi
 
 if [ -d "/Library/Frameworks/Mono.framework/Versions/Current/bin" ]; then
   export PATH="${PATH}:/Library/Frameworks/Mono.framework/Versions/Current/bin"
+fi
+
+if [ -z "$SSH_AGENT_PID" ]; then
+    eval `ssh-agent`
 fi
 
 _byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true

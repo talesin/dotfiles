@@ -75,4 +75,6 @@ fi
 TMPPREFIX="${TMPDIR%/}/zsh"
 _byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true
 
-eval `ssh-agent`
+if [[ -z "$SSH_AGENT_PID" ]]; then
+    eval `ssh-agent`
+fi

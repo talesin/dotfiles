@@ -68,7 +68,7 @@ case "$(uname -s)" in
 esac
 
 #export LC_BYOBU=0
-eval $(/usr/libexec/path_helper -s)
+#eval $(/usr/libexec/path_helper -s)
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

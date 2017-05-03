@@ -46,6 +46,10 @@ if [ -z $ZSHENV ]; then
     export PATH="${PATH}:/Library/Frameworks/Mono.framework/Versions/Current/bin"
   fi
 
+  if ! [[ "$PATH" -regex-match "(^|:)${HOME}/Library/Python/2.7/bin(/?)(:|$)" ]] && [ -d "${HOME}/Library/Python/2.7/bin" ]; then
+    export PATH="${PATH}:${HOME}/Library/Python/2.7/bin"
+  fi
+
   function sublime() {
     /Applications/Sublime\ Text.app/Contents/MacOS/Sublime\ Text $@ 2>/dev/null &
   }
