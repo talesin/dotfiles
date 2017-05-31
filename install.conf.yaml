@@ -19,8 +19,8 @@
     ~/.zshrc: zshrc
     ~/.profile: profile
     ~/.bash_profile: bash_profile
-#    ~/.fzf.bash: fzf.bash
-#    ~/.fzf.zsh: fzf.zsh
+    ~/.fzf.bash: fzf.bash
+    ~/.fzf.zsh: fzf.zsh
 #    ~/.spacevim: spacevim
 
 - shell:
