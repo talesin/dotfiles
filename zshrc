@@ -16,7 +16,16 @@ alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
 export PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:$PATH"
-export EDITOR=vim
+
+if [[ `which -s nvim` ]]; then
+  alias vimdiff='nvim -d'
+  alias vim="nvim"
+  alias vi="nvim"
+  export EDITOR=nvim
+else
+  export EDITOR=vim
+fi
+
 export VISUAL="$EDITOR"
 
 autoload edit-command-line; zle -N edit-command-line
@@ -42,16 +51,6 @@ case "$(uname -s)" in
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
 
-    # if [ `which -s docker-machine` 2>/dev/null ]; then
-    #   if [ `docker-machine status default` != "Running" ]; then
-    #     echo "Starting docker machine default"
-    #     docker-machine start default
-    #   fi
-    #
-    #   eval "$(docker-machine env default)"
-    # fi
-
-    #export LC_BYOBU=1
     export PATH="/usr/local/sbin:$PATH"
 
     if [ -e /usr/local/share/zsh/site-functions/_aws ]; then
