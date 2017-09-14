@@ -2,6 +2,8 @@
 # vi: noai:ts=2:sw=2
 # Source Prezto.
 
+# echo "Running zshrc"
+
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
@@ -15,15 +17,16 @@ alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
-export PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:$PATH"
 
 if [[ `which -s nvim` ]]; then
   alias vimdiff='nvim -d'
   alias vim="nvim"
   alias vi="nvim"
   export EDITOR=nvim
+  export VISUAL=nvim
 else
   export EDITOR=vim
+  export VISUAL=vim
 fi
 
 export VISUAL="$EDITOR"
@@ -43,15 +46,11 @@ case "$(uname -s)" in
       export JAVA_HOME=`/usr/libexec/java_home`
     fi
 
-    export PATH=$PATH:/Applications/Xcode.app/Contents/Developer/usr/libexec/git-core:/Applications/Xcode.app//Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-
     export BREW_PREFIX=$(brew --prefix)
     export BYOBU_PREFIX=$BREW_PREFIX
 
     export LDFLAGS="-L/usr/local/opt/openssl/lib"
     export CPPFLAGS="-I/usr/local/opt/openssl/include"
-
-    export PATH="/usr/local/sbin:$PATH"
 
     if [ -e /usr/local/share/zsh/site-functions/_aws ]; then
       source /usr/local/share/zsh/site-functions/_aws
@@ -71,3 +70,10 @@ esac
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.zsh ]] && . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.zsh
