@@ -23,6 +23,8 @@
     ~/.fzf.bash: fzf.bash
     ~/.fzf.zsh: fzf.zsh
 #    ~/.spacevim: spacevim
+    ~/.config/fish: fish/
+    ~/.config/omf: omf/
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
