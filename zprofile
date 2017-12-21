@@ -9,6 +9,9 @@
 # Browser
 #
 
+# echo "Running zprofile"
+# echo $PATH
+
 
 if [[ "$OSTYPE" == darwin* ]]; then
   export BROWSER='open'
@@ -18,8 +21,8 @@ fi
 # Editors
 #
 
-export EDITOR='vim'
-export VISUAL='vim'
+# export EDITOR='vim'
+# export VISUAL='vim'
 export PAGER='less'
 
 #
