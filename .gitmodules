@@ -10,3 +10,6 @@
 [submodule "vim/bundle/Dockerfile"]
 	path = vim/bundle/Dockerfile
 	url = https://github.com/ekalinin/Dockerfile.vim.git
+[submodule "SpaceVim"]
+	path = SpaceVim
+	url = https://github.com/SpaceVim/SpaceVim.git
