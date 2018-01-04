@@ -5,7 +5,7 @@
     ~/.vim: vim/
     ~/.SpaceVim: SpaceVim/
     ~/.SpaceVim.d: SpaceVim.d/
-    ~/.vimrc: vimrc
+    #    ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig

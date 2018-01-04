@@ -70,17 +70,18 @@ if [ -z $FISHENV ]
   append-path "/sbin"
   append-path "/opt/X11/bin"
 
+
+  set -U FISHENV 1
+end
+
+function awsauth
   if test -d "$HOME/Documents/Projects/awssamlcliauth"
     alias unset=set
-    function awsauth
       bash $HOME/Documents/Projects/awssamlcliauth/auth.sh
       if test -r "$HOME/.aws/sessiontoken"
         . $HOME/.aws/sessiontoken
-      end
     end
   end
-
-  set -U FISHENV 1
 end
 
 function vscode
