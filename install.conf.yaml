@@ -2,10 +2,10 @@
 
 - link:
     ~/.dotfiles: ''
-#    ~/.vim: vim/
+    ~/.vim: vim/
     ~/.SpaceVim: SpaceVim/
     ~/.SpaceVim.d: SpaceVim.d/
-    ~/.vimrc: vimrc
+    #    ~/.vimrc: vimrc
     ~/.bashrc: bashrc
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
@@ -22,7 +22,6 @@
     ~/.bash_profile: bash_profile
     ~/.fzf.bash: fzf.bash
     ~/.fzf.zsh: fzf.zsh
-#    ~/.spacevim: spacevim
     ~/.config/fish: fish/
     ~/.config/omf: omf/
 
