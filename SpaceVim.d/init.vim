@@ -6,3 +6,4 @@ let g:spacevim_custom_plugins = [
   \ ['Shougo/neosnippet'],
   \ ['Shougo/neosnippet-snippets'],
   \ ]
+
