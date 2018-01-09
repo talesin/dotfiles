@@ -2,3 +2,4 @@ byobu/.ssh-agent
 .DS_Store
 fish/fishd.*
 *.un~
+SpaceVim.d/.netrwhist

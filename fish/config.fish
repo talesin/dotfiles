@@ -74,22 +74,6 @@ if [ -z $FISHENV ]
   set -U FISHENV 1
 end
 
-function awsauth
-  if test -d "$HOME/Documents/Projects/awssamlcliauth"
-    alias unset=set
-      bash $HOME/Documents/Projects/awssamlcliauth/auth.sh
-      if test -r "$HOME/.aws/sessiontoken"
-        . $HOME/.aws/sessiontoken
-    end
-  end
-end
-
-function vscode
-  if test "/Applications/Visual Studio Code - Insiders.app/Contents/MacOS/Electron"
-    "/Applications/Visual Studio Code - Insiders.app/Contents/MacOS/Electron" $argv &
-  end
-end
-
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
 [ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
