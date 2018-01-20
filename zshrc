@@ -68,6 +68,7 @@ esac
 #export LC_BYOBU=0
 #eval $(/usr/libexec/path_helper -s)
 
+eval "$(direnv hook zsh)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

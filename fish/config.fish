@@ -74,6 +74,8 @@ if [ -z $FISHENV ]
   set -U FISHENV 1
 end
 
+eval (direnv hook fish)
+
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
 [ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish

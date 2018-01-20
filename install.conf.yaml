@@ -24,6 +24,7 @@
     ~/.fzf.zsh: fzf.zsh
     ~/.config/fish: fish/
     ~/.config/omf: omf/
+    ~/.envrc: envrc
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
