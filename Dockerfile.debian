@@ -1,0 +1,16 @@
+FROM debian:stable-slim
+
+WORKDIR /root
+
+RUN apt-get update && apt-get -y install \
+      git-core \
+      python \
+      direnv
+
+
+RUN mkdir .dotfiles && mkdir .config
+ADD . .dotfiles
+
+RUN cd .dotfiles && ./install && cd
+
+RUN direnv allow
