@@ -23,12 +23,16 @@ function prepend-path
   end
 end
 
+function whch
+  which $argv > /dev/null
+end
+
 alias cls=clear
 alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
-if which -s nvim
+if whch nvim
   alias vimdiff='nvim -d'
   alias vim="nvim"
   alias vi="nvim"
@@ -42,15 +46,19 @@ end
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
+  if not test -d $HOME/.local/bin
+    mkdir $HOME/.local/bin
+  end
+
   set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
 
-  if which -s brew
+  if whch brew
     set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
 
     prepend-path $PYTHON_BIN
   end
 
-  # if which -s stack
+  # if whch stack
   #   set stack_path (stack path --bin-path 2>/dev/null)
   #   export PATH=$stack_path
   # end

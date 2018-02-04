@@ -24,7 +24,9 @@
         force: true
         path: profile
     ~/.bash_profile: bash/bash_profile
-    ~/.config/fish: fish/
+    ~/.config/fish:
+        force: true
+        path: fish/
     ~/.config/omf: fish/omf/
     ~/.envrc: envrc
 
