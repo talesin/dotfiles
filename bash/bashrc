@@ -21,4 +21,8 @@ fi
    export PATH="${PATH}:/usr/local/share/dotnet"
  fi
 
+ if [ -z "$GROOVY_HOME" ] && [ -e /usr/local/opt/groovy/libexec ]; then
+  export GROOVY_HOME=/usr/local/opt/groovy/libexec
+ fi
+
 eval "$(direnv hook bash)"

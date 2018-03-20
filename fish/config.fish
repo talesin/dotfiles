@@ -54,9 +54,12 @@ if [ -z $FISHENV ]
 
   if whch brew
     set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
-
     prepend-path $PYTHON_BIN
+
+    set -U GROOVY_HOME (brew --prefix)/opt/groovy/libexec
+    prepend-path $GROOVY_HOME
   end
+
 
   # if whch stack
   #   set stack_path (stack path --bin-path 2>/dev/null)
