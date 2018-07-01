@@ -1,3 +1,5 @@
+echo "Executing $0"
+
 if [ -d "/usr/local/bin" ] ; then
   export PATH="/usr/local/bin:$PATH"
 fi
@@ -7,22 +9,26 @@ if [ -d "$HOME/bin" ] ; then
   export PATH="$HOME/bin:$PATH"
 fi
 
- if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
   export SCALA_HOME="/usr/local/share/scala"
   export PATH="$PATH:$SCALA_HOME/bin"
- fi
+fi
 
- which stack >/dev/null
- if [ $? -eq 0 ]; then
+which stack >/dev/null
+if [ $? -eq 0 ]; then
   export PATH=`stack path --bin-path 2>/dev/null`
- fi
+fi
 
- if [ -d "/usr/local/share/dotnet" ]; then
+if [ -d "/usr/local/share/dotnet" ]; then
    export PATH="${PATH}:/usr/local/share/dotnet"
- fi
+fi
 
- if [ -z "$GROOVY_HOME" ] && [ -e /usr/local/opt/groovy/libexec ]; then
+if [ -z "$GROOVY_HOME" ] && [ -e /usr/local/opt/groovy/libexec ]; then
   export GROOVY_HOME=/usr/local/opt/groovy/libexec
- fi
+fi
+
+if [ -d "/usr/local/opt/python/libexec/bin" ]; then
+  export PATH="/usr/local/opt/python/libexec/bin;${PATH}"
+fi
 
 eval "$(direnv hook bash)"

@@ -55,6 +55,6 @@ if [ -z "$SSH_AGENT_PID" ]; then
     eval `ssh-agent`
 fi
 
-_byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true
 
 launchctl setenv PATH $PATH
+_byobu_sourced=1 . /usr/local/Cellar/byobu/5.125/bin/byobu-launch 2>/dev/null || true
