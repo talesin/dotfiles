@@ -1,1 +1,1 @@
-source_env $HOME/.config/envrc
+source_env $HOME/.config

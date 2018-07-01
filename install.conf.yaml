@@ -1,29 +1,33 @@
 - clean: ['~']
 
 - link:
-    ~/.dotfiles: ''
+  #    ~/.dotfiles: ''
     ~/.vim: SpaceVim/
     ~/.SpaceVim: SpaceVim/
     ~/.SpaceVim.d: SpaceVim.d/
     ~/.vimrc: vimrc
-    ~/.bashrc: bashrc
+    ~/.bashrc:
+        force: true
+        path: bash/bashrc
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
     ~/.spacemacs: spacemacs
-    ~/.emacs.d: emacs
-    ~/.zprezto: prezto
-    ~/.zlogin: zlogin
-    ~/.zlogout: zlogout
-    ~/.zpreztorc: zpreztorc
-    ~/.zprofile: zprofile
-    ~/.zshenv: zshenv
-    ~/.zshrc: zshrc
-    ~/.profile: profile
-    ~/.bash_profile: bash_profile
-    ~/.fzf.bash: fzf.bash
-    ~/.fzf.zsh: fzf.zsh
-    ~/.config/fish: fish/
-    ~/.config/omf: omf/
+    ~/.emacs.d: emacs/
+    ~/.zprezto: zsh/prezto
+    ~/.zlogin: zsh/zlogin
+    ~/.zlogout: zsh/zlogout
+    ~/.zpreztorc: zsh/zpreztorc
+    ~/.zprofile: zsh/zprofile
+    ~/.zshenv: zsh/zshenv
+    ~/.zshrc: zsh/zshrc
+    ~/.profile:
+        force: true
+        path: profile
+    ~/.bash_profile: bash/bash_profile
+    ~/.config/fish:
+        force: true
+        path: fish/
+    ~/.config/omf: fish/omf/
     ~/.envrc: envrc
 
 - shell:

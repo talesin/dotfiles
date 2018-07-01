@@ -23,12 +23,16 @@ function prepend-path
   end
 end
 
+function whch
+  which $argv > /dev/null
+end
+
 alias cls=clear
 alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
-if which -s nvim
+if whch nvim
   alias vimdiff='nvim -d'
   alias vim="nvim"
   alias vi="nvim"
@@ -42,15 +46,22 @@ end
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
-  set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
-
-  if which -s brew
-    set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
-
-    prepend-path $PYTHON_BIN
+  if not test -d $HOME/.local/bin
+    mkdir $HOME/.local/bin
   end
 
-  # if which -s stack
+  set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
+
+  if whch brew
+    set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
+    prepend-path $PYTHON_BIN
+
+    set -U GROOVY_HOME (brew --prefix)/opt/groovy/libexec
+    prepend-path $GROOVY_HOME
+  end
+
+
+  # if whch stack
   #   set stack_path (stack path --bin-path 2>/dev/null)
   #   export PATH=$stack_path
   # end
@@ -82,3 +93,4 @@ eval (direnv hook fish)
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
 [ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish
+status --is-login; and status --is-interactive; and exec byobu-launcher
