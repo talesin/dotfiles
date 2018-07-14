@@ -38,7 +38,7 @@ popd
 # setup fish
 pushd $HOME/Downloads
 curl -s -L https://get.oh-my.fish > omf-install.fish
-fish omf-install.fish
+fish omf-install.fish --noninteractive
 popd
 grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
