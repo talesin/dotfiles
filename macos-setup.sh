@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-DIR=`cd $(dirname $0)/..; pwd`
+DIR=`cd $(dirname $0); pwd`
 pushd $DIR
 
-# install iTerm2
+# download iTerm2
 if ! [ -d "/Applications/iTerm.app" ]; then
-   curl -o /Applications/iTerm.app  https://iterm2.com/downloads/stable/latest 
+    open https://iterm2.com/downloads/stable/latest
+    if [ -e "$HOME/Downloads/iTerm.app" ]; then
+        mv $HOME/Downloads/iTerm.app /Applications
+    fi
 fi
 
 # install brew
 which brew > /dev/null
-if [ $? -eq 0 ]; then
+if [ $? -eq 1 ]; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 else
     brew update
@@ -19,9 +22,8 @@ brew install coreutils git python direnv byobu vim fish
 # enable direnv
 direnv allow
 
-export PATH="/usr/local/opt/python/libexec/bin;${PATH}"
-
 # install powerline fonts
+export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
 pip install --user powerline-status
 
 pushd /tmp
@@ -34,7 +36,10 @@ popd
 
 # setup fish
 curl -L https://get.oh-my.fish | fish
-sudo echo /usr/local/bin/fish >> /etc/shells
+grep -sq fish /etc/shells
+if [ $? -eq 1 ]; then
+    sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
+fi
 chsh -s /usr/local/bin/fish
 
 # install .dotfiles
@@ -46,6 +51,6 @@ pushd $HOME/.dotfiles
 popd
 
 # setup byobu
-byobu-enable
+/usr/local/bin/byobu-enable
 
 popd
