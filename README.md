@@ -2,7 +2,7 @@
 
 ## Quick Install
 
-`curl -s https://raw.githubusercontent.com/talesin/dotfiles/macos-setup.sh | bash`
+`curl -s https://raw.githubusercontent.com/talesin/dotfiles/master/macos-setup.sh | bash`
 
 ## Manual Install
 

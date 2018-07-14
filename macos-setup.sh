@@ -52,6 +52,9 @@ if ! [ -d "$HOME/.dotfiles" ]; then
 fi
 pushd $HOME/.dotfiles
 ./install
+if [ $? -ne 0 ]; then
+    ./install
+fi
 popd
 
 # setup byobu
