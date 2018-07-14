@@ -51,7 +51,6 @@ if ! [ -d "$HOME/.dotfiles" ]; then
     git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
 fi
 pushd $HOME/.dotfiles
-git checkout doc-and-clean
 ./install
 popd
 
