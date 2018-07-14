@@ -4,10 +4,11 @@ pushd $DIR
 
 # download iTerm2
 if ! [ -d "/Applications/iTerm.app" ]; then
-    open https://iterm2.com/downloads/stable/latest
-    if [ -e "$HOME/Downloads/iTerm.app" ]; then
-        mv $HOME/Downloads/iTerm.app /Applications
-    fi
+    pushd $HOME/Downloads
+    curl -L -s -o iTerm.zip https://iterm2.com/downloads/stable/latest
+    unzip iTerm.zip
+    mv iTerm.app /Applications
+    popd
 fi
 
 # install brew
@@ -40,7 +41,6 @@ grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
-chsh -s /usr/local/bin/fish
 
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then
@@ -54,3 +54,5 @@ popd
 /usr/local/bin/byobu-enable
 
 popd
+
+chsh -s /usr/local/bin/fish
