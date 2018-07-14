@@ -36,15 +36,19 @@ rm -fr fonts
 popd
 
 # setup fish
-curl -L https://get.oh-my.fish | fish
+pushd $HOME/Downloads
+curl -s -L https://get.oh-my.fish > omf-install.fish
+fish omf-install.fish
+popd
 grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
+chsh -s /usr/local/bin/fish
 
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then
-    git clone https://github.com/talesin/dotfiles.git $HOME/.dotfiles
+    git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
 fi
 pushd $HOME/.dotfiles
 ./install
@@ -54,5 +58,3 @@ popd
 /usr/local/bin/byobu-enable
 
 popd
-
-chsh -s /usr/local/bin/fish
