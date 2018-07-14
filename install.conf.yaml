@@ -1,7 +1,6 @@
 - clean: ['~']
 
 - link:
-  #    ~/.dotfiles: ''
     ~/.vim: SpaceVim/
     ~/.SpaceVim: SpaceVim/
     ~/.SpaceVim.d: SpaceVim.d/
@@ -9,7 +8,9 @@
     ~/.bashrc:
         force: true
         path: bash/bashrc
-    ~/.byobu: byobu/
+    ~/.byobu:
+        force: true
+        path: byobu/
     ~/.gitconfig: gitconfig
     ~/.spacemacs: spacemacs
     ~/.emacs.d: emacs/
@@ -27,8 +28,10 @@
     ~/.config/fish:
         force: true
         path: fish/
-    ~/.config/omf: fish/omf/
+    ~/.config/omf:
+        force: true
+        path: fish/omf/
     ~/.envrc: envrc
 
 - shell:
-  - [git submodule update --init --recursive, Installing submodules]
+    - [git submodule update --init --recursive, Installing submodules]
