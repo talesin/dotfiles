@@ -7,6 +7,7 @@
 ## Cygwin
 
 - Install [Cygwin](https://www.cygwin.com)
+- `curl -s https://raw.githubusercontent.com/talesin/dotfiles/cygwin/cygwin-setup.sh | bash`
 
 ## Windows Subsystem for Linux
 
