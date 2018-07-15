@@ -2,8 +2,15 @@
 
 `curl -s https://raw.githubusercontent.com/talesin/dotfiles/master/macos-setup.sh | bash`
 
-## Manual Install
+# Windows
 
+## Cygwin
+
+- Install [Cygwin](https://www.cygwin.com)
+
+## Windows Subsystem for Linux
+
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
 
 # References
 
