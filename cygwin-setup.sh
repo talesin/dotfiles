@@ -26,6 +26,9 @@ rm omf-install.fish
 sed 's/db_shell.*//' /etc/nsswitch.conf | awk NF > /etc/nsswitch.conf
 FISH_PATH=`which fish`
 echo "db_shell: $FISH_PATH" >> /etc/nsswitch.conf
+if [ "$FISH_PATH" != "/usr/local/bin/fish" ]; then
+    ln -s $FISH_PATH /usr/local/bin/fish
+fi
 
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then

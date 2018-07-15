@@ -1,5 +1,13 @@
 echo "Executing $0"
 
+if ! [[ "$PATH" =~ ^/bin|:/bin ]]; then
+  export PATH="/bin:$PATH"
+fi
+
+if ! [[ "$PATH" =~ ^/usr/bin|:/usr/bin ]]; then
+  export PATH="/usr/bin:$PATH"
+fi
+
 if [ -d "/usr/local/bin" ] ; then
   export PATH="/usr/local/bin:$PATH"
 fi
@@ -31,4 +39,7 @@ if [ -d "/usr/local/opt/python/libexec/bin" ]; then
   export PATH="/usr/local/opt/python/libexec/bin;${PATH}"
 fi
 
-eval "$(direnv hook bash)"
+which direnv
+if [ $? -eq 0 ]; then
+  eval "$(direnv hook bash)"
+fi
