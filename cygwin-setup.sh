@@ -19,6 +19,17 @@ make install
 popd
 rm -fr $BYOBU_MAKEDIR
 
+# install pip
+curl -L -s https://bootstrap.pypa.io/get-pip.py | python
+
+# install powerline fonts
+pip install --user powerline-status
+git clone https://github.com/powerline/fonts.git --depth=1
+cd fonts
+./install.ps1
+cd ..
+rm -fr fonts
+
 # setup fish
 curl -L https://get.oh-my.fish > omf-install.fish
 fish omf-install.fish --noninteractive

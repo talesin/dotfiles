@@ -7,9 +7,14 @@
 
 ## Cygwin
 
+- Ensure you can run PowerShell scripts, run the following as administrator if you can't:
+    - `set-executionpolicy unrestricted`
 - Install [Cygwin](https://www.cygwin.com/setup-x86_64.exe)
+- Install [ConEmu](https://www.fosshub.com/ConEmu.html)
+    - Choose CygWin bash as your shell
 - From a Cygwin shell run:
     - `curl -s https://raw.githubusercontent.com/talesin/dotfiles/cygwin-setup.sh | bash`
+- Open the ConEmu settings and choose a powerline font
 
 ## Windows Subsystem for Linux
 
@@ -26,3 +31,5 @@
 - [Oh My Fish](https://github.com/oh-my-fish/oh-my-fish)
 - [Powerline fonts](https://github.com/powerline/fonts)
 - [Cygwin](https://www.cygwin.com)
+- [ConEmu](https://conemu.github.io)
+- [PowerShell](https://docs.microsoft.com/en-us/powershell)
