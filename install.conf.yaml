@@ -8,6 +8,9 @@
     ~/.bashrc:
         force: true
         path: bash/bashrc
+    ~/.bash_profile:
+        force: true
+        path: bash/bash_profile
     ~/.byobu:
         force: true
         path: byobu/
@@ -24,7 +27,6 @@
     ~/.profile:
         force: true
         path: profile
-    ~/.bash_profile: bash/bash_profile
     ~/.config/fish:
         force: true
         path: fish/

@@ -85,7 +85,9 @@ if [ -z $FISHENV ]
   set -U FISHENV 1
 end
 
-eval (direnv hook fish)
+if which direnv
+  eval (direnv hook fish)
+end
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
