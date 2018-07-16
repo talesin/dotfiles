@@ -3,8 +3,11 @@
 pushd $TEMP
 
 # install cygwin packages
-curl -L -o setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
-./setup-x86_64.exe -q -W --packages=bash,vim,git,fish,python,tmux,make,lynx,wget
+if ! [ -e setup-x86_64.exe ]; then
+    curl -L -o setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
+    chmod +x setup-x86_64.exe
+    ./setup-x86_64.exe -q -W --packages=bash,vim,git,fish,python,tmux,make,lynx,wget
+fi
 
 # install byobu
 BYOBU_VERSION=5.125
@@ -26,7 +29,7 @@ curl -L -s https://bootstrap.pypa.io/get-pip.py | python
 pip install --user powerline-status
 git clone https://github.com/powerline/fonts.git --depth=1
 cd fonts
-./install.ps1
+powershell -File install.ps1
 cd ..
 rm -fr fonts
 
