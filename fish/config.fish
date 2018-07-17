@@ -5,6 +5,11 @@ fish_vi_key_bindings
 
 test -e {$HOME}/.iterm2_shell_integration.endsh ; and source {$HOME}/.iterm2_shell_integration.endsh
 
+if [ -z $LANG ]
+  set -U LANG en_US.UTF-8
+  set -U LC_CTYPE en_US.UTF-8
+end
+
 function append-path
   set dir $argv
   if not contains $dir $PATH
@@ -24,7 +29,7 @@ function prepend-path
 end
 
 function whch
-  which $argv > /dev/null
+  which $argv > /dev/null 2> /dev/null
 end
 
 alias cls=clear
@@ -85,7 +90,7 @@ if [ -z $FISHENV ]
   set -U FISHENV 1
 end
 
-if which direnv
+if whch direnv
   eval (direnv hook fish)
 end
 
