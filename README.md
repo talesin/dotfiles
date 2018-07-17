@@ -7,8 +7,9 @@
 
 ## Cygwin
 
-- Ensure you can run PowerShell scripts, run the following as administrator if you can't:
-    - `set-executionpolicy unrestricted`
+- Ensure you can run PowerShell scripts
+    - Run the following as administrator if you can't: `set-executionpolicy unrestricted`
+    - And check that you have the latest version by running `host` at the prompt checking if you need to [upgrade](https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell)
 - Install [Cygwin](https://www.cygwin.com/setup-x86_64.exe)
 - Install [ConEmu](https://www.fosshub.com/ConEmu.html)
     - Choose CygWin bash as your shell

@@ -8,6 +8,9 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+export LANG=en_US.UTF-8    
+export LC_CTYPE=en_US.UTF-8
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
@@ -57,4 +60,4 @@ fi
 
 
 launchctl setenv PATH $PATH
-_byobu_sourced=1 . /usr/local/Cellar/byobu/5.125/bin/byobu-launch 2>/dev/null || true
+_byobu_sourced=1 . /usr/local/bin/byobu-launch 2>/dev/null || true
