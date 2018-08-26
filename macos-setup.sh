@@ -43,7 +43,7 @@ grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
-#chsh -s /usr/local/bin/fish
+chsh -s /usr/local/bin/fish
 
 # setup powershell
 mkdir ~/.config/powershell/
@@ -54,7 +54,7 @@ grep -sq pwsh /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
 fi
-chsh -s /usr/local/bin/pwsh
+# chsh -s /usr/local/bin/pwsh
 
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then
