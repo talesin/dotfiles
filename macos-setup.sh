@@ -13,10 +13,13 @@ fi
 which brew > /dev/null
 if [ $? -eq 1 ]; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-else
-    brew update
 fi
+
+brew update-reset
+brew tap
+brew update
 brew install coreutils git python direnv byobu vim fish
+brew cask install powershell
 
 # enable direnv
 direnv allow
@@ -40,7 +43,18 @@ grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
-chsh -s /usr/local/bin/fish
+#chsh -s /usr/local/bin/fish
+
+# setup powershell
+mkdir ~/.config/powershell/
+pwsh -c { Install-Module posh-git -Scope CurrentUser }
+pwsh -c { Install-Module oh-my-posh -Scope CurrentUser }
+pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force }
+grep -sq pwsh /etc/shells
+if [ $? -eq 1 ]; then
+    sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
+fi
+chsh -s /usr/local/bin/pwsh
 
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then
