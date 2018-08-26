@@ -34,6 +34,9 @@
         force: true
         path: fish/omf/
     ~/.envrc: envrc
+    ~/.config/powershell/Microsoft.PowerShell_profile.ps1:
+        force: true
+        path: Microsoft.PowerShell_profile.ps1
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
