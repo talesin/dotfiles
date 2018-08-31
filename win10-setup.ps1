@@ -7,6 +7,8 @@ choco install conemu
 choco install git.install
 choco install powershell-core --pre
 
+$pwsh = dir 'C:\Program Files\PowerShell\*\pwsh.exe' | sort -Property LastWriteTime -Descending | %{ $_.FullName } | select -First 1
+
 # install powerline fonts
 pushd $env:TEMP
 git clone https://github.com/powerline/fonts.git
@@ -16,6 +18,6 @@ cd ..
 del -recurse -force fonts
 popd
 
-pwsh -c { Install-Module posh-git -Scope CurrentUser }
-pwsh -c { Install-Module oh-my-posh -Scope CurrentUser }
-pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force }
+& $pwsh -c { Install-Module posh-git -Scope AllUsers }
+& $pwsh -c { Install-Module oh-my-posh -Scope AllUSers }
+& $pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }

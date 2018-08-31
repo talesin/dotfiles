@@ -51,5 +51,5 @@ if ($isNix) {
 }
 
 elseif ($isWin) {
-    apend-path "C:\Program Files\Git\bin"
+    append-path "C:\Program Files\Git\bin"
 }
