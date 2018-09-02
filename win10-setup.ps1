@@ -3,17 +3,18 @@
 Set-ExecutionPolicy Bypass -Scope Process -Force
 iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-choco install conemu
-choco install git.install
-choco install powershell-core --pre
+choco install -y conemu
+choco install -y git.install
+choco install -y powershell-core --pre
 
+$git = dir 'C:\Program Files\Git\bin\git.exe'
 $pwsh = dir 'C:\Program Files\PowerShell\*\pwsh.exe' | sort -Property LastWriteTime -Descending | %{ $_.FullName } | select -First 1
 
 # install powerline fonts
 pushd $env:TEMP
-git clone https://github.com/powerline/fonts.git
+& $git clone https://github.com/powerline/fonts.git
 cd fonts
-pswh -File .\install.ps1
+.\install.ps1
 cd ..
 del -recurse -force fonts
 popd
