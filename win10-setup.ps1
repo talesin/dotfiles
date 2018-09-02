@@ -1,7 +1,7 @@
 
 # install chocolately - https://chocolatey.org/docs/installation
 Set-ExecutionPolicy Bypass -Scope Process -Force
-iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+powershell -c { Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) }
 
 choco install -y conemu
 choco install -y git.install
