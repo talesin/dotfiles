@@ -52,4 +52,5 @@ if ($isNix) {
 
 elseif ($isWin) {
     append-path "C:\Program Files\Git\bin"
+    append-path (dir 'C:\Program Files\PowerShell\*\pwsh.exe' | sort -Property LastWriteTime -Descending | %{ $_.DirectoryName } | select -First 1)
 }
