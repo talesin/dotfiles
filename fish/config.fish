@@ -94,6 +94,15 @@ if whch direnv
   eval (direnv hook fish)
 end
 
+if [ -z $SSH_AGENT_PID ]
+    set name /tmp/agent-(random).sh
+    ssh-agent > $name
+    chmod +x $name
+    bass source $name
+    rm -f $name
+end
+
+
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
 [ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
