@@ -94,13 +94,13 @@ if whch direnv
   eval (direnv hook fish)
 end
 
-if [ -z $SSH_AGENT_PID ]
-    set name /tmp/agent-(random).sh
-    ssh-agent > $name
-    chmod +x $name
-    bass source $name
-    rm -f $name
-end
+# if [ -z $SSH_AGENT_PID ]
+#     set name /tmp/agent-(random).sh
+#     ssh-agent > $name
+#     chmod +x $name
+#     bass source $name
+#     rm -f $name
+# end
 
 
 # tabtab source for serverless package
