@@ -76,7 +76,7 @@ if [ -z $FISHENV ]
   prepend-path "$HOME/.local/bin"
 
   append-path "/Applications/Xcode.app/Contents/Developer/usr/libexec/git-core"
-  append-path "/Applications/Xcode.app//Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+  append-path "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
   append-path "/usr/local/share/dotnet"
   append-path "/Library/Frameworks/Mono.framework/Versions/Current/bin"
 
