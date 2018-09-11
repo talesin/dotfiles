@@ -54,6 +54,8 @@ set -U VISUAL $EDITOR
 if [ -z $FISHENV ]
     set -U INITIAL_TERM_PROGRAM $TERM_PROGRAM
 
+    ssh-add
+
     if not test -d $HOME/.local/bin
         mkdir $HOME/.local/bin
     end
@@ -97,15 +99,6 @@ end
 if whch direnv
     eval (direnv hook fish)
 end
-
-# if [ -z $SSH_AGENT_PID ]
-#     set name /tmp/agent-(random).sh
-#     ssh-agent > $name
-#     chmod +x $name
-#     bass source $name
-#     rm -f $name
-# end
-
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
