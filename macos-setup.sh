@@ -7,6 +7,8 @@ if ! [ -d "/Applications/iTerm.app" ]; then
     curl -L -s -o iTerm.zip https://iterm2.com/downloads/stable/latest
     unzip iTerm.zip
     mv iTerm.app /Applications
+    
+    curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
 fi
 
 # install brew
@@ -18,7 +20,7 @@ fi
 brew update-reset
 brew tap
 brew update
-brew install coreutils git python direnv byobu vim fish
+brew install coreutils git python direnv byobu vim fish mosh
 brew cask install powershell
 
 # enable direnv
