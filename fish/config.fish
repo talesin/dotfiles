@@ -3,33 +3,34 @@
 
 fish_vi_key_bindings
 
-test -e {$HOME}/.iterm2_shell_integration.endsh ; and source {$HOME}/.iterm2_shell_integration.endsh
+test -e {$HOME}/.iterm2_shell_integration.endsh
+and source {$HOME}/.iterm2_shell_integration.endsh
 
 if [ -z $LANG ]
-  set -U LANG en_US.UTF-8
-  set -U LC_CTYPE en_US.UTF-8
+    set -U LANG en_US.UTF-8
+    set -U LC_CTYPE en_US.UTF-8
 end
 
 function append-path
-  set dir $argv
-  if not contains $dir $PATH
-    and test -d $dir
-    echo "Appending $dir"
-    set -U PATH $PATH $dir
-  end
+    set dir $argv
+    if not contains $dir $PATH
+        and test -d $dir
+        echo "Appending $dir"
+        set -U PATH $PATH $dir
+    end
 end
 
 function prepend-path
-  set dir $argv
-  if not contains $dir $PATH
-    and test -d $dir
-    echo "Prepending $dir"
-    set -U PATH $dir $PATH
-  end
+    set dir $argv
+    if not contains $dir $PATH
+        and test -d $dir
+        echo "Prepending $dir"
+        set -U PATH $dir $PATH
+    end
 end
 
 function whch
-  which $argv > /dev/null 2> /dev/null
+    which $argv >/dev/null 2>/dev/null
 end
 
 alias cls=clear
@@ -38,60 +39,63 @@ alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
 
 if whch nvim
-  alias vimdiff='nvim -d'
-  alias vim="nvim"
-  alias vi="nvim"
-  set -U EDITOR nvim
-  set -U VISUAL nvim
+    alias vimdiff='nvim -d'
+    alias vim="nvim"
+    alias vi="nvim"
+    set -U EDITOR nvim
+    set -U VISUAL nvim
 else
-  set -U EDITOR vim
-  set -U VISUAL vim
+    set -U EDITOR vim
+    set -U VISUAL vim
 end
 
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
-  if not test -d $HOME/.local/bin
-    mkdir $HOME/.local/bin
-  end
+    set -U INITIAL_TERM_PROGRAM $TERM_PROGRAM
 
-  set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
+    if not test -d $HOME/.local/bin
+        mkdir $HOME/.local/bin
+    end
 
-  if whch brew
-    set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
-    prepend-path $PYTHON_BIN
+    set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
 
-    set -U GROOVY_HOME (brew --prefix)/opt/groovy/libexec
-    prepend-path $GROOVY_HOME
-  end
+    if whch brew
+        set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
+        prepend-path $PYTHON_BIN
 
-
-  # if whch stack
-  #   set stack_path (stack path --bin-path 2>/dev/null)
-  #   export PATH=$stack_path
-  # end
-
-  prepend-path "/usr/local/sbin"
-  prepend-path "/usr/local/bin"
-  prepend-path "$HOME/.local/bin"
-
-  append-path "/Applications/Xcode.app/Contents/Developer/usr/libexec/git-core"
-  append-path "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
-  append-path "/usr/local/share/dotnet"
-  append-path "/Library/Frameworks/Mono.framework/Versions/Current/bin"
-
-  append-path "/bin"
-  append-path "/usr/bin"
-  append-path "/usr/sbin"
-  append-path "/sbin"
-  append-path "/opt/X11/bin"
+        set -U GROOVY_HOME (brew --prefix)/opt/groovy/libexec
+        prepend-path $GROOVY_HOME
+    end
 
 
-  set -U FISHENV 1
+    # if whch stack
+    #   set stack_path (stack path --bin-path 2>/dev/null)
+    #   export PATH=$stack_path
+    # end
+
+    prepend-path "/usr/local/sbin"
+    prepend-path "/usr/local/bin"
+    prepend-path "$HOME/.local/bin"
+
+    append-path "/Applications/Xcode.app/Contents/Developer/usr/libexec/git-core"
+    append-path "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+    append-path "/usr/local/share/dotnet"
+    append-path "/Library/Frameworks/Mono.framwork/Versions/Current/bin"
+
+    append-path "/bin"
+    append-path "/usr/bin"
+    append-path "/usr/sbin"
+    append-path "/sbin"
+    append-path "/opt/X11/bin"
+
+    set -U FISHENV 1
+else
+    set -U FISHENV (math $FISHENV + 1)
 end
 
 if whch direnv
-  eval (direnv hook fish)
+    eval (direnv hook fish)
 end
 
 # if [ -z $SSH_AGENT_PID ]
@@ -105,7 +109,15 @@ end
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
+[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]
+and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
-[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish ]; and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish
+[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish ]
+and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish
+
+if [ $TERM_PROGRAM != "Apple_Terminal" ]
+    status --is-login; and status --is-interactive; and exec byobu-launcher
+end
+
+# echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"

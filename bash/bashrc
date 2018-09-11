@@ -20,7 +20,6 @@ if [ -d "/usr/local/bin" ] ; then
   export PATH="/usr/local/bin:$PATH"
 fi
 
-# set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
   export PATH="$HOME/bin:$PATH"
 fi
@@ -39,19 +38,11 @@ if [ -d "/usr/local/share/dotnet" ]; then
    export PATH="${PATH}:/usr/local/share/dotnet"
 fi
 
-if [ -z "$GROOVY_HOME" ] && [ -e /usr/local/opt/groovy/libexec ]; then
-  export GROOVY_HOME=/usr/local/opt/groovy/libexec
-fi
-
 if [ -d "/usr/local/opt/python/libexec/bin" ]; then
-  export PATH="/usr/local/oPpt/python/libexec/bin;${PATH}"
+  export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
 fi
 
 which direnv > /dev/null
 if [ $? -eq 0 ]; then
   eval "$(direnv hook bash)"
 fi
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
