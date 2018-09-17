@@ -13,6 +13,9 @@ echo Profile
 export LANG=en_US.UTF-8    
 export LC_CTYPE=en_US.UTF-8
 
+export LSCOLORS=gxfxcxdxbxegedabagacad
+export LS_COLORS=di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists

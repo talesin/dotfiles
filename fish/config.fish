@@ -42,17 +42,19 @@ if whch nvim
     alias vimdiff='nvim -d'
     alias vim="nvim"
     alias vi="nvim"
-    set -U EDITOR nvim
-    set -U VISUAL nvim
+    set -Ux EDITOR nvim
+    set -Ux VISUAL nvim
 else
-    set -U EDITOR vim
-    set -U VISUAL vim
+    set -Ux EDITOR vim
+    set -Ux VISUAL vim
 end
 
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
-    set -U INITIAL_TERM_PROGRAM $TERM_PROGRAM
+    set -Ux INITIAL_TERM_PROGRAM $TERM_PROGRAM
+    set -Ux LSCOLORS gxfxcxdxbxegedabagacad
+    set -Ux LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 
     ssh-add
 
@@ -63,18 +65,18 @@ if [ -z $FISHENV ]
     set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
 
     if whch brew
-        set -U PYTHON_BIN (brew --prefix)/opt/python/libexec/bin
+        set BREW_PREFIX (brew --prefix)
+        set -Ux PYTHON_BIN $BREW_PREFIX/opt/python/libexec/bin
         prepend-path $PYTHON_BIN
 
-        set -U GROOVY_HOME (brew --prefix)/opt/groovy/libexec
+        set -Ux GROOVY_HOME $BREW_PREFIX/opt/groovy/libexec
         prepend-path $GROOVY_HOME
     end
 
 
-    # if whch stack
-    #   set stack_path (stack path --bin-path 2>/dev/null)
-    #   export PATH=$stack_path
-    # end
+    if whch stack
+      append-path (stack path --bin-path 2>/dev/null)
+    end
 
     prepend-path "/usr/local/sbin"
     prepend-path "/usr/local/bin"
@@ -91,9 +93,9 @@ if [ -z $FISHENV ]
     append-path "/sbin"
     append-path "/opt/X11/bin"
 
-    set -U FISHENV 1
+    set -Ux FISHENV 1
 else
-    set -U FISHENV (math $FISHENV + 1)
+    set -Ux FISHENV (math $FISHENV + 1)
 end
 
 if whch direnv
