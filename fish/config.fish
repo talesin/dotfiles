@@ -103,17 +103,9 @@ if whch direnv
     eval (direnv hook fish)
 end
 
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]
-and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[ -f /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish ]
-and . /usr/local/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.fish
-
 if [ $TERM_PROGRAM != "Apple_Terminal" ]
     status --is-login; and status --is-interactive; and exec byobu-launcher
 end
 
 # echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"
+
