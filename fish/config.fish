@@ -94,7 +94,6 @@ if [ -z $FISHENV ]
     append-path "/opt/X11/bin"
 
     set -Ux FISHENV 1
-    set -Ux BYOBU_PYTHON (which python3)
 else
     set -Ux FISHENV (math $FISHENV + 1)
 end
@@ -104,6 +103,7 @@ if whch direnv
 end
 
 if [ $TERM_PROGRAM != "Apple_Terminal" ]
+    set -Ux BYOBU_PYTHON (which python3)
     status --is-login; and status --is-interactive; and exec byobu-launcher
 end
 
