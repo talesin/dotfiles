@@ -3,8 +3,7 @@
 
 fish_vi_key_bindings
 
-test -e {$HOME}/.iterm2_shell_integration.endsh
-and source {$HOME}/.iterm2_shell_integration.endsh
+test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell_integration.fish
 
 if [ -z $LANG ]
     set -U LANG en_US.UTF-8

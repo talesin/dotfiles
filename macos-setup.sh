@@ -20,7 +20,7 @@ fi
 brew update-reset
 brew tap
 brew update
-brew install coreutils git python direnv byobu vim fish mosh
+brew install coreutils git python direnv byobu vim fish mosh nvm
 brew cask install powershell
 
 # enable direnv
