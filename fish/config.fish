@@ -101,7 +101,7 @@ if whch direnv
     eval (direnv hook fish)
 end
 
-if [ $TERM_PROGRAM != "Apple_Terminal" ]
+if [ $TERM_PROGRAM = $INITIAL_TERM_PROGRAM ]
     set -Ux BYOBU_PYTHON (which python3)
     status --is-login; and status --is-interactive; and exec byobu-launcher
 end
