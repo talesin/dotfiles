@@ -20,7 +20,7 @@ fi
 brew update-reset
 brew tap
 brew update
-brew install coreutils git python direnv byobu vim fish mosh nvm
+brew install coreutils git python direnv byobu vim fish mosh
 brew cask install powershell
 
 # enable direnv
@@ -35,17 +35,22 @@ cd fonts
 cd ..
 rm -fr fonts
 
+
 # setup fish
 curl -s -L https://get.oh-my.fish > omf-install.fish
 fish omf-install.fish --noninteractive
 rm omf-install.fish
 fish -c omf theme install agnoster
 fish -c omf theme agnoster
+fish -c omf install bass
 grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
 chsh -s /usr/local/bin/fish
+
+# install nvm
+curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 
 # setup powershell
 mkdir ~/.config/powershell/
