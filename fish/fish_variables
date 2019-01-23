@@ -1,0 +1,38 @@
+# This file contains fish universal variable definitions.
+# VERSION: 3.0
+SETUVAR --export EDITOR:vim
+SETUVAR --export FISHENV:15
+SETUVAR --export GROOVY_HOME:/usr/local/opt/groovy/libexec
+SETUVAR --export INITIAL_TERM_PROGRAM:iTerm\x2eapp
+SETUVAR --export LSCOLORS:gxfxcxdxbxegedabagacad
+SETUVAR --export LS_COLORS:di\x3d36\x3aln\x3d35\x3aso\x3d32\x3api\x3d33\x3aex\x3d31\x3abd\x3d34\x3b46\x3acd\x3d34\x3b43\x3asu\x3d30\x3b41\x3asg\x3d30\x3b46\x3atw\x3d30\x3b42\x3aow\x3d30\x3b43
+SETUVAR --path PATH:/Users/mbirman/\x2elocal/bin\x1e/usr/local/bin\x1e/usr/bin\x1e/bin\x1e/usr/sbin\x1e/sbin
+SETUVAR --export PYTHON_BIN:/usr/local/opt/python/libexec/bin
+SETUVAR --export VISUAL:vim
+SETUVAR __fish_init_2_3_0:\x1d
+SETUVAR __fish_init_3_x:\x1d
+SETUVAR fish_color_autosuggestion:555\x1ebrblack
+SETUVAR fish_color_cancel:\x2dr
+SETUVAR fish_color_command:b2cff3
+SETUVAR fish_color_comment:990000
+SETUVAR fish_color_cwd:green
+SETUVAR fish_color_cwd_root:red
+SETUVAR fish_color_end:009900
+SETUVAR fish_color_error:ff0000
+SETUVAR fish_color_escape:00a6b2
+SETUVAR fish_color_history_current:\x2d\x2dbold
+SETUVAR fish_color_host:normal
+SETUVAR fish_color_match:\x2d\x2dbackground\x3dbrblue
+SETUVAR fish_color_normal:normal
+SETUVAR fish_color_operator:00a6b2
+SETUVAR fish_color_param:00afff
+SETUVAR fish_color_quote:999900
+SETUVAR fish_color_redirection:00afff
+SETUVAR fish_color_search_match:bryellow\x1e\x2d\x2dbackground\x3dbrblack
+SETUVAR fish_color_selection:white\x1e\x2d\x2dbold\x1e\x2d\x2dbackground\x3dbrblack
+SETUVAR fish_color_user:brgreen
+SETUVAR fish_color_valid_path:\x2d\x2dunderline
+SETUVAR fish_greeting:Welcome\x20to\x20fish\x2c\x20the\x20friendly\x20interactive\x20shell
+SETUVAR fish_pager_color_description:B3A06D\x1eyellow
+SETUVAR fish_pager_color_prefix:white\x1e\x2d\x2dbold\x1e\x2d\x2dunderline
+SETUVAR fish_pager_color_progress:brwhite\x1e\x2d\x2dbackground\x3dcyan

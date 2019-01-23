@@ -63,6 +63,7 @@ if [ -z "$SSH_AGENT_PID" ]; then
     eval `ssh-agent`
 fi
 
+export BYOBU_PYTHON=/usr/local/bin/python3
 
 launchctl setenv PATH $PATH
 _byobu_sourced=1 . /usr/local/Cellar/byobu/5.125/bin/byobu-launch 2>/dev/null || true

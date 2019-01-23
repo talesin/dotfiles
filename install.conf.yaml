@@ -2,8 +2,6 @@
 
 - link:
     ~/.vim: SpaceVim/
-    ~/.SpaceVim: SpaceVim/
-    ~/.SpaceVim.d: SpaceVim.d/
     ~/.vimrc: vimrc
     ~/.bashrc:
         force: true
@@ -15,7 +13,6 @@
         force: true
         path: byobu/
     ~/.gitconfig: gitconfig
-    ~/.spacemacs: spacemacs
     ~/.emacs.d: emacs/
     ~/.zprezto: zsh/prezto
     ~/.zlogin: zsh/zlogin
@@ -34,12 +31,6 @@
         force: true
         path: fish/omf/
     ~/.envrc: envrc
-    ~/.config/powershell/Microsoft.PowerShell_profile.ps1:
-        force: true
-        create: true
-        path: Microsoft.PowerShell_profile.ps1
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
-    - [ln -fh Microsoft.PowerShell_profile.ps1 $HOME/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1, Linking PowerShell Profile]
-    - [ln -fh Microsoft.PowerShell_profile.ps1 $HOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1, Linking PowerShell Profile]

@@ -21,10 +21,10 @@ brew update-reset
 brew tap
 brew update
 brew install coreutils git python direnv byobu vim fish mosh
-brew cask install powershell
 
 # enable direnv
-direnv allow
+touch ~/.envrc
+direnv allow ~/.envrc
 
 # install powerline fonts
 PATH="/usr/local/opt/python/libexec/bin:${PATH}" pip install --user powerline-status
@@ -36,31 +36,22 @@ cd ..
 rm -fr fonts
 
 # setup fish
-curl -s -L https://get.oh-my.fish > omf-install.fish
-fish omf-install.fish --noninteractive
-rm omf-install.fish
-fish -c omf theme install agnoster
-fish -c omf theme agnoster
+if ! [ -d "/Users/mbirman/.local/share/omf" ]; then
+    curl -s -L https://get.oh-my.fish > omf-install.fish
+    fish omf-install.fish --noninteractive
+    rm omf-install.fish
+    fish -c omf theme install agnoster
+    fish -c omf theme agnoster
+fi
 grep -sq fish /etc/shells
 if [ $? -eq 1 ]; then
     sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
 fi
 chsh -s /usr/local/bin/fish
 
-# setup powershell
-mkdir ~/.config/powershell/
-pwsh -c { Install-Module posh-git -Scope AllUsers }
-pwsh -c { Install-Module oh-my-posh -Scope AllUsers }
-pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
-grep -sq pwsh /etc/shells
-if [ $? -eq 1 ]; then
-    sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
-fi
-# chsh -s /usr/local/bin/pwsh
-
 # install .dotfiles
 if ! [ -d "$HOME/.dotfiles" ]; then
-    git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
+    git clone --recurse-submodules . $HOME/.dotfiles
 fi
 pushd $HOME/.dotfiles
 ./install

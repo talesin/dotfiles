@@ -1,8 +1,7 @@
 [user]
-	name = Jeremy Clough
-	email = jclough@seek.com.au
+	name = Matt Birman
+	email = mbirman@zendesk.com
 [core]
-	excludesfile = /Users/jclough/.gitignore_global
 	autocrlf = input
 [difftool "kdiff3"]
 	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$LOCAL\" \"$REMOTE\"
@@ -27,11 +26,3 @@
 	trustExitCode = false
 [mergetool]
 	keepBackup = false
-[difftool "sourcetree"]
-	cmd = /Applications/p4merge.app/Contents/MacOS/p4merge \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/p4merge.app/Contents/MacOS/p4merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
-	trustExitCode = true
-[commit]
-	template = /Users/jclough/.stCommitMsg
