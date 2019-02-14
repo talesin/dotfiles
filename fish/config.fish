@@ -12,19 +12,19 @@ end
 
 function append-path
     set dir $argv
-    if not contains $dir $PATH
+    if not contains $dir $fish_user_paths
         and test -d $dir
         echo "Appending $dir"
-        set -U PATH $PATH $dir
+        set -U fish_user_paths $fish_user_paths $dir
     end
 end
 
 function prepend-path
     set dir $argv
-    if not contains $dir $PATH
+    if not contains $dir $fish_user_paths
         and test -d $dir
         echo "Prepending $dir"
-        set -U PATH $dir $PATH
+        set -U fish_user_paths $dir $fish_user_paths
     end
 end
 
@@ -51,9 +51,9 @@ end
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
-    set -Ux INITIAL_TERM_PROGRAM $TERM_PROGRAM
-    set -Ux LSCOLORS gxfxcxdxbxegedabagacad
-    set -Ux LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+    set -gx INITIAL_TERM_PROGRAM $TERM_PROGRAM
+    set -gx LSCOLORS gxfxcxdxbxegedabagacad
+    set -gx LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 
     ssh-add
 
@@ -61,14 +61,16 @@ if [ -z $FISHENV ]
         mkdir $HOME/.local/bin
     end
 
-    set -U PATH $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
+    set -gx PATH
+    set -Ux PATH
+    set -U fish_user_paths $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin
 
     if whch brew
         set BREW_PREFIX (brew --prefix)
-        set -Ux PYTHON_BIN $BREW_PREFIX/opt/python/libexec/bin
+        set -gx PYTHON_BIN $BREW_PREFIX/opt/python/libexec/bin
         prepend-path $PYTHON_BIN
 
-        set -Ux GROOVY_HOME $BREW_PREFIX/opt/groovy/libexec
+        set -gx GROOVY_HOME $BREW_PREFIX/opt/groovy/libexec
         prepend-path $GROOVY_HOME
     end
 
@@ -103,7 +105,7 @@ if whch direnv
 end
 
 if [ $TERM_PROGRAM = $INITIAL_TERM_PROGRAM ]
-    set -Ux BYOBU_PYTHON (which python3)
+    set -U BYOBU_PYTHON (which python3)
     status --is-login; and status --is-interactive; and exec byobu-launcher
 end
 
