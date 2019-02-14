@@ -77,6 +77,7 @@ if [ -z $FISHENV ]
       append-path (stack path --bin-path 2>/dev/null)
     end
 
+    prepend-path "/usr/local/opt/make/libexec/gnubin"
     prepend-path "/usr/local/sbin"
     prepend-path "/usr/local/bin"
     prepend-path "$HOME/.local/bin"

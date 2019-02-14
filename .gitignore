@@ -3,3 +3,4 @@ byobu/.ssh-agent
 fish/fishd.*
 *.un~
 SpaceVim.d/.netrwhist
+fish/fish_variables
