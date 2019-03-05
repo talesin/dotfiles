@@ -1,59 +1,63 @@
-echo "Executing $0"
+if [ -z "$BASH_ENV" ]; then
+  echo "Executing $0"
 
-export PS1=" \[\e[00;34m\]λ \W \[\e[0m\]"
-alias ls="'/bin/ls' -G"
+  export PS1=" \[\e[00;34m\]λ \W \[\e[0m\]"
+  alias ls="'/bin/ls' -G"
 
-if [ -z "$LSCOLORS" ]; then
-  export LSCOLORS=gxfxcxdxbxegedabagacad
-  export LS_COLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+  if [ -z "$LSCOLORS" ]; then
+    export LSCOLORS=gxfxcxdxbxegedabagacad
+    export LS_COLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+  fi
+
+  if [ -z "$LANG" ]; then
+    export LANG=en_US.UTF-8
+    export LC_CTYPE=en_US.UTF-8
+  fi
+
+  if ! [[ "$PATH" =~ ^/bin|:/bin ]]; then
+    export PATH="/bin:$PATH"
+  fi
+
+  if ! [[ "$PATH" =~ ^/usr/bin|:/usr/bin ]]; then
+    export PATH="/usr/bin:$PATH"
+  fi
+
+  if [ -d "/usr/local/bin" ] ; then
+    export PATH="/usr/local/bin:$PATH"
+  fi
+
+  if [ -d "$HOME/bin" ] ; then
+    export PATH="$HOME/bin:$PATH"
+  fi
+
+  if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+    export SCALA_HOME="/usr/local/share/scala"
+    export PATH="$PATH:$SCALA_HOME/bin"
+  fi
+
+  which stack >/dev/null
+  if [ $? -eq 0 ]; then
+    export PATH=`stack path --bin-path 2>/dev/null`
+  fi
+
+  if [ -d "/usr/local/share/dotnet" ]; then
+    export PATH="${PATH}:/usr/local/share/dotnet"
+  fi
+
+  if [ -d "/usr/local/opt/python/libexec/bin" ]; then
+    export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
+  fi
+
+  which direnv > /dev/null
+  if [ $? -eq 0 ]; then
+    eval "$(direnv hook bash)"
+  fi
+
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+  PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+
+  export BASH_ENV=1
 fi
-
-if [ -z "$LANG" ]; then
-  export LANG=en_US.UTF-8
-  export LC_CTYPE=en_US.UTF-8
-fi
-
-if ! [[ "$PATH" =~ ^/bin|:/bin ]]; then
-  export PATH="/bin:$PATH"
-fi
-
-if ! [[ "$PATH" =~ ^/usr/bin|:/usr/bin ]]; then
-  export PATH="/usr/bin:$PATH"
-fi
-
-if [ -d "/usr/local/bin" ] ; then
-  export PATH="/usr/local/bin:$PATH"
-fi
-
-if [ -d "$HOME/bin" ] ; then
-  export PATH="$HOME/bin:$PATH"
-fi
-
-if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
-  export SCALA_HOME="/usr/local/share/scala"
-  export PATH="$PATH:$SCALA_HOME/bin"
-fi
-
-which stack >/dev/null
-if [ $? -eq 0 ]; then
-  export PATH=`stack path --bin-path 2>/dev/null`
-fi
-
-if [ -d "/usr/local/share/dotnet" ]; then
-   export PATH="${PATH}:/usr/local/share/dotnet"
-fi
-
-if [ -d "/usr/local/opt/python/libexec/bin" ]; then
-  export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
-fi
-
-which direnv > /dev/null
-if [ $? -eq 0 ]; then
-  eval "$(direnv hook bash)"
-fi
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
