@@ -104,7 +104,7 @@ if whch direnv
     eval (direnv hook fish)
 end
 
-if [ $TERM_PROGRAM = $INITIAL_TERM_PROGRAM ]
+if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ]
     set -U BYOBU_PYTHON (which python3)
     status --is-login; and status --is-interactive; and exec byobu-launcher
 end
