@@ -17,59 +17,32 @@ if [ $? -eq 1 ]; then
     ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-brew update-reset
-brew tap
 brew update
-brew install coreutils git python direnv byobu vim fish mosh
-brew cask install powershell
+brew bundle
+brew cleanup
 
 # enable direnv
 direnv allow
 
 # install powerline fonts
-PATH="/usr/local/opt/python/libexec/bin:${PATH}" pip install --user powerline-status
+./setup-fonts.sh
 
-git clone https://github.com/powerline/fonts.git --depth=1
-cd fonts
-./install.sh
-cd ..
-rm -fr fonts
-
+# setup bash
+./setup-bash.sh
 
 # setup fish
-curl -s -L https://get.oh-my.fish > omf-install.fish
-fish omf-install.fish --noninteractive
-rm omf-install.fish
-fish -c omf theme install agnoster
-fish -c omf theme agnoster
-fish -c omf install bass
-grep -sq fish /etc/shells
-if [ $? -eq 1 ]; then
-    sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
-fi
+./setup-fish.sh
 chsh -s /usr/local/bin/fish
 
 # install nvm
-curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
 # setup powershell
-mkdir ~/.config/powershell/
-pwsh -c { Install-Module posh-git -Scope AllUsers }
-pwsh -c { Install-Module oh-my-posh -Scope AllUsers }
-pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
-grep -sq pwsh /etc/shells
-if [ $? -eq 1 ]; then
-    sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
-fi
+./setup-pwsh.sh
 # chsh -s /usr/local/bin/pwsh
 
 # install .dotfiles
-if ! [ -d "$HOME/.dotfiles" ]; then
-    git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
-fi
-pushd $HOME/.dotfiles
-./install
-popd
+./setup-dotfiles.sh
 
 # setup byobu
 /usr/local/bin/byobu-enable

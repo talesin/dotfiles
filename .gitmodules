@@ -10,3 +10,6 @@
 [submodule "SpaceVim"]
 	path = SpaceVim
 	url = https://github.com/SpaceVim/SpaceVim.git
+[submodule "bash/oh-my-bash"]
+	path = bash/oh-my-bash
+	url = https://github.com/ohmybash/oh-my-bash.git
