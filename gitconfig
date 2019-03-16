@@ -1,5 +1,5 @@
 [core]
-	excludesfile = /Users/jclough/.gitignore_global
+	excludesfile = $HOME/.gitignore_global
 	autocrlf = input
 	safecrlf = false
 [difftool "kdiff3"]
