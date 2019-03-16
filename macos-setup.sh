@@ -69,6 +69,10 @@ function setup-powershell() {
     # chsh -s /usr/local/bin/pwsh
 }
 
+function install-spacevim() {
+    curl -sLf https://spacevim.org/install.sh | bash
+}
+
 function install-dotfiles() {
     if ! [ -d "$HOME/.dotfiles" ]; then
         git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
@@ -78,12 +82,14 @@ function install-dotfiles() {
     popd
 }
 
+
 pushd $DIR
 
 install-brew
 install-apps
 install-powerline
 install-nvm
+install-spacevim
 
 setup-bash
 setup-fish
