@@ -9,7 +9,7 @@ function install-brew() {
 }
 
 function install-apps {
-    if [ -f Brewfile ]; then
+    if ! [ -f Brewfile ]; then
         curl -s 'https://raw.githubusercontent.com/talesin/dotfiles/bash-tweaks/Brewfile' -o Brewfile
     fi
 
