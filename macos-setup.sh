@@ -25,26 +25,55 @@ brew cleanup
 direnv allow
 
 # install powerline fonts
-./setup-fonts.sh
+PATH="/usr/local/opt/python/libexec/bin:${PATH}" pip install --user powerline-status
+
+git clone https://github.com/powerline/fonts.git --depth=1
+cd fonts
+./install.sh
+cd ..
+rm -fr fonts
+
 
 # setup bash
-./setup-bash.sh
+curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash
 
 # setup fish
-./setup-fish.sh
+curl -s -L https://get.oh-my.fish > omf-install.fish
+fish omf-install.fish --noninteractive
+rm omf-install.fish
+fish -c omf theme install agnoster
+fish -c omf theme agnoster
+fish -c omf install bass
+grep -sq fish /etc/shells
+if [ $? -eq 1 ]; then
+    sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
+fi
 chsh -s /usr/local/bin/fish
 
 # install nvm
 curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
 # setup powershell
-./setup-pwsh.sh
+mkdir ~/.config/powershell/
+pwsh -c { Install-Module posh-git -Scope AllUsers }
+pwsh -c { Install-Module oh-my-posh -Scope AllUsers }
+pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
+grep -sq pwsh /etc/shells
+if [ $? -eq 1 ]; then
+    sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
+fi
 # chsh -s /usr/local/bin/pwsh
 
 # install .dotfiles
-./setup-dotfiles.sh
+if ! [ -d "$HOME/.dotfiles" ]; then
+    git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
+fi
+pushd $HOME/.dotfiles
+./install
+popd
+
 
 # setup byobu
-/usr/local/bin/byobu-enable
+#/usr/local/bin/byobu-enable
 
 popd
