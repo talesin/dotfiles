@@ -7,24 +7,12 @@
 - clean: ['~']
 
 - link:
-    ~/.vim: SpaceVim/
-    ~/.SpaceVim: SpaceVim/
-    ~/.SpaceVim.d: SpaceVim.d/
     ~/.vimrc: vimrc
     ~/.bashrc: bash/bashrc
     ~/.bash_profile: bash/bash_profile
     ~/.oh-my-bash: bash/oh-my-bash/
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
-    ~/.spacemacs: spacemacs
-    ~/.emacs.d: emacs/
-    ~/.zprezto: zsh/prezto
-    ~/.zlogin: zsh/zlogin
-    ~/.zlogout: zsh/zlogout
-    ~/.zpreztorc: zsh/zpreztorc
-    ~/.zprofile: zsh/zprofile
-    ~/.zshenv: zsh/zshenv
-    ~/.zshrc: zsh/zshrc
     ~/.profile: profile
     ~/.config/fish: fish/
     ~/.config/omf: fish/omf/
