@@ -1,3 +1,9 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+      force: true
+
 - clean: ['~']
 
 - link:
@@ -5,15 +11,10 @@
     ~/.SpaceVim: SpaceVim/
     ~/.SpaceVim.d: SpaceVim.d/
     ~/.vimrc: vimrc
-    ~/.bashrc:
-        force: true
-        path: bash/bashrc
-    ~/.bash_profile:
-        force: true
-        path: bash/bash_profile
-    ~/.byobu:
-        force: true
-        path: byobu/
+    ~/.bashrc: bash/bashrc
+    ~/.bash_profile: bash/bash_profile
+    ~/.oh-my-bash: bash/oh-my-bash/
+    ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
     ~/.spacemacs: spacemacs
     ~/.emacs.d: emacs/
@@ -24,20 +25,11 @@
     ~/.zprofile: zsh/zprofile
     ~/.zshenv: zsh/zshenv
     ~/.zshrc: zsh/zshrc
-    ~/.profile:
-        force: true
-        path: profile
-    ~/.config/fish:
-        force: true
-        path: fish/
-    ~/.config/omf:
-        force: true
-        path: fish/omf/
+    ~/.profile: profile
+    ~/.config/fish: fish/
+    ~/.config/omf: fish/omf/
     ~/.envrc: envrc
-    ~/.config/powershell/Microsoft.PowerShell_profile.ps1:
-        force: true
-        create: true
-        path: Microsoft.PowerShell_profile.ps1
+    ~/.config/powershell/Microsoft.PowerShell_profile.ps1: Microsoft.PowerShell_profile.ps1
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

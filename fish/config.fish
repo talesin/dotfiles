@@ -102,6 +102,7 @@ end
 
 if whch direnv
     eval (direnv hook fish)
+    set -Ux DIRENV_LOG_FORMAT ""
 end
 
 if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ]
