@@ -63,7 +63,9 @@ function install-nvm() {
 }
 
 function setup-powershell() {
-    mkdir ~/.config/powershell/
+    mkdir $HOME/.config/powershell/ 2>/dev/null
+    mkdir $HOME/Documents/WindowsPowerShell/ 2>/dev/null
+    mkdir $HOME/Documents/PowerShell/ 2>/dev/null
     pwsh -noprofile -c { Install-Module posh-git -Scope AllUsers }
     pwsh -noprofile -c { Install-Module oh-my-posh -Scope AllUsers }
     pwsh -noprofile -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
