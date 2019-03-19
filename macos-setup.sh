@@ -17,8 +17,6 @@ function install-apps {
     brew bundle
     brew cleanup
 
-    rm -f Brewfile
-
     # enable direnv
     direnv allow
 
