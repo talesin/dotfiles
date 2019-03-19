@@ -21,7 +21,7 @@ function install-apps {
     direnv allow
 
     # iterm2 shell integration
-    curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
+    curl -sL https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
 }
 
 # install powerline fonts
@@ -36,7 +36,12 @@ function install-powerline() {
 }
 
 function setup-bash() {
-    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash
+    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | /usr/local/bin/bash
+    grep -sq /usr/local/bin/bash /etc/shells
+    if [ $? -eq 1 ]; then
+        sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
+    fi
+    # chsh -s /usr/local/bin/bash
 }
 
 function setup-fish() {
@@ -58,10 +63,12 @@ function install-nvm() {
 }
 
 function setup-powershell() {
-    mkdir ~/.config/powershell/
-    pwsh -c { Install-Module posh-git -Scope AllUsers }
-    pwsh -c { Install-Module oh-my-posh -Scope AllUsers }
-    pwsh -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
+    mkdir $HOME/.config/powershell/ 2>/dev/null
+    mkdir $HOME/Documents/WindowsPowerShell/ 2>/dev/null
+    mkdir $HOME/Documents/PowerShell/ 2>/dev/null
+    pwsh -noprofile -c { Install-Module posh-git -Scope AllUsers }
+    pwsh -noprofile -c { Install-Module oh-my-posh -Scope AllUsers }
+    pwsh -noprofile -c { Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force }
     grep -sq pwsh /etc/shells
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"

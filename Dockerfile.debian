@@ -38,5 +38,3 @@ RUN mkdir -p $HOME/.local/share \
       && fish /tmp/install --path=$HOME/.local/share/omf --config=$HOME/.dotfiles/fish/omf --yes --verbose --noninteractive
 
 RUN direnv allow
-
-RUN byobu-enable
