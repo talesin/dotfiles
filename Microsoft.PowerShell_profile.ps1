@@ -1,3 +1,19 @@
+function module-installed($module) {
+    (Get-InstalledModule PSReadLine -ErrorAction SilentlyContinue).Count -eq 0 
+}
+
+if (module-installed posh-git) {
+    Install-Module -Name posh-git -AllowPrerelease -Scope AllUsers -Force
+}
+
+if (module-installed oh-my-posh) {
+    Install-Module -Name oh-my-posh -AllowPrerelease -Scope AllUsers -Force
+}
+
+if (module-installed PSReadLine) {
+    Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force
+}
+
 Import-Module posh-git
 Import-Module oh-my-posh
 Set-Theme Paradox
