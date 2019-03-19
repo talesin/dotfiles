@@ -21,7 +21,7 @@ function install-apps {
     direnv allow
 
     # iterm2 shell integration
-    curl -L https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
+    curl -sL https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
 }
 
 # install powerline fonts

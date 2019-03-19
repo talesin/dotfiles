@@ -1,14 +1,15 @@
 - defaults:
     link:
       create: true
-      relink: true
       force: true
 
 - clean: ['~']
 
 - link:
     ~/.vimrc: vimrc
-    ~/.bashrc: bash/bashrc
+    ~/.bashrc:
+        path: bash/bashrc
+        force: true
     ~/.bash_profile: bash/bash_profile
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
