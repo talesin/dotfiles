@@ -10,7 +10,6 @@
     ~/.vimrc: vimrc
     ~/.bashrc: bash/bashrc
     ~/.bash_profile: bash/bash_profile
-    ~/.oh-my-bash: bash/oh-my-bash/
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
     ~/.profile: profile

@@ -17,6 +17,8 @@ function install-apps {
     brew bundle
     brew cleanup
 
+    rm -f Brewfile
+
     # enable direnv
     direnv allow
 
@@ -36,7 +38,12 @@ function install-powerline() {
 }
 
 function setup-bash() {
-    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash
+    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | /usr/local/bin/bash
+    grep -sq /usr/local/bin/bash /etc/shells
+    if [ $? -eq 1 ]; then
+        sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
+    fi
+    # chsh -s /usr/local/bin/bash
 }
 
 function setup-fish() {
