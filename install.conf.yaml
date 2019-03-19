@@ -7,9 +7,7 @@
 
 - link:
     ~/.vimrc: vimrc
-    ~/.bashrc:
-        path: bash/bashrc
-        force: true
+    ~/.bashrc: bash/bashrc
     ~/.bash_profile: bash/bash_profile
     ~/.byobu: byobu/
     ~/.gitconfig: gitconfig
