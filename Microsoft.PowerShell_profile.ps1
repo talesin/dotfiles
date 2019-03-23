@@ -1,3 +1,7 @@
+if ($PSVersionTable.PSVersion.Major -lt 5.0) {
+    exit
+}
+
 function module-installed($module) {
     (Get-InstalledModule PSReadLine -ErrorAction SilentlyContinue).Count -eq 0 
 }
