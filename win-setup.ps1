@@ -53,6 +53,7 @@ function Install-Prerequisites() {
         shutdown /r /f
         Exit-PSSession
     }
+    
 }
 
 function Install-Apps() {
@@ -61,22 +62,28 @@ function Install-Apps() {
 
 function Install-Powerline() {
     # install powerline fonts
-    # & $git clone https://github.com/powerline/fonts.git
-    # cd fonts
-    # .\install.ps1
-    # cd ..
-    # del -recurse -force fonts
+    if ((dir C:\Windows\Fonts\*power*.ttf).Count -eq 0) {
+        & "C:\Program Files\Git\bin\git.exe" clone https://github.com/powerline/fonts.git
+        pushd "$env:TEMP\fonts"
+        .\install.ps1
+        popd
+        del -recurse -force "$env:TEMP\fonts"
+    }
 }
 
 
 function Setup-Powershell() {
-    Install-Module posh-git -Scope AllUsers -Confirm
-    Install-Module oh-my-posh -Scope AllUSers -Confirm
-    Install-Module PSReadLine -Scope AllUsers -Confirm
+    Set-PSRepository PSGallery -InstallationPolicy Trusted
+    # Install-PackageProvider -Name NuGet -Force
+    # Import-PackageProvider -Name NuGet
+    Install-Module -Name PackageManagement -SkipPublisherCheck -Force -AllowClobber
+    Install-Module -Name posh-git -Scope AllUsers -Force
+    Install-Module -Name oh-my-posh -Scope AllUSers -Force
+    Install-Module -Name PSReadLine -Scope AllUsers -Force -SkipPublisherCheck
 }
 
 function Setup-Bash() {
-    & "C:\Program Files\Git\bin\bash" -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
+    & "C:\Program Files\Git\bin\bash.exe" -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
 }
 
 pushd $env:TEMP

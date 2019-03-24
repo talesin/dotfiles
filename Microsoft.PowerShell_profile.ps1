@@ -2,25 +2,44 @@ if ($PSVersionTable.PSVersion.Major -lt 5.0) {
     exit
 }
 
-function module-installed($module) {
-    (Get-InstalledModule PSReadLine -ErrorAction SilentlyContinue).Count -eq 0 
+function Has-Module($module) {
+    (Get-InstalledModule $module -ErrorAction SilentlyContinue).Count -eq 0 
 }
 
-if (module-installed posh-git) {
-    Install-Module -Name posh-git -AllowPrerelease -Scope AllUsers -Force
+if (Has-Module PackageManagement) {
+    Install-Module -Name PackageManagement -SkipPublisherCheck -Force -AllowClobber
 }
 
-if (module-installed oh-my-posh) {
-    Install-Module -Name oh-my-posh -AllowPrerelease -Scope AllUsers -Force
+if (Has-Module posh-git) {
+    if ($PSVersionTable.PSVersion.Major -ge 6.0) {
+        Install-Module -Name posh-git -AllowPrerelease -Scope AllUsers -Force
+    }
+    else {
+        Install-Module -Name posh-git -Scope AllUsers -Force
+    }
 }
 
-if (module-installed PSReadLine) {
-    Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force
+if (Has-Module oh-my-posh) {
+    if ($PSVersionTable.PSVersion.Major -ge 6.0) {
+        Install-Module -Name oh-my-posh -AllowPrerelease -Scope AllUsers -Force
+    }
+    else {
+        Install-Module -Name oh-my-posh -Scope AllUsers -Force 
+    }
+}
+
+if (Has-Module PSReadLine) {
+    if ($PSVersionTable.PSVersion.Major -ge 6.0) {
+        Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force -SkipPublisherCheck
+    }
+    else {
+        Install-Module -Name PSReadLine -Scope AllUsers -Force -SkipPublisherCheck
+    }
 }
 
 Import-Module posh-git
 Import-Module oh-my-posh
-Set-Theme Paradox
+Import-Module PSReadLine
 
 $isWin = $IsWindows -or ($env:OS -ieq "Windows_NT")
 $isNix = $IsLinux -or $IsMacOS
@@ -74,3 +93,5 @@ elseif ($isWin) {
     append-path "C:\Program Files\Git\bin"
     append-path (dir 'C:\Program Files\PowerShell\*\pwsh.exe' | sort -Property LastWriteTime -Descending | %{ $_.DirectoryName } | select -First 1)
 }
+
+Set-Theme Agnoster
