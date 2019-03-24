@@ -1,5 +1,8 @@
 # Set-ExecutionPolicy Bypass -Scope Process -Force
 
+$bash = "C:\Program Files\Git\bin\bash.exe"
+$git = "C:\Program Files\Git\bin\git.exe"
+
 function Install-Updates {
     wuauclt.exe /updatenow
 }
@@ -17,13 +20,21 @@ function Install-Chocolatey() {
             Exit-PSSession
         }
     }
+    else {
+        choco upgrade -y chocolatey
+    }
 
     choco feature enable -name=exitOnRebootDetected
 }
 
 function Download-File($url, $path) {
     if (-not (Test-Path $path)) {
-        curl -s "$url" -o "$path"
+        if ((Get-Command curl -ErrorAction SilentlyContinue).CommandType -eq "Application") {
+            curl -s "$url" -o "$path"
+        }
+        else {
+            (New-Object System.Net.WebClient).DownloadFile($url, $path)
+        }
     }    
 }
 
@@ -38,7 +49,7 @@ function Install-Prerequisites() {
     if ($PSVersionTable.PSVersion.Major -lt 5.0) {
         choco upgrade -y curl 7zip
         $zip = 'C:\Program Files\7-Zip\7z.exe'
-
+        
         Download-File 'https://download.microsoft.com/download/E/2/1/E21644B5-2DF2-47C2-91BD-63C560427900/NDP452-KB2901907-x86-x64-AllOS-ENU.exe' "$env:TEMP\NDP452-KB2901907-x86-x64-AllOS-ENU.exe"
         Start-Process "$env:TEMP\NDP452-KB2901907-x86-x64-AllOS-ENU.exe" -Wait -ArgumentList "/passive"
 
@@ -62,31 +73,42 @@ function Install-Apps() {
 
 function Install-Powerline() {
     # install powerline fonts
-    if ((dir C:\Windows\Fonts\*power*.ttf).Count -eq 0) {
-        & "C:\Program Files\Git\bin\git.exe" clone https://github.com/powerline/fonts.git
-        pushd "$env:TEMP\fonts"
+    if ((Get-ChildItem C:\Windows\Fonts\*power*.ttf).Count -eq 0) {
+        & $git clone https://github.com/powerline/fonts.git
+        Push-Location "$env:TEMP\fonts"
         .\install.ps1
-        popd
-        del -recurse -force "$env:TEMP\fonts"
+        Pop-Location
+        Remove-Item -recurse -force "$env:TEMP\fonts"
     }
 }
 
 
 function Setup-Powershell() {
     Set-PSRepository PSGallery -InstallationPolicy Trusted
-    # Install-PackageProvider -Name NuGet -Force
-    # Import-PackageProvider -Name NuGet
+
+    if (($PSVersionTable.PSVersion.Major -eq 5) -and ((Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue).Count -eq 0)) {
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Import-PackageProvider -Name NuGet
+    }
+
     Install-Module -Name PackageManagement -SkipPublisherCheck -Force -AllowClobber
     Install-Module -Name posh-git -Scope AllUsers -Force
     Install-Module -Name oh-my-posh -Scope AllUSers -Force
     Install-Module -Name PSReadLine -Scope AllUsers -Force -SkipPublisherCheck
+
+    if (Test-Path $PROFILE) {
+        Remove-Item "$PROFILE.original" -ErrorAction SilentlyContinue
+        Rename-Item $PROFILE "$PROFILE.original"
+    }
+
+    Download-File "https://raw.githubusercontent.com/talesin/dotfiles/master/Microsoft.PowerShell_profile.ps1" $PROFILE
 }
 
 function Setup-Bash() {
-    & "C:\Program Files\Git\bin\bash.exe" -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
+    & $bash -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
 }
 
-pushd $env:TEMP
+Push-Location $env:TEMP
 
 Install-Updates
 Install-Chocolatey
@@ -96,4 +118,4 @@ Install-Powerline
 Setup-Powershell
 Setup-Bash
 
-popd
+Pop-Location

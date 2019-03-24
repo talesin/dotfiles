@@ -1,16 +1,20 @@
 if ($PSVersionTable.PSVersion.Major -lt 5.0) {
     exit
 }
+elseif (($PSVersionTable.PSVersion.Major -eq 5) -and ((Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue).Count -eq 0)) {
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Import-PackageProvider -Name NuGet
+}
 
-function Has-Module($module) {
+function No-Module($module) {
     (Get-InstalledModule $module -ErrorAction SilentlyContinue).Count -eq 0 
 }
 
-if (Has-Module PackageManagement) {
+if (No-Module PackageManagement) {
     Install-Module -Name PackageManagement -SkipPublisherCheck -Force -AllowClobber
 }
 
-if (Has-Module posh-git) {
+if (No-Module posh-git) {
     if ($PSVersionTable.PSVersion.Major -ge 6.0) {
         Install-Module -Name posh-git -AllowPrerelease -Scope AllUsers -Force
     }
@@ -19,7 +23,7 @@ if (Has-Module posh-git) {
     }
 }
 
-if (Has-Module oh-my-posh) {
+if (No-Module oh-my-posh) {
     if ($PSVersionTable.PSVersion.Major -ge 6.0) {
         Install-Module -Name oh-my-posh -AllowPrerelease -Scope AllUsers -Force
     }
@@ -28,7 +32,7 @@ if (Has-Module oh-my-posh) {
     }
 }
 
-if (Has-Module PSReadLine) {
+if (No-Module PSReadLine) {
     if ($PSVersionTable.PSVersion.Major -ge 6.0) {
         Install-Module -Name PSReadLine -AllowPrerelease -Scope AllUsers -Force -SkipPublisherCheck
     }
