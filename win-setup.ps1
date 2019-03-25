@@ -105,7 +105,7 @@ function Setup-Powershell() {
 }
 
 function Setup-Bash() {
-    & $bash -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
+    & $bash -c "$(curl -fsSL 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh')"
 }
 
 Push-Location $env:TEMP
