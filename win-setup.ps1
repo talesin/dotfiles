@@ -113,10 +113,9 @@ function Setup-Powershell() {
 }
 
 function Setup-Bash() {
-    & $bash -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
-    (Get-Content "$HOME\.bashrc") -replace 'OSH_THEME="font"', 'OSH_THEME="powerline"' > "$HOME\.bashrc"
     echo "Configuring bash"
     & $bash -c 'curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash'
+    (Get-Content "$HOME\.bashrc") -replace 'OSH_THEME="font"', 'OSH_THEME="powerline"' > "$HOME\.bashrc"
 }
 
 Push-Location $env:TEMP
