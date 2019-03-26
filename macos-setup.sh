@@ -58,6 +58,10 @@ function setup-fish() {
     # chsh -s /usr/local/bin/fish
 }
 
+function setup-zsh() {
+    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+}
+
 function install-nvm() {    
     curl -s -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 }
@@ -92,18 +96,28 @@ function install-dotfiles() {
 
 pushd $DIR
 
-install-brew
-install-apps
-install-powerline
-install-nvm
-install-spacevim
+case $1 in
+"")
+    install-brew
+    install-apps
+    install-powerline
+    install-nvm
+    install-spacevim
 
-setup-bash
-setup-fish
-setup-powershell
+    setup-bash
+    setup-fish
+    setup-zsh
+    setup-powershell
 
-install-dotfiles
+    install-dotfiles
 
-#/usr/local/bin/byobu-enable
+    #/usr/local/bin/byobu-enable
+    ;;
+
+*)
+    $1
+    ;;
+
+esac
 
 popd
