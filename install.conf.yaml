@@ -16,6 +16,7 @@
     ~/.config/omf: fish/omf/
     ~/.envrc: envrc
     ~/.config/powershell/Microsoft.PowerShell_profile.ps1: Microsoft.PowerShell_profile.ps1
+    ~/.config/powershell/Microsoft.VSCode_profile.ps1: Microsoft.PowerShell_profile.ps1
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

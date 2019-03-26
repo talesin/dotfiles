@@ -4,10 +4,12 @@ $bash = "C:\Program Files\Git\bin\bash.exe"
 $git = "C:\Program Files\Git\bin\git.exe"
 
 function Install-Updates {
+    echo "Installing windows updates"
     wuauclt.exe /updatenow
 }
 
 function Install-Chocolatey() {
+    echo "Installing/upgrading chocolatey"
     # install chocolately - https://chocolatey.org/docs/installation
     choco -? 2>&1>$null
     if (-not $?) {
@@ -29,6 +31,7 @@ function Install-Chocolatey() {
 
 function Download-File($url, $path) {
     if (-not (Test-Path $path)) {
+        echo "Downloading $url"
         if ((Get-Command curl -ErrorAction SilentlyContinue).CommandType -eq "Application") {
             curl -s "$url" -o "$path"
         }
@@ -40,6 +43,7 @@ function Download-File($url, $path) {
 
 function Install-Prerequisites() {
     if ([System.Environment]::OSVersion.Version -eq "6.1.7600.0") {
+        echo "Installing Windows 7 SP1"
         choco install -y KB976932 
         Read-Host "Press enter to reboot your computer, then run this script again. Ctrl-C to break out"
         shutdown /r /f
@@ -47,6 +51,7 @@ function Install-Prerequisites() {
     }
 
     if ($PSVersionTable.PSVersion.Major -lt 5.0) {
+        echo "Installing prerequisites"
         choco upgrade -y curl 7zip
         $zip = 'C:\Program Files\7-Zip\7z.exe'
         
@@ -68,12 +73,14 @@ function Install-Prerequisites() {
 }
 
 function Install-Apps() {
+    echo "Installing/upgrading apps"
     choco upgrade -y dotnetcore-runtime conemu git.install powershell powershell-core
 }
 
 function Install-Powerline() {
     # install powerline fonts
     if ((Get-ChildItem C:\Windows\Fonts\*power*.ttf).Count -eq 0) {
+        echo "Installing fonts"
         & $git clone https://github.com/powerline/fonts.git
         Push-Location "$env:TEMP\fonts"
         .\install.ps1
@@ -84,6 +91,7 @@ function Install-Powerline() {
 
 
 function Setup-Powershell() {
+    echo "Configuring Powershell"
     Set-PSRepository PSGallery -InstallationPolicy Trusted
 
     if (($PSVersionTable.PSVersion.Major -eq 5) -and ((Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue).Count -eq 0)) {
@@ -105,7 +113,9 @@ function Setup-Powershell() {
 }
 
 function Setup-Bash() {
-    & $bash -c "curl -s 'https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh' | bash"
+    echo "Configuring bash"
+    & $bash -c 'curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | bash'
+    (Get-Content "$HOME\.bashrc") -replace 'OSH_THEME="font"', 'OSH_THEME="powerline"' > "$HOME\.bashrc"
 }
 
 Push-Location $env:TEMP
