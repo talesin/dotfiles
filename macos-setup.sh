@@ -41,7 +41,6 @@ function setup-bash() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/bash
 }
 
 function setup-fish() {
@@ -55,11 +54,17 @@ function setup-fish() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/fish
 }
 
 function setup-zsh() {
+    if [ -d $HOME/.oh-my-zsh ]; then
+        rm -fr $HOME/.oh-my-zsh
+    fi
     sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    grep -sq /usr/local/bin/zsh /etc/shells
+    if [ $? -eq 1 ]; then
+        sudo sh -c "echo /usr/local/bin/zsh >> /etc/shells"
+    fi
 }
 
 function install-nvm() {    
@@ -77,7 +82,6 @@ function setup-powershell() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/pwsh
 }
 
 function install-spacevim() {
@@ -110,8 +114,6 @@ case $1 in
     setup-powershell
 
     install-dotfiles
-
-    #/usr/local/bin/byobu-enable
     ;;
 
 *)
@@ -119,5 +121,10 @@ case $1 in
     ;;
 
 esac
+
+# chsh -s /usr/local/bin/pwsh
+# chsh -s /usr/local/bin/bash
+# chsh -s /usr/local/bin/fish
+# /usr/local/bin/byobu-enable
 
 popd
