@@ -2,6 +2,7 @@
     link:
       create: true
       force: true
+      relink: true
 
 - clean: ['~']
 
@@ -14,6 +15,7 @@
     ~/.profile: profile
     ~/.config/fish: fish/
     ~/.config/omf: fish/omf/
+    ~/.zshrc: zsh/zshrc
     ~/.envrc: envrc
     ~/.config/powershell/Microsoft.PowerShell_profile.ps1: Microsoft.PowerShell_profile.ps1
     ~/.config/powershell/Microsoft.VSCode_profile.ps1: Microsoft.PowerShell_profile.ps1
