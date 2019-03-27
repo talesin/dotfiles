@@ -60,7 +60,11 @@ function setup-zsh() {
     if [ -d $HOME/.oh-my-zsh ]; then
         rm -fr $HOME/.oh-my-zsh
     fi
-    sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+    expect << EOF
+spawn sh -c "curl -fsSL 'https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh' | bash"
+expect "Password for ${USER}: "
+send "\r"
+EOF
     grep -sq /usr/local/bin/zsh /etc/shells
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/zsh >> /etc/shells"
@@ -93,6 +97,7 @@ function install-dotfiles() {
         git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
     fi
     pushd $HOME/.dotfiles
+    git submodule update --init --remote dotbot && git add dotbot
     ./install
     popd
 }
