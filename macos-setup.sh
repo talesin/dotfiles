@@ -41,7 +41,6 @@ function setup-bash() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/bash
 }
 
 function setup-fish() {
@@ -55,7 +54,21 @@ function setup-fish() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/fish >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/fish
+}
+
+function setup-zsh() {
+    if [ -d $HOME/.oh-my-zsh ]; then
+        rm -fr $HOME/.oh-my-zsh
+    fi
+    expect << EOF
+spawn sh -c "curl -fsSL 'https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh' | bash"
+expect "Password for ${USER}: "
+send "\r"
+EOF
+    grep -sq /usr/local/bin/zsh /etc/shells
+    if [ $? -eq 1 ]; then
+        sudo sh -c "echo /usr/local/bin/zsh >> /etc/shells"
+    fi
 }
 
 function install-nvm() {    
@@ -73,7 +86,6 @@ function setup-powershell() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /usr/local/bin/pwsh >> /etc/shells"
     fi
-    # chsh -s /usr/local/bin/pwsh
 }
 
 function install-spacevim() {
@@ -85,6 +97,7 @@ function install-dotfiles() {
         git clone --recurse-submodules https://github.com/talesin/dotfiles.git $HOME/.dotfiles
     fi
     pushd $HOME/.dotfiles
+    git submodule update --init --remote dotbot && git add dotbot
     ./install
     popd
 }
@@ -92,18 +105,31 @@ function install-dotfiles() {
 
 pushd $DIR
 
-install-brew
-install-apps
-install-powerline
-install-nvm
-install-spacevim
+case $1 in
+"")
+    install-brew
+    install-apps
+    install-powerline
+    install-nvm
+    install-spacevim
 
-setup-bash
-setup-fish
-setup-powershell
+    setup-bash
+    setup-fish
+    setup-zsh
+    setup-powershell
 
-install-dotfiles
+    install-dotfiles
+    ;;
 
-#/usr/local/bin/byobu-enable
+*)
+    $1
+    ;;
+
+esac
+
+# chsh -s /usr/local/bin/pwsh
+# chsh -s /usr/local/bin/bash
+# chsh -s /usr/local/bin/fish
+# /usr/local/bin/byobu-enable
 
 popd
