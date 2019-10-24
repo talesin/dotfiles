@@ -51,7 +51,7 @@ end
 set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
-    set -gx INITIAL_TERM_PROGRAM $TERM_PROGRAM
+    set -Ux INITIAL_TERM_PROGRAM $TERM_PROGRAM
     set -gx LSCOLORS gxfxcxdxbxegedabagacad
     set -gx LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 
@@ -105,10 +105,12 @@ if whch direnv
     set -Ux DIRENV_LOG_FORMAT ""
 end
 
-if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ]
+#echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"
+
+if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ] #; or [ -z $INITIAL_TERM_PROGRAM ]
     set -U BYOBU_PYTHON (which python3)
     status --is-login; and status --is-interactive; and exec byobu-launcher
+#    byobu-select-session
 end
 
-# echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"
 
