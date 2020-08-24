@@ -36,3 +36,6 @@
 
 [include]
 	path = ~/.config/.gitconfig.local
+[user]
+	name = Jeremy Clough
+	email = jeclough@amazon.com

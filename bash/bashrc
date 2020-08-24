@@ -123,6 +123,14 @@ if [ -z "$BASH_ENV" ]; then
     export PATH="$HOME/bin:$PATH"
   fi
 
+  if [ -d "$HOME/sbin" ] ; then
+    export PATH="$HOME/sbin:$PATH"
+  fi
+
+  if [ -d "$HOME/sbin" ] ; then
+    export PATH="$HOME/.toolbox/bin"
+  fi
+
   if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
     export SCALA_HOME="/usr/local/share/scala"
     export PATH="$PATH:$SCALA_HOME/bin"
@@ -140,10 +148,6 @@ if [ -z "$BASH_ENV" ]; then
   if [ $? -eq 0 ]; then
     eval "$(direnv hook bash)"
   fi
-
-  export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
   export BYOBU_PYTHON=$(which python)
 

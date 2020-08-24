@@ -83,6 +83,9 @@ if [ -z $FISHENV ]
     prepend-path "/usr/local/sbin"
     prepend-path "/usr/local/bin"
     prepend-path "$HOME/.local/bin"
+    prepend-path "$HOME/bin"
+    prepend-path "$HOME/sbin"
+    prepend-path "$HOME/.toolbox/bin"
 
     append-path "/Applications/Xcode.app/Contents/Developer/usr/libexec/git-core"
     append-path "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin"
@@ -109,8 +112,8 @@ end
 
 if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ] #; or [ -z $INITIAL_TERM_PROGRAM ]
     set -U BYOBU_PYTHON (which python3)
-    status --is-login; and status --is-interactive; and exec byobu-launcher
 #    byobu-select-session
 end
 
 
+status --is-login; and status --is-interactive; and exec byobu-launcher

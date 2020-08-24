@@ -36,10 +36,11 @@ function install-powerline() {
 }
 
 function setup-bash() {
-    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | /usr/local/bin/bash
-    grep -sq /usr/local/bin/bash /etc/shells
+    BASH_PATH=`which bash`
+    curl -fsSL https://raw.github.com/ohmybash/oh-my-bash/master/tools/install.sh | $BASH_PATH
+    grep -sq $BASH_PATH /etc/shells
     if [ $? -eq 1 ]; then
-        sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
+        sudo sh -c "echo $BASH_PATH >> /etc/shells"
     fi
 }
 
