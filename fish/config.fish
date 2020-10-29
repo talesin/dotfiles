@@ -10,6 +10,9 @@ if [ -z $LANG ]
     set -U LC_CTYPE en_US.UTF-8
 end
 
+set -gx LSCOLORS gxfxcxdxbxegedabagacad
+set -gx LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+
 function append-path
     set dir $argv
     if not contains $dir $fish_user_paths
@@ -52,10 +55,6 @@ set -U VISUAL $EDITOR
 
 if [ -z $FISHENV ]
     set -Ux INITIAL_TERM_PROGRAM $TERM_PROGRAM
-    set -gx LSCOLORS gxfxcxdxbxegedabagacad
-    set -gx LS_COLORS 'di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
-
-    ssh-add
 
     if not test -d $HOME/.local/bin
         mkdir $HOME/.local/bin
@@ -73,7 +72,6 @@ if [ -z $FISHENV ]
         set -gx GROOVY_HOME $BREW_PREFIX/opt/groovy/libexec
         prepend-path $GROOVY_HOME
     end
-
 
     if whch stack
       append-path (stack path --bin-path 2>/dev/null)
@@ -105,7 +103,11 @@ if whch direnv
     set -Ux DIRENV_LOG_FORMAT ""
 end
 
-#echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"
+if not pgrep -q ssh-agent
+    ssh-add
+end
+
+# echo "FISHENV=$FISHENV TERM_PROGRAM=$TERM_PROGRAM INITIAL_TERM_PROGRAM=$INITIAL_TERM_PROGRAM"
 
 if [ "$TERM_PROGRAM" = "$INITIAL_TERM_PROGRAM" ] #; or [ -z $INITIAL_TERM_PROGRAM ]
     set -U BYOBU_PYTHON (which python3)
