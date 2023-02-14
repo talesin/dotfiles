@@ -97,3 +97,63 @@ source $ZSH/oh-my-zsh.sh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+export JAVA_TOOLS_OPTIONS="-Dlog4j2.formatMsgNoLookups=true"
+
+
+if [ -z "$ZSH_ENV" ]; then
+
+  if [ -z "$LANG" ]; then
+    export LANG=en_US.UTF-8
+    export LC_CTYPE=en_US.UTF-8
+  fi
+
+  if ! [[ "$PATH" =~ (^/bin|:/bin) ]]; then
+    export PATH="/bin:$PATH"
+  fi
+
+  if ! [[ "$PATH" =~ (^/usr/bin|:/usr/bin) ]]; then
+    export PATH="/usr/bin:$PATH"
+  fi
+
+  if [ -d "/usr/local/bin" ] ; then
+    export PATH="/usr/local/bin:$PATH"
+  fi
+
+  if [ -d "$HOME/bin" ] ; then
+    export PATH="$HOME/bin:$PATH"
+  fi
+
+  if [ -d "$HOME/sbin" ] ; then
+    export PATH="$HOME/sbin:$PATH"
+  fi
+
+  if [ -d "$HOME/.toolbox/bin" ] ; then
+    export PATH="$HOME/.toolbox/bin:$PATH"
+  fi
+
+  if [ -z "$SCALA_HOME" ] && [ -e /usr/local/share/scala ]; then
+    export SCALA_HOME="/usr/local/share/scala"
+    export PATH="$PATH:$SCALA_HOME/bin"
+  fi
+
+  if [ -d "/usr/local/share/dotnet" ]; then
+    export PATH="${PATH}:/usr/local/share/dotnet"
+  fi
+
+  if [ -d "/usr/local/opt/python/libexec/bin" ]; then
+    export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
+  fi
+
+  export JAVA_HOME=$(/usr/libexec/java_home)
+
+  which direnv > /dev/null
+  if [ $? -eq 0 ]; then
+    eval "$(direnv hook bash)"
+  fi
+
+  export BYOBU_PYTHON=$(which python)
+
+  export ZSH_ENV=1 
+fi
+
+alias cls="clear; printf '\e[3J'"

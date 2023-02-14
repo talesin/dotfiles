@@ -35,7 +35,11 @@ function whch
     which $argv >/dev/null 2>/dev/null
 end
 
-alias cls=clear
+function cls
+  clear
+  printf '\e[3J'
+end
+
 alias 'ls-al'='ls -al'
 alias 'cd..'='cd ..'
 alias 'cd...'='cd ...'
@@ -71,6 +75,8 @@ if [ -z $FISHENV ]
 
         set -gx GROOVY_HOME $BREW_PREFIX/opt/groovy/libexec
         prepend-path $GROOVY_HOME
+
+        set -gx JAVA_HOME (/usr/libexec/java_home)
     end
 
     if whch stack
