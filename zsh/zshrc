@@ -156,4 +156,7 @@ if [ -z "$ZSH_ENV" ]; then
   export ZSH_ENV=1 
 fi
 
+eval "$(jenv init -)"
+
 alias cls="clear; printf '\e[3J'"
+eval "$(zellij setup --generate-auto-start zsh)"
