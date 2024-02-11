@@ -1,0 +1,19 @@
+# echo is-expired-sshkey
+
+if [ -z "$SSH_PUB_KEY" ]; then
+  echo "SSH_PUB_KEY is not set"
+  return 1
+fi
+
+NOW=`date +%s`
+
+if [ -z $SSH_EXPIRY ] || [[ $NOW -ge $SSH_EXPIRY ]]; then
+  EXPIRY_DATE=$(ssh-keygen -L -f $SSH_PUB_KEY | grep Valid | sed 's/^ *//;s/ *$//' | cut -d $' ' -f 5)
+  if is-mac; then
+      export SSH_EXPIRY=`TZ=UTC date -jf '%FT%T' $EXPIRY_DATE +%s`
+  else
+      export SSH_EXPIRY=`date --date=$EXPIRY_DATE +%s`
+  fi
+fi
+
+[[ $NOW -ge $SSH_EXPIRY ]]

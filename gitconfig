@@ -2,37 +2,20 @@
 	excludesfile = $HOME/.gitignore_global
 	autocrlf = input
 	safecrlf = false
-[difftool "kdiff3"]
-	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "kdiff3"]
-	cmd = /Applications/kdiff3.app/Contents/MacOS/kdiff3 \"$BASE\" \"$LOCAL\" \"$REMOTE\" -o \"$MERGED\"
-	trustExitCode = true
+
 [push]
 	default = simple
+	autoSetupRemote = true
 [branch]
 	autosetuprebase = always
 [alias]
 	lg = log --color --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
-[diff]
-	tool = p4mergetool
-[difftool "p4mergetool"]
-	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge $LOCAL $REMOTE
-[merge]
-	tool = p4mergetool
-[mergetool "p4mergetool"]
-	cmd = /Applications/p4merge.app/Contents/Resources/launchp4merge $PWD/$BASE $PWD/$REMOTE $PWD/$LOCAL $PWD/$MERGED
-	trustExitCode = false
-[mergetool]
-	keepBackup = false
-[difftool "sourcetree"]
-	cmd = /Applications/p4merge.app/Contents/MacOS/p4merge \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/p4merge.app/Contents/MacOS/p4merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
-	trustExitCode = true
-[credential]
-	helper = !/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/bin/java -Ddebug=false -Djava.net.useSystemProxies=true -jar /usr/local/Cellar/git-credential-manager/2.0.4/libexec/git-credential-manager-2.0.4.jar
+
+# [credential]
+	# helper = !/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home/jre/bin/java -Ddebug=false -Djava.net.useSystemProxies=true -jar /usr/local/Cellar/git-credential-manager/2.0.4/libexec/git-credential-manager-2.0.4.jar
 
 [include]
-	path = ~/.config/.gitconfig.local
+	path = ~/.config/gitconfig.local
+
+[init]
+	defaultBranch = mainline

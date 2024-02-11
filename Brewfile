@@ -1,13 +1,29 @@
 brew "coreutils"
 brew "git"
-brew "python"
+brew "python3"
+brew "ruby"
 brew "direnv"
-brew "byobu"
 brew "vim"
+brew "mas"
+brew "jq"
+
+# shells
 brew "fish"
-brew "mosh"
 brew "bash"
 brew "zsh"
-cask "powershell"
-cask "iterm2", args: { force: true }
-cask "visual-studio-code", args: { force: true }
+brew "zellij"
+
+# dev
+cask "corretto"
+brew "coursier"
+
+# apps
+# cask "google-chrome"
+brew "chrome-cli"
+cask "iterm2"
+cask "visual-studio-code" 
+mas "xcode", id: 497799835
+
+#amazon
+brew "mwinit"
+brew "awscli"

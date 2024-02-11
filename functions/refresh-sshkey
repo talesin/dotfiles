@@ -1,0 +1,19 @@
+SSH_ENV="$HOME/.ssh/env"
+while [[ -z $retry ]]; do
+    ssh-add -l > /dev/null  2>&1
+    ERR=$?
+    if [ $ERR -eq 1 ]; then
+        ssh-add > /dev/null  2>&1
+    elif [ $ERR -eq 2 ]; then
+        if [ ! -z $RETRY ]; then
+            killall -9 ssh-agent > /dev/null 2>&1
+        fi
+
+        PIDS=`pgrep ssh-agent | wc --lines`
+        if [ ! -f $SSH_ENV ] || [ $PIDS -eq 0 ]; then
+            ssh-agent > $SSH_ENV
+        fi
+        source $SSH_ENV > /dev/null
+    fi
+    retry=1
+done
