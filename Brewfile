@@ -1,6 +1,6 @@
 brew "coreutils"
 brew "git"
-brew "python3"
+brew "python"
 brew "ruby"
 brew "direnv"
 brew "vim"
@@ -18,12 +18,10 @@ cask "corretto"
 brew "coursier"
 
 # apps
-# cask "google-chrome"
-brew "chrome-cli"
+cask "google-chrome"
 cask "iterm2"
 cask "visual-studio-code" 
 mas "xcode", id: 497799835
 
 #amazon
-brew "mwinit"
 brew "awscli"

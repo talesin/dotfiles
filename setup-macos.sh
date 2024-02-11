@@ -16,13 +16,22 @@ function not-installed() {
 	return $?
 }
 
-function setup-dotbot() {
-	if [ ! -d $DIR/dotbot ]; then
-		git submodule add https://github.com/anishathalye/dotbot
-		git config -f .gitmodules submodule.dotbot.ignore dirty
+function install-brew() {
+	if not-installed brew; then
+		echo "Installing brew"
+		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+		export PATH=/opt/homebrew/bin:$PATH
 	fi
 
-	$DIR/install
+	brew tap coursier/formulas
+
+	brew analytics off
+}
+
+function setup-dotbot() {
+	pip install dotbot --force
+	dotbot -c $DIR/install.conf.yaml
 }
 
 function install-xcode() {
@@ -35,26 +44,12 @@ function install-xcode() {
 	fi
 }
 
-function install-brew() {
-	if not-installed brew; then
-		echo "Installing brew"
-		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-		export PATH=/opt/homebrew/bin:$PATH
-	fi
-
-	brew tap amazon/homebrew-amazon ssh://git.amazon.com/pkg/HomebrewAmazon
-	brew tap coursier/formulas
-
-	brew analytics off
-}
-
 
 function install-apps() {
 	brew update
 	brew bundle
 
-	python3 -m pip install --upgrade pip
+	python -m pip install --upgrade pip
 
     grep -sq /usr/local/bin/bash /etc/shells
     if [ $? -eq 1 ]; then
@@ -75,6 +70,10 @@ function install-apps() {
 		coursier setup
 	fi
 
+	if [ ! -f $HOME/.config/gitconfig.local ]; then
+		mkdir -p $HOME/.config 2>/dev/null
+		touch $HOME/.config/gitconfig.local
+	fi
 }
 
 function install-node() {
@@ -85,16 +84,10 @@ function install-node() {
 		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 	fi
 
-	nvm install 16
-	nvm use 16
-
 	npm install -g typescript cdk
 }
 
 function setup-vscode() {
-	# https://w.amazon.com/bin/view/VisualStudioCode/
-	# https://w.amazon.com/bin/view/VSCodeCloudDesktop/
-
 	# install extensions
 	cat vscode.extensions.lst | xargs -t -L 1 code --install-extension	>/dev/null
 }
@@ -141,25 +134,16 @@ function install-powerline() {
 	popd >/dev/null
 }
 
-function install-chrome() {
-	if [ ! -d "/Applications/Google Chrome.app" ]; then
-		brew install --cask google-chrome
-	fi
-
-	# TBD - https://superuser.com/questions/1650457/installing-chrome-extension-via-cli
-}
-
 case $OPT in
 "")
-	setup-dotbot
 	install-brew
 	install-apps
+	setup-dotbot
 	install-xcode
 	install-node
 	install-powerline
 	install-zsh
 	install-bash
-	install-chrome
 	setup-vscode
 	;;
 

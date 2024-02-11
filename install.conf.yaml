@@ -20,5 +20,5 @@
     ~/.functions: functions
     ~/.config/zellij/config.kdl: zellij.kdl
 
-- shell:
-    - [git submodule update --init --recursive, Installing submodules]
+# - shell:
+#     - [git submodule update --init --recursive, Installing submodules]

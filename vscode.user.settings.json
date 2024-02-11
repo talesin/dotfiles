@@ -81,8 +81,6 @@
     },
     "terminal.integrated.defaultProfile.linux": "bash",
     "terminal.integrated.defaultProfile.osx": "bash",
-    // "jest.showCoverageOnLoad": true,
     "jest.jestCommandLine": "npm run test -- ",
     "jest.testExplorer": null,
-    // "jest.debugMode": true,
 }

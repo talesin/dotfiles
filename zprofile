@@ -17,6 +17,6 @@ fi
 
 add-path $HOME/Library/Application Support/Coursier/bin
 add-path $HOME/.local/bin
-add-path $HOME/.toolbox/bin
+add-path /opt/homebrew/bin
 
 export ZPROFILE_LOADED=1
