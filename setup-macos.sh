@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-DIR=`cd $(dirname $0); pwd`
+
+DIR=$HOME/.dotfiles
+mkdir -p $DIR 2>/dev/null
 pushd $DIR >/dev/null
 
 OPT=$1
