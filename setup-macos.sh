@@ -16,26 +16,13 @@ function not-installed() {
 	return $?
 }
 
-function check-midway() {
-	if not-installed mwinit; then
-		echo "Install mwinit from Self Service"
-		exit 1
+function setup-dotbot() {
+	if [ ! -d $DIR/dotbot ]; then
+		git submodule add https://github.com/anishathalye/dotbot
+		git config -f .gitmodules submodule.dotbot.ignore dirty
 	fi
 
-	NOW=`date +%s`
-	EXPIRES=`date -jf '%FT%T' $(ssh-keygen -L -f $HOME/.ssh/id_ecdsa-cert.pub | grep Valid | sed 's/^ *//;s/ *$//' | cut -d $' ' -f 5) +%s`
-	if [[ $NOW -ge $EXPIRES ]]; then
-		echo "*** Midway ***"
-		mwinit -s --aea
-	fi
-}
-
-function check-toolbox() {
-	if not-installed toolbox; then
-		open "jamfselfservice://"
-		echo "Install toolbox from Self Service"
-		exit 1
-	fi
+	$DIR/install
 }
 
 function install-xcode() {
@@ -52,6 +39,8 @@ function install-brew() {
 	if not-installed brew; then
 		echo "Installing brew"
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+		export PATH=/opt/homebrew/bin:$PATH
 	fi
 
 	brew tap amazon/homebrew-amazon ssh://git.amazon.com/pkg/HomebrewAmazon
@@ -99,7 +88,6 @@ function install-node() {
 	nvm install 16
 	nvm use 16
 
-	brazil setup --node
 	npm install -g typescript cdk
 }
 
@@ -109,28 +97,6 @@ function setup-vscode() {
 
 	# install extensions
 	cat vscode.extensions.lst | xargs -t -L 1 code --install-extension	>/dev/null
-
-	# install viceroy
-	pushd /tmp >/dev/null
-	mcurl -o vscode-brazil.vsix -sL "https://code.amazon.com/packages/Viceroy/releases/1.0/latest_artifact?version_set=Viceroy/release&path=ext/vscode-brazil.vsix&download=true" 
-	code --install-extension vscode-brazil.vsix >/dev/null
-	rm -f vscode-brazil.vsix >/dev/null
-	popd >/dev/null
-}
-
-function install-amazon-apps() {
-	toolbox registry add s3://buildertoolbox-registry-hub-create-us-west-2/tools.json
-	toolbox registry add s3://buildertoolbox-registry-isengard-cli-us-west-2/tools.json
-	toolbox install $(cat packages.toolbox.lst | xargs echo)
-
-	axe init builder-tools
-
-	if not-installed brazil; then
-		echo "Reboot and rerun installation to complete brazil installation"
-	else
-		echo "Installing brazil"
-		brazil setup completion
-	fi
 }
 
 function install-spacevim() {
@@ -157,15 +123,6 @@ function install-bash() {
 	fi
 }
 
-function install-dotbot() {
-	pushd $HOME >/dev/null
-	if [ ! -d $HOME/.dotfiles ]; then
-		git clone ssh://git.amazon.com/pkg/Jeclough-dotfiles $HOME/.dotfiles
-	fi
-
-	$HOME/.dotfiles/install
-	popd >/dev/null
-}
 
 function install-powerline() {
 	pushd /tmp >/dev/null
@@ -190,34 +147,15 @@ function install-chrome() {
 	fi
 
 	# TBD - https://superuser.com/questions/1650457/installing-chrome-extension-via-cli
-
-	# tamper monkey
-	if [ ! -d $HOME/Library/Application\ Support/Google/Chrome/Default/Extensions/dhdgffkkebhmkfjojejmpbldmpobfkfo ]; then
-		chrome-cli open "https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?pli=1"
-
-		# https://w.amazon.com/bin/view/Greasemonkey/PhoneTool
-		# factorum
-		chrome-cli open "https://axzile.corp.amazon.com/-/carthamus/download_script/job-finder-phone-tool-who's-hiring!%3F!.user.js"
-
-		# hyperbadge
-		chrome-cli open "https://userscript.hyperbadge.amazon.dev/hyperbadge.user.js"
-
-		# job history
-		chrome-cli open "https://ekarulf.corp.amazon.com/job-history/job-history.user.js"
-	fi
-
 }
 
 case $OPT in
 "")
-	check-midway
-	check-toolbox
-	install-dotbot
+	setup-dotbot
 	install-brew
 	install-apps
 	install-xcode
 	install-node
-	install-amazon-apps
 	install-powerline
 	install-zsh
 	install-bash
@@ -226,7 +164,6 @@ case $OPT in
 	;;
 
 *)
-	check-midway
 	$OPT $@
 	;;
 esac
