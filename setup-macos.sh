@@ -32,6 +32,7 @@ function install-brew() {
 }
 
 function setup-dotbot() {
+	
 	pip install dotbot --force
 	dotbot -c $DIR/install.conf.yaml
 }
@@ -51,7 +52,7 @@ function install-apps() {
 	brew update
 	brew bundle
 
-	python -m pip install --upgrade pip
+	python3 -m pip install --upgrade pip
 
     grep -sq /opt/homebrew/bin/bash /etc/shells
     if [ $? -eq 1 ]; then
