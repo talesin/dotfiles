@@ -6,6 +6,7 @@ brew "direnv"
 brew "vim"
 brew "mas"
 brew "jq"
+brew "gh"
 
 # shells
 brew "fish"
