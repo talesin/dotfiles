@@ -51,14 +51,14 @@ function install-apps() {
 
 	python -m pip install --upgrade pip
 
-    grep -sq /usr/local/bin/bash /etc/shells
+    grep -sq /opt/homebrew/bin/bash /etc/shells
     if [ $? -eq 1 ]; then
-        sudo sh -c "echo /usr/local/bin/bash >> /etc/shells"
+        sudo sh -c "echo /opt/homebrew/bin/bash >> /etc/shells"
     fi
 
-    grep -sq /usr/local/bin/zsh /etc/shells
+    grep -sq /opt/homebrew/bin/zsh /etc/shells
     if [ $? -eq 1 ]; then
-        sudo sh -c "echo /usr/local/bin/zsh >> /etc/shells"
+        sudo sh -c "echo /opt/homebrew/bin/zsh >> /etc/shells"
     fi
 
 	if [ ! -f $HOME/.iterm2_shell_integration.zsh ]; then
@@ -98,9 +98,9 @@ function install-spacevim() {
 
 
 function install-zsh() {
-	if [ $SHELL != "/usr/local/bin/zsh" ]; then
+	if [ $SHELL != "/opt/homebrew/bin/zsh " ]; then
 		echo "Change shell to zsh"
-		sudo chsh -s /usr/local/bin/zsh
+		sudo chsh -s /opt/homebrew/bin/zsh 
 	fi
 
 	if [ ! -d $HOME/.oh-my-zsh ]; then
@@ -122,7 +122,7 @@ function install-powerline() {
 
 	ls ~/Library/Fonts | grep -i powerline >/dev/null
 	if [ ! $? -eq 0 ]; then
-		PATH="/usr/local/opt/python/libexec/bin:${PATH}" pip install --user powerline-status
+		PATH="/opt/homebrew/bin:${PATH}" pip install --user powerline-status
 
 		git clone https://github.com/powerline/fonts.git --depth=1
 		cd fonts

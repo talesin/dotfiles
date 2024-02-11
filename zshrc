@@ -18,7 +18,7 @@ if [[ -z ${fpath[(r)$fdir]} ]] ; then
     autoload -Uz ${fdir}/*(:t)
 fi
 
-refresh-sshkey
+#refresh-sshkey
 
 update-tools
 
@@ -28,13 +28,11 @@ ZSH_THEME="robbyrussell"
 plugins=(git vi-mode)
 source $ZSH/oh-my-zsh.sh
 
-
 # iterm & brew
 if is-mac; then
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
   is-installed brew && eval "$(brew shellenv)"
 fi
-
 
 # zellij
 if is-installed zellij; then

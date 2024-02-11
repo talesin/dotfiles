@@ -4,13 +4,12 @@ if [ -f $HOME/.config/env.local ]; then
     source $HOME/.config/env.local
 fi
 
-# if you wish to use IMDS set AWS_EC2_METADATA_DISABLED=false
-export AWS_EC2_METADATA_DISABLED=true
-
 # ssh key
-certs=($HOME/.ssh/*-cert.pub)
-if [ ${#certs[@]} -gt 0 ]; then
-    export SSH_PUB_KEY=${certs[1]}
+if [ -d $HOME/.ssh ]; then
+    certs=($HOME/.ssh/*-cert.pub)
+    if [ ${#certs[@]} -gt 0 ]; then
+        export SSH_PUB_KEY=${certs[1]}
+    fi
 fi
 
 export OS=`uname`

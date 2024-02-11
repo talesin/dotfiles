@@ -1,1 +1,2 @@
+# echo is-linux
 [[ $OS = "Linux" ]]

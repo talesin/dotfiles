@@ -1,2 +1,3 @@
+# echo is-installed
 which $1 1>/dev/null 2>/dev/null
 return $?
