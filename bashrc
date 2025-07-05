@@ -1,4 +1,4 @@
-# echo bashrc
+echo bashrc
 
 if [[ -z $BASH_PROFILE_LOADED ]] && [[ -f $HOME/.bash_profile ]]; then
     FROM_BASHRC=1 source $HOME/.bash_profile

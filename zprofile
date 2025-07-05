@@ -1,9 +1,5 @@
 # echo zprofile start
 
-if [[ ! -z "$ZPROFILE_LOADED" ]]; then
-    exit
-fi
-
 typeset -U fpath
 fdir=$HOME/.functions
 if [[ -z ${fpath[(r)$fdir]} ]] ; then

@@ -1,7 +1,7 @@
-# echo bash_profile
+echo bash_profile
 
 if [[ ! -z "$BASH_PROFILE_LOADED" ]]; then
-    exit
+    return
 fi
 
 export BASH_SILENCE_DEPRECATION_WARNING=1

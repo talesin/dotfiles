@@ -2,9 +2,9 @@
 
 NOW=`date +%s`
 
-if [[ -z $ZPROFILE_LOADED ]]; then
-    source $HOME/.zprofile
-fi
+# if [[ -z $ZPROFILE_LOADED ]]; then
+#     source $HOME/.zprofile
+# fi
 
 if [ -f ~/.aliases ]; then
   source ~/.aliases
@@ -29,9 +29,7 @@ plugins=(git vi-mode)
 source $ZSH/oh-my-zsh.sh
 
 # iterm
-if is-mac; then
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-fi
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 eval "$(brew shellenv)"
 
