@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 
-
 DIR=$HOME/.dotfiles
 mkdir -p $DIR 2>/dev/null
 pushd $DIR >/dev/null
 
+# Load shared setup functions
+source "$DIR/setup-common.sh"
+
 OPT=$1
 shift
-
-function is-installed() {
-	which $1 >/dev/null
-	return $?
-}
-
-function not-installed() {
-	! is-installed $1
-	return $?
-}
 
 function install-brew() {
 	if not-installed brew; then
@@ -31,11 +23,6 @@ function install-brew() {
 	brew analytics off
 }
 
-function setup-dotbot() {
-	
-	pip install dotbot --force
-	dotbot -c $DIR/install.conf.yaml
-}
 
 function install-xcode() {
 	xcode-select -p >/dev/null
@@ -79,14 +66,7 @@ function install-apps() {
 	fi
 }
 
-function install-node() {
-	if not-installed nvm; then
-		NVM_VERSION=$(curl -sL https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq -r '.version')
-		PROFILE=/dev/null bash -c "curl -sL -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$NVM_VERSION/install.sh | bash"
-		export NVM_DIR="$HOME/.nvm"
-		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-	fi
-
+function install-node-extras() {
 	npm install -g typescript cdk
 }
 
@@ -97,23 +77,14 @@ function setup-vscode() {
 
 
 
-function install-zsh() {
-	if [ $SHELL != "/opt/homebrew/bin/zsh " ]; then
+function install-zsh-macos() {
+	if [ "$SHELL" != "/opt/homebrew/bin/zsh" ]; then
 		echo "Change shell to zsh"
 		sudo chsh -s /opt/homebrew/bin/zsh 
 	fi
-
-	if [ ! -d $HOME/.oh-my-zsh ]; then
-		echo "Installing oh-my-zsh"
-		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-	fi
-}
-
-function install-bash() {
-	if [ ! -d $HOME/.oh-my-bash ]; then
-		echo "Installing oh-my-bash"
-		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
-	fi
+	
+	# Call shared zsh installation
+	install-zsh
 }
 
 
@@ -138,11 +109,12 @@ case $OPT in
 "")
 	install-brew
 	install-apps
-	setup-dotbot
+	apply-dotbot
 	install-xcode
 	install-node
+	install-node-extras
 	install-powerline
-	install-zsh
+	install-zsh-macos
 	install-bash
 	setup-vscode
 	;;

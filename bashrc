@@ -1,3 +1,4 @@
+# Bash-specific configuration
 echo bashrc
 
 if [[ -z $BASH_PROFILE_LOADED ]] && [[ -f $HOME/.bash_profile ]]; then
@@ -10,7 +11,7 @@ case $- in
     *) return;;
 esac
 
-# Path to your oh-my-bash installation.
+# Oh My Bash (bash-specific)
 export OSH=$HOME/.oh-my-bash
 OSH_THEME="font"
 OMB_USE_SUDO=true
@@ -22,35 +23,11 @@ completions=(
 aliases=(
   general
 )
-
 plugins=(
   git
   bashmarks
 )
 source "$OSH"/oh-my-bash.sh
 
-if [ -f ~/.aliases ]; then
-  source ~/.aliases
-fi
-
-# iterm & brew
-if is-mac; then
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-  is-installed brew && eval "$(brew shellenv)"
-fi
-
-if is-installed direnv; then
-  eval "$(direnv hook bash)"
-fi
-
-function _dotnet_bash_complete()
-{
-  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n' # On Windows you may need to use use IFS=$'\r\n'
-  local candidates
-
-  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
-
-  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
-}
-
-complete -f -F _dotnet_bash_complete dotnet
+# Load shared shell configuration
+source ~/.shell-common.sh

@@ -16,10 +16,8 @@ if is-installed launchctl; then
 fi
 
 
-# >>> coursier install directory >>>
-export PATH="$PATH:/Users/jeremy/Library/Application Support/Coursier/bin"
-# <<< coursier install directory <<<
-. "$HOME/.cargo/env"
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
+# PATH management is handled by profile.d/paths
+# Environment variables that need to be set early can be sourced here
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi

@@ -19,6 +19,7 @@
     ~/.functions: functions
     ~/.config/zellij/config.kdl: zellij.kdl
     ~/.profile.d: profile.d
+    ~/.shell-common.sh: shell-common.sh
 
 # - shell:
 #     - [git submodule update --init --recursive, Installing submodules]
