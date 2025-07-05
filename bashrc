@@ -29,14 +29,8 @@ plugins=(
 )
 source "$OSH"/oh-my-bash.sh
 
-# brazil
-if [ -f $HOME/.brazil_completion/bash_completion ]; then
-    source $HOME/.brazil_completion/bash_completion
-fi
-
-# mise
-if is-installed mise; then
-    eval "$(mise activate bash)"
+if [ -f ~/.aliases ]; then
+  source ~/.aliases
 fi
 
 # iterm & brew
