@@ -95,9 +95,6 @@ function setup-vscode() {
 	cat vscode.extensions.lst | xargs -t -L 1 code --install-extension	>/dev/null
 }
 
-function install-spacevim() {
-	curl -sLf https://spacevim.org/install.sh | bash
-}
 
 
 function install-zsh() {

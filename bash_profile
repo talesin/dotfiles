@@ -6,15 +6,8 @@ fi
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-if [ -f $HOME/.config/env.local ]; then
-    source $HOME/.config/env.local
-fi
-
-export NODE_ENV=local
-export NVM_DIR=$HOME/.nvm
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
-
-. "$HOME/.cargo/env"
+# Load shared environment variables
+source $HOME/.dotfiles/profile.d/env
 
 if [ -f $HOME/.aliases ]; then
     source $HOME/.aliases
@@ -34,12 +27,7 @@ if is-installed launchctl; then
   launchctl setenv PATH "$PATH"
 fi
 
-add-path /opt/homebrew/bin
-add-path "$HOME/Library/Application Support/Coursier/bin"
-add-path $HOME/.local/bin
-add-path $HOME/.cargo/bin
-add-path $HOME/.lmstudio/bin
-add-path $HOME/.codeium/windsurf/bin
+source $HOME/.dotfiles/profile.d/paths
 
 export BASH_PROFILE_LOADED=1
 if [[ -z $FROM_BASHRC ]] && [[ -f $HOME/.bashrc ]]; then

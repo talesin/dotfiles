@@ -16,9 +16,9 @@
     ~/.zshenv: zshenv
     ~/.zshrc: zshrc
     ~/.zprofile: zprofile
-    ~/.zlogout: zlogout
     ~/.functions: functions
     ~/.config/zellij/config.kdl: zellij.kdl
+    ~/.profile.d: profile.d
 
 # - shell:
 #     - [git submodule update --init --recursive, Installing submodules]

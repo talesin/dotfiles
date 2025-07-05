@@ -5,3 +5,4 @@ fish/fishd.*
 SpaceVim.d/.netrwhist
 fish/fish_variables
 Brewfile.lock.json
+.claude

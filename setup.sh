@@ -7,7 +7,7 @@ OS=`uname`
 if [ $OS = "Darwin" ]; then
     exec $DIR/setup-macos.sh $@
 elif [ $OS = "Linux" ]; then
-    exec $DIR/setup-clouddesktop.sh $@
+    exec $DIR/setup-linux.sh $@
 else
     echo "Unsupported OS"
     exit 1

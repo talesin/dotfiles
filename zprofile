@@ -15,12 +15,7 @@ if is-installed launchctl; then
   launchctl setenv PATH $PATH
 fi
 
-add-path /opt/homebrew/bin
-add-path "$HOME/Library/Application Support/Coursier/bin"
-add-path $HOME/.local/bin
-add-path $HOME/.cargo/bin
-add-path $HOME/.lmstudio/bin
-add-path $HOME/.codeium/windsurf/bin
+source $HOME/.dotfiles/profile.d/paths
 
 export ZPROFILE_LOADED=1
 
