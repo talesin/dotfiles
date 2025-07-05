@@ -1,4 +1,4 @@
-# echo zshrc
+# echo zshrc start
 
 NOW=`date +%s`
 
@@ -28,10 +28,34 @@ ZSH_THEME="robbyrussell"
 plugins=(git vi-mode)
 source $ZSH/oh-my-zsh.sh
 
-# iterm & brew
+# iterm
 if is-mac; then
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-  is-installed brew && eval "$(brew shellenv)"
+fi
+
+eval "$(brew shellenv)"
+
+
+eval "$(direnv hook zsh)"
+
+# zsh parameter completion for the dotnet CLI
+if is-installed dotnet; then
+  _dotnet_zsh_complete()
+  {
+    local completions=("$(dotnet complete "$words")")
+
+    # If the completion list is empty, just continue with filename selection
+    if [ -z "$completions" ]
+    then
+      _arguments '*::arguments: _normal'
+      return
+    fi
+
+    # This is not a variable assignment, don't remove spaces!
+    _values = "${(ps:\n:)completions}"
+  }
+
+  compdef _dotnet_zsh_complete dotnet
 fi
 
 # zellij
@@ -40,3 +64,4 @@ if is-installed zellij; then
   eval "$(zellij setup --generate-auto-start zsh)"
 fi
 
+# echo zshrc end

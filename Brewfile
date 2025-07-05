@@ -7,6 +7,7 @@ brew "vim"
 brew "mas"
 brew "jq"
 brew "gh"
+brew "wget"
 
 # shells
 brew "fish"
@@ -17,6 +18,7 @@ brew "zellij"
 # dev
 cask "corretto"
 brew "coursier"
+brew "dotnet"
 
 # apps
 cask "google-chrome"

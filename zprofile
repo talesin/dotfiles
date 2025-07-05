@@ -1,4 +1,4 @@
-# echo zprofile
+# echo zprofile start
 
 if [[ ! -z "$ZPROFILE_LOADED" ]]; then
     exit
@@ -16,7 +16,12 @@ if is-installed launchctl; then
 fi
 
 add-path /opt/homebrew/bin
-add-path $HOME/Library/Application Support/Coursier/bin
+add-path "$HOME/Library/Application Support/Coursier/bin"
 add-path $HOME/.local/bin
+add-path $HOME/.cargo/bin
+add-path $HOME/.lmstudio/bin
+add-path $HOME/.codeium/windsurf/bin
 
 export ZPROFILE_LOADED=1
+
+# echo zprofile end

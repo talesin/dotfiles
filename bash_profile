@@ -6,14 +6,18 @@ fi
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-if [ -f $HOME/.zshenv ]; then
-    source $HOME/.zshenv
-elif [ -f $HOME/.config/env.local ]; then
+if [ -f $HOME/.config/env.local ]; then
     source $HOME/.config/env.local
 fi
 
-if [ -f ~/.aliases ]; then
-    source ~/.aliases
+export NODE_ENV=local
+export NVM_DIR=$HOME/.nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
+
+. "$HOME/.cargo/env"
+
+if [ -f $HOME/.aliases ]; then
+    source $HOME/.aliases
 fi
 
 if [ -d $HOME/.functions ]; then
@@ -27,14 +31,17 @@ if [ -d $HOME/.functions ]; then
 fi
 
 if is-installed launchctl; then
-  launchctl setenv PATH $PATH
+  launchctl setenv PATH "$PATH"
 fi
 
-add-path $HOME/Library/Application Support/Coursier/bin
+add-path /opt/homebrew/bin
+add-path "$HOME/Library/Application Support/Coursier/bin"
 add-path $HOME/.local/bin
+add-path $HOME/.cargo/bin
+add-path $HOME/.lmstudio/bin
+add-path $HOME/.codeium/windsurf/bin
 
+export BASH_PROFILE_LOADED=1
 if [[ -z $FROM_BASHRC ]] && [[ -f $HOME/.bashrc ]]; then
     source $HOME/.bashrc
 fi
-
-export BASH_PROFILE_LOADED=1

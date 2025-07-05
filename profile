@@ -15,7 +15,11 @@ if is-installed launchctl; then
   launchctl setenv PATH $PATH
 fi
 
+
 # >>> coursier install directory >>>
-export PATH="$PATH:/Users/jeclough/Library/Application Support/Coursier/bin"
+export PATH="$PATH:/Users/jeremy/Library/Application Support/Coursier/bin"
 # <<< coursier install directory <<<
 . "$HOME/.cargo/env"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
