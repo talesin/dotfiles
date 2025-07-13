@@ -3,8 +3,8 @@
 
 add-path /opt/homebrew/bin
 add-path "$HOME/Library/Application Support/Coursier/bin"
-add-path $HOME/.local/bin
-add-path $HOME/.cargo/bin
-add-path $HOME/.lmstudio/bin
-add-path $HOME/.codeium/windsurf/bin
-add-path $HOME/.claude/local
+add-path "$HOME/.local/bin"
+add-path "$HOME/.cargo/bin"
+add-path "$HOME/.lmstudio/bin"
+add-path "$HOME/.codeium/windsurf/bin"
+add-path "$HOME/.claude/local"

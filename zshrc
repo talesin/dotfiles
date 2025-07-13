@@ -3,13 +3,6 @@
 # Zsh-specific configuration
 NOW=`date +%s`
 
-# Load functions (zsh-specific)
-typeset -U fpath
-fdir=$HOME/.functions
-if [[ -z ${fpath[(r)$fdir]} ]] ; then
-    export fpath=($fdir $fpath)
-    autoload -Uz ${fdir}/*(:t)
-fi
 
 # Oh My Zsh (zsh-specific)
 export ZSH="$HOME/.oh-my-zsh"

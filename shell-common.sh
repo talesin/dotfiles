@@ -8,6 +8,26 @@ if [ -f ~/.aliases ]; then
   source ~/.aliases
 fi
 
+# Load functions
+if [ -d ~/.functions ]; then
+  if [ -n "$ZSH_VERSION" ]; then
+    # Zsh autoload mechanism
+    typeset -U fpath
+    fdir=$HOME/.functions
+    if [[ -z ${fpath[(r)$fdir]} ]] ; then
+        export fpath=($fdir $fpath)
+        autoload -Uz ${fdir}/*(:t)
+    fi
+  else
+    # Bash/other shells manual sourcing
+    pushd ~/.functions >/dev/null
+    for fn in *; do
+        eval "function $fn { source ~/.functions/$fn; }"
+    done
+    popd >/dev/null
+  fi
+fi
+
 # iTerm integration (works for both shells)
 if is-mac; then
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
