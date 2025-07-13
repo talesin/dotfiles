@@ -37,7 +37,7 @@ function install-xcode() {
 
 function install-apps() {
 	brew update
-	brew bundle
+	brew bundle --file "$DIR/Brewfile.macos"
 
 	python3 -m pip install --upgrade pip
 
