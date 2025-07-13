@@ -16,7 +16,11 @@ if [ -d ~/.functions ]; then
     fdir=$HOME/.functions
     if [[ -z ${fpath[(r)$fdir]} ]] ; then
         export fpath=($fdir $fpath)
-        autoload -Uz ${fdir}/*(:t)
+        for func_file in $fdir/*; do
+            if [ -f "$func_file" ]; then
+                autoload -Uz $(basename "$func_file")
+            fi
+        done
     fi
   else
     # Bash/other shells manual sourcing

@@ -1,12 +1,12 @@
 # echo zshenv start
 
 # Load shared environment variables
-source $HOME/.dotfiles/profile.d/env
+source $HOME/.profile.d/env
 
 # SSH key detection
 if [ -d $HOME/.ssh ]; then
     setopt NULL_GLOB
-    certs=($HOME/.ssh/*-cert.pub) 2> /dev/null
+    certs=($HOME/.ssh/*-cert.pub) 2>/dev/null
     unsetopt NULL_GLOB
 
     if [ ${#certs[@]} -gt 0 ]; then
@@ -14,6 +14,6 @@ if [ -d $HOME/.ssh ]; then
     fi
 fi
 
-export OS=`uname`
+export OS=$(uname)
 
 # echo zshenv end

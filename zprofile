@@ -11,7 +11,7 @@ if is-installed launchctl; then
   launchctl setenv PATH $PATH
 fi
 
-source $HOME/.dotfiles/profile.d/paths
+source $HOME/.profile.d/paths
 
 export ZPROFILE_LOADED=1
 

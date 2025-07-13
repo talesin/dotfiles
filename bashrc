@@ -2,13 +2,13 @@
 # echo bashrc
 
 if [[ -z $BASH_PROFILE_LOADED ]] && [[ -f $HOME/.bash_profile ]]; then
-    FROM_BASHRC=1 source $HOME/.bash_profile
+  FROM_BASHRC=1 source $HOME/.bash_profile
 fi
 
 # Enable the subsequent settings only in interactive sessions
 case $- in
-  *i*) ;;
-    *) return;;
+*i*) ;;
+*) return ;;
 esac
 
 # Oh My Bash (bash-specific)
