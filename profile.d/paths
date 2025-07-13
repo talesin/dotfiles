@@ -7,3 +7,4 @@ add-path $HOME/.local/bin
 add-path $HOME/.cargo/bin
 add-path $HOME/.lmstudio/bin
 add-path $HOME/.codeium/windsurf/bin
+add-path $HOME/.claude/local

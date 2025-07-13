@@ -55,8 +55,9 @@ if is-installed zellij; then
   export ZELLIJ_AUTO_ATTACH=true
   if [ -n "$ZSH_VERSION" ]; then
     eval "$(zellij setup --generate-auto-start zsh)"
-  elif [ -n "$BASH_VERSION" ]; then
-    eval "$(zellij setup --generate-auto-start bash)"
+  # TODO: Uncomment these lines if you want to enable Zellij auto-start for Bash
+  # elif [ -n "$BASH_VERSION" ]; then
+    # eval "$(zellij setup --generate-auto-start bash)"
   fi
 fi
 

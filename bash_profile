@@ -1,4 +1,4 @@
-echo bash_profile
+# echo bash_profile
 
 if [[ ! -z "$BASH_PROFILE_LOADED" ]]; then
     return

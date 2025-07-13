@@ -14,10 +14,3 @@ export LS_COLORS=di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;
 if is-installed launchctl; then
   launchctl setenv PATH $PATH
 fi
-
-
-# PATH management is handled by profile.d/paths
-# Environment variables that need to be set early can be sourced here
-if [ -f "$HOME/.cargo/env" ]; then
-    . "$HOME/.cargo/env"
-fi
