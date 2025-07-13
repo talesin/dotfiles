@@ -1,0 +1,15 @@
+# Shared environment variables for both zsh and bash
+# This file is sourced by both zshenv and bash_profile
+
+# Load local environment overrides
+if [ -f $HOME/.config/env.local ]; then
+    source $HOME/.config/env.local
+fi
+
+# Node.js
+export NODE_ENV=local
+export NVM_DIR=$HOME/.nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Rust
+. "$HOME/.cargo/env"

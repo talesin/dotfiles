@@ -1,0 +1,12 @@
+# echo update-tools
+FORCE=$1
+YESTERDAY=$((`date +%s` - 86400))
+UPDATED=`date -r $HOME/.updated +%s 2>/dev/null || echo 0`
+if [[ ! -z $FORCE ]] || [ $UPDATED -lt $YESTERDAY ]; then
+  echo -n "Update tools? [y/n] "
+  read -q update
+  if [ $update = "y" ]; then
+    is-installed brew && brew update && brew upgrade
+  fi
+  touch $HOME/.updated
+fi

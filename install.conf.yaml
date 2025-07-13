@@ -7,20 +7,19 @@
 - clean: ['~']
 
 - link:
+    ~/.aliases: aliases
     ~/.vimrc: vimrc
-    ~/.bashrc: bash/bashrc
-    ~/.bash_profile: bash/bash_profile
-    ~/.byobu: byobu/
+    ~/.bashrc: bashrc
+    ~/.bash_profile: bash_profile
     ~/.gitconfig: gitconfig
     ~/.profile: profile
-    ~/.config/fish: fish/
-    ~/.config/omf: fish/omf/
-    ~/.zshrc: zsh/zshrc
-    ~/.envrc: envrc
-    ~/.config/powershell/Microsoft.PowerShell_profile.ps1: Microsoft.PowerShell_profile.ps1
-    ~/.config/powershell/Microsoft.VSCode_profile.ps1: Microsoft.PowerShell_profile.ps1
+    ~/.zshenv: zshenv
+    ~/.zshrc: zshrc
+    ~/.zprofile: zprofile
+    ~/.functions: functions
+    ~/.config/zellij/config.kdl: zellij.kdl
+    ~/.profile.d: profile.d
+    ~/.shell-common.sh: shell-common.sh
 
-- shell:
-    - [git submodule update --init --recursive, Installing submodules]
-    - [ln -fh Microsoft.PowerShell_profile.ps1 $HOME/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1, Linking PowerShell Profile]
-    - [ln -fh Microsoft.PowerShell_profile.ps1 $HOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1, Linking PowerShell Profile]
+# - shell:
+#     - [git submodule update --init --recursive, Installing submodules]
