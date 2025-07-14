@@ -9,7 +9,7 @@
 #umask 022
 
 export LSCOLORS=gxfxcxdxbxegedabagacad
-export LS_COLORS=di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;4
+export LS_COLORS="di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;40:st=37;44:mi=05;37;41:or=01;31:ca=30;41:mh=00:cl=00:rs=0"
 
 if is-installed launchctl; then
   launchctl setenv PATH $PATH

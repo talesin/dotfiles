@@ -60,7 +60,7 @@ if is-installed dotnet; then
         _arguments '*::arguments: _normal'
         return
       fi
-      _values = "${(ps:\n:)completions}"
+      _values="${(ps:\n:)completions}"
     }
     compdef _dotnet_zsh_complete dotnet
   elif [ -n "$BASH_VERSION" ]; then
