@@ -17,3 +17,6 @@
 [init]
 	defaultBranch = master
 
+[user]
+	email = jeremy.clough@gmail.com
+	name = Jeremy Clough

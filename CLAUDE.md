@@ -4,59 +4,67 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a personal dotfiles repository that manages shell configuration files, development tools, and environment setup for macOS and Linux systems.
+Personal dotfiles repository managing shell configuration, development tools, and environment setup for macOS and Linux systems.
 
 ## Common Commands
 
 ### Setup and Installation
-- `./setup.sh` - Main setup script that detects OS and runs appropriate platform-specific setup
-- `./setup-macos.sh` - macOS-specific setup (installs Homebrew, apps, dotbot configuration)
-- `./setup-linux.sh` - Linux-specific setup (installs packages, dotbot configuration)
-
-### Dotbot Configuration
-- `dotbot -c install.conf.yaml` - Apply dotfile symlinks and configurations
-- The dotbot configuration links files from the repo to home directory locations
+- `./setup.sh` - Main entry point; detects OS and runs platform-specific setup
+- `./setup-macos.sh` - macOS setup (Homebrew, apps, symlinks)
+- `./setup-linux.sh` - Linux setup (apt/dnf/yum packages, symlinks)
 
 ### Package Management
-- `brew bundle` - Install applications and tools from Brewfile (macOS)
-- `brew update && brew bundle` - Update Homebrew and install/update packages
+- `brew bundle --file=Brewfile.macos` - Install macOS packages
 
 ## Architecture
 
-### Core Components
+### Setup Scripts
+- `setup.sh` - OS detection, delegates to platform scripts
+- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts
+- `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`
 
-1. **Shell Configuration**
-   - `zshrc` - Zsh shell configuration with Oh My Zsh integration
-   - `bashrc` - Bash shell configuration with Oh My Bash integration
-   - `aliases` - Shell aliases shared across shells
-   - `profile`, `zprofile`, `bash_profile` - Shell profile configurations
+### Shell Configuration
+- `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash
+- `shell-common.sh` - Shared config loaded by both shells (aliases, functions, integrations)
+- `profile` / `zprofile` / `bash_profile` - Login shell setup
+- `zshenv` - Zsh environment (NVM, Rust, SSH key detection)
+- `aliases` - Shared aliases (`cls`, `zka`)
 
-2. **Development Tools Setup**
-   - `Brewfile` - Homebrew package definitions for macOS
-   - `vscode.extensions.lst` - VS Code extensions to install
-   - `packages.linux.lst` - Linux package list
+### Profile Configuration (`profile.d/`)
+- `env` - Environment variables, loads `~/.config/env.local` for local overrides
+- `paths` - PATH management via `add-path` function
 
-3. **Configuration Files**
-   - `gitconfig` - Git configuration
-   - `vimrc` - Vim editor configuration
-   - `zellij.kdl` - Zellij terminal multiplexer configuration
+### Shell Functions (`functions/`)
+- `add-path` - Add directory to PATH if exists and not already present
+- `is-installed` - Check if command exists
+- `is-mac` / `is-linux` - OS detection
+- `refresh-sshkey` - SSH agent startup and key management
+- `is-expired-sshkey` - Check SSH certificate expiration
+- `update-tools` - Interactive daily Homebrew update prompt
 
-4. **Setup Scripts**
-   - Modular functions for installing different components (brew, node, zsh, etc.)
-   - OS detection and platform-specific execution
-   - Dotbot integration for file linking
+### Development Tool Configs
+- `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
+- `vscode.extensions.lst` - VS Code extensions (Scala, Java, .NET, Copilot)
+- `vscode.user.settings.json` - VS Code settings
 
-### Key Features
+### Application Configs
+- `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
+- `vimrc` - Vim config with syntax highlighting, 2-space tabs
+- `zellij.kdl` - Zellij terminal multiplexer keybindings
 
-- **Cross-platform support**: Separate setup scripts for macOS and Linux
-- **Modular installation**: Individual functions for different tools (brew, node, zsh, etc.)
-- **Shell integration**: Supports both Zsh (Oh My Zsh) and Bash (Oh My Bash)
-- **Development environment**: Includes VS Code, Git, Node.js, and various CLI tools
-- **Terminal multiplexer**: Zellij configuration for terminal management
+### Symlinks (`apply-dotfiles` in setup-common.sh)
+Creates symlinks from repo to home directory:
+- Shell configs → `~/.zshrc`, `~/.bashrc`, etc.
+- Functions → `~/.functions/`
+- Profile.d → `~/.profile.d/`
+- Zellij → `~/.config/zellij/config.kdl`
 
-## File Structure
+## Key Features
 
-- Configuration files are stored in the repository root
-- `install.conf.yaml` defines the symlink mappings via dotbot
-- Setup scripts handle tool installation and environment configuration
-- Platform-specific package lists maintain consistency across environments
+- **Cross-platform**: macOS (Homebrew) and Linux (apt/dnf/yum)
+- **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
+- **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
+- **SSH key management**: Auto-start ssh-agent, certificate expiration checks
+- **Zellij integration**: Auto-attach, custom keybindings, `cls` alias
+- **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET

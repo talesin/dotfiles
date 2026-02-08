@@ -13,7 +13,7 @@ shift
 function install-brew() {
 	if not-installed brew; then
 		echo "Installing brew"
-		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 		export PATH=/opt/homebrew/bin:$PATH
 	fi
@@ -109,7 +109,7 @@ case $OPT in
 "")
 	install-brew
 	install-apps
-	apply-dotbot
+	apply-dotfiles "$DIR"
 	install-xcode
 	install-node
 	install-node-extras
