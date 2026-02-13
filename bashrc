@@ -31,3 +31,4 @@ source "$OSH"/oh-my-bash.sh
 
 # Load shared shell configuration
 source ~/.shell-common.sh
+. "$HOME/.cargo/env"
