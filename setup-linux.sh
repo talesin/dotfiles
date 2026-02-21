@@ -1,74 +1,88 @@
 #!/usr/bin/env bash
 
-DIR=`cd $(dirname $0); pwd`
-pushd $DIR >/dev/null
+DIR=$(cd "$(dirname "$0")" && pwd)
+pushd "$DIR" >/dev/null
 
 # Load shared setup functions
 source "$DIR/setup-common.sh"
 
-OPT=$1
-shift
+OPT=${1:-}
+shift 2>/dev/null || true
 
 
-function install-apps() {
-  sudo yum -y install $(cat $DIR/packages.clouddesktop.lst)
+# Install packages via system package manager (pre-built binaries, no compilation)
+function install-packages() {
+	echo "Installing packages..."
 
-  mkdir -p $HOME/.local/bin >/dev/null
-}
+	if is-installed apt-get; then
+		# Debian/Ubuntu
+		local packages="bash zsh vim git curl wget jq gnupg direnv python3"
 
+		# Add GitHub CLI repo if not present
+		if [ ! -f /etc/apt/sources.list.d/github-cli.list ]; then
+			sudo mkdir -p -m 755 /etc/apt/keyrings
+			curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+			sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+			echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+		fi
 
-function install-zellij() {
-  if not-installed zellij; then
-    if [ ! -f $HOME/.local/bin/zellij ]; then 
-      echo "Installing zellij"
-      mkdir -p /tmp/zellij >/dev/null
-      pushd /tmp/zellij >/dev/null
+		sudo apt-get update
+		sudo apt-get install -y $packages gh
 
-      wget https://github.com/zellij-org/zellij/releases/download/v0.39.2/zellij-x86_64-unknown-linux-musl.tar.gz
+	elif is-installed dnf; then
+		# Fedora
+		sudo dnf install -y bash zsh vim git curl wget jq gnupg2 direnv python3 gh
 
-      tar -xvf zellij*.tar.gz
-      cp zellij $HOME/.local/bin
-      chmod +x zellij
-
-      rm -fr /tmp/zellij >/dev/null
-
-      popd >/dev/null
-    fi
-  fi
-}
-
-
-
-function install-dotbot() {
-	pushd $HOME >/dev/null
-	if [ ! -d $HOME/.dotfiles ]; then
-		git clone ssh://git.amazon.com/pkg/Jeclough-dotfiles $HOME/.dotfiles
+	elif is-installed yum; then
+		# RHEL/CentOS (gh requires EPEL or manual install)
+		sudo yum install -y bash zsh vim git curl wget jq gnupg2 direnv python3
 	fi
-
-	$HOME/.dotfiles/install
-	popd >/dev/null
 }
 
-function install-spacevim() {
-	curl -sLf https://spacevim.org/install.sh | bash
+
+# Install zellij from GitHub releases (not in apt)
+function install-zellij() {
+	if not-installed zellij; then
+		echo "Installing zellij..."
+		local version
+		version=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | jq -r .tag_name)
+		local arch
+		arch=$(uname -m)
+		if [ "$arch" = "x86_64" ]; then
+			arch="x86_64-unknown-linux-musl"
+		elif [ "$arch" = "aarch64" ]; then
+			arch="aarch64-unknown-linux-musl"
+		fi
+		curl -fsSL "https://github.com/zellij-org/zellij/releases/download/${version}/zellij-${arch}.tar.gz" | tar -xz -C "$HOME/.local/bin"
+	fi
 }
 
+
+function setup-config() {
+	mkdir -p "$HOME/.local/bin"
+	export PATH="$HOME/.local/bin:$PATH"
+
+	if [ ! -f "$HOME/.config/gitconfig.local" ]; then
+		mkdir -p "$HOME/.config"
+		touch "$HOME/.config/gitconfig.local"
+	fi
+}
 
 
 case $OPT in
 "")
-  apply-dotbot
-  install-apps
-  install-node
-  install-spacevim
-  install-zsh
-  install-bash
-  install-zellij
-  ;;
+	install-packages
+	setup-config
+	install-zellij
+	apply-dotfiles "$DIR"
+	install-node
+	install-zsh
+	install-bash
+	;;
 
 *)
-  $OPT $@
-  ;;
+	$OPT "$@"
+	;;
 esac
 
 popd >/dev/null

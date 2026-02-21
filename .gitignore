@@ -2,7 +2,6 @@ byobu/.ssh-agent
 .DS_Store
 fish/fishd.*
 *.un~
-SpaceVim.d/.netrwhist
 fish/fish_variables
 Brewfile.lock.json
 .claude
