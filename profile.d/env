@@ -1,8 +1,6 @@
 # Shared environment variables for both zsh and bash
 # This file is sourced by both zshenv and bash_profile
 
-export PATH=/usr/local/bin:$PATH
-
 # Load local environment overrides
 if [ -f $HOME/.config/env.local ]; then
     source $HOME/.config/env.local

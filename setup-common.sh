@@ -69,22 +69,28 @@ function install-bash() {
 
 # Seed gitconfig.local with user identity and gh credential helper
 function seed-gitconfig() {
-	if [ ! -f "$HOME/.config/gitconfig.local" ]; then
-		read -rp "Git name: " git_name
-		read -rp "Git email: " git_email
-		mkdir -p "$HOME/.config"
-		cat > "$HOME/.config/gitconfig.local" <<-GITCFG
-		[user]
-			email = $git_email
-			name = $git_name
-		[credential "https://github.com"]
-			helper =
-			helper = !$(which gh) auth git-credential
-		[credential "https://gist.github.com"]
-			helper =
-			helper = !$(which gh) auth git-credential
-		GITCFG
-	fi
+    if [ ! -f "$HOME/.config/gitconfig.local" ]; then
+        local git_name git_email
+        while [ -z "$git_name" ]; do
+            read -rp "Git name: " git_name
+        done
+        while [ -z "$git_email" ]; do
+            read -rp "Git email: " git_email
+        done
+
+        mkdir -p "$HOME/.config"
+        local cfg="$HOME/.config/gitconfig.local"
+
+        git config --file "$cfg" user.name "$git_name"
+        git config --file "$cfg" user.email "$git_email"
+
+        if is-installed gh; then
+            git config --file "$cfg" 'credential.https://github.com.helper' ''
+            git config --file "$cfg" 'credential.https://github.com.helper' '!gh auth git-credential'
+            git config --file "$cfg" 'credential.https://gist.github.com.helper' ''
+            git config --file "$cfg" 'credential.https://gist.github.com.helper' '!gh auth git-credential'
+        fi
+    fi
 }
 
 # Create a symlink, removing any existing file/symlink
@@ -122,9 +128,9 @@ function apply-dotfiles() {
 
     # Symlink scripts to ~/.local/bin
     if [ -d "$dotfiles_dir/scripts" ]; then
-        mkdir -p ~/.local/bin
+        mkdir -p "$HOME/.local/bin"
         for script in "$dotfiles_dir/scripts"/*; do
-            [ -f "$script" ] && link-dotfile "$script" ~/.local/bin/$(basename "$script")
+            [ -f "$script" ] && link-dotfile "$script" "$HOME/.local/bin/$(basename "$script")"
         done
     fi
 
