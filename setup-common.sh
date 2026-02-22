@@ -92,5 +92,13 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh
 
+    # Symlink scripts to ~/.local/bin
+    if [ -d "$dotfiles_dir/scripts" ]; then
+        mkdir -p ~/.local/bin
+        for script in "$dotfiles_dir/scripts"/*; do
+            [ -f "$script" ] && link-dotfile "$script" ~/.local/bin/$(basename "$script")
+        done
+    fi
+
     echo "Done."
 }

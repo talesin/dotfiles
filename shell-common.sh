@@ -85,6 +85,11 @@ if is-installed zellij; then
   fi
 fi
 
+# Start ssh-agent and load keys
+if type refresh-sshkey >/dev/null 2>&1; then
+  refresh-sshkey
+fi
+
 # Update tools
 update-tools
 
