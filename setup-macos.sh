@@ -39,8 +39,6 @@ function install-apps() {
 	brew update
 	brew bundle --file "$DIR/Brewfile.macos"
 
-	python3 -m pip install --upgrade pip
-
     grep -sq /opt/homebrew/bin/bash /etc/shells
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /opt/homebrew/bin/bash >> /etc/shells"
@@ -67,13 +65,6 @@ function install-node-extras() {
 	npm install -g typescript cdk
 }
 
-function setup-vscode() {
-	# install extensions
-	cat vscode.extensions.lst | xargs -t -L 1 code --install-extension	>/dev/null
-}
-
-
-
 function install-zsh-macos() {
 	if [ "$SHELL" != "/opt/homebrew/bin/zsh" ]; then
 		echo "Change shell to zsh"
@@ -90,7 +81,7 @@ function install-powerline() {
 
 	ls ~/Library/Fonts | grep -i powerline >/dev/null
 	if [ ! $? -eq 0 ]; then
-		PATH="/opt/homebrew/bin:${PATH}" pip install --user powerline-status
+		pipx install powerline-status
 
 		git clone https://github.com/powerline/fonts.git --depth=1
 		cd fonts
@@ -113,7 +104,6 @@ case $OPT in
 	install-powerline
 	install-zsh-macos
 	install-bash
-	setup-vscode
 	;;
 
 *)
