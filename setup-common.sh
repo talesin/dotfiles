@@ -20,6 +20,10 @@ function install-node() {
         echo "Installing nvm"
         # Use latest stable NVM version
         NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        if [ -z "$NVM_VERSION" ]; then
+            echo "Error: failed to fetch NVM version from GitHub API" >&2
+            return 1
+        fi
         curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
     fi
 
@@ -63,9 +67,39 @@ function install-bash() {
     fi
 }
 
+# Seed gitconfig.local with user identity and gh credential helper
+function seed-gitconfig() {
+    if [ ! -f "$HOME/.config/gitconfig.local" ]; then
+        local git_name git_email
+        while [ -z "$git_name" ]; do
+            read -rp "Git name: " git_name
+        done
+        while [ -z "$git_email" ]; do
+            read -rp "Git email: " git_email
+        done
+
+        mkdir -p "$HOME/.config"
+        local cfg="$HOME/.config/gitconfig.local"
+
+        git config --file "$cfg" user.name "$git_name"
+        git config --file "$cfg" user.email "$git_email"
+
+        if is-installed gh; then
+            git config --file "$cfg" 'credential.https://github.com.helper' ''
+            git config --file "$cfg" 'credential.https://github.com.helper' '!gh auth git-credential'
+            git config --file "$cfg" 'credential.https://gist.github.com.helper' ''
+            git config --file "$cfg" 'credential.https://gist.github.com.helper' '!gh auth git-credential'
+        fi
+    fi
+}
+
 # Create a symlink, removing any existing file/symlink
 function link-dotfile() {
     local src="$1" dest="$2"
+    if [ -z "$dest" ]; then
+        echo "Error: link-dotfile requires a destination path" >&2
+        return 1
+    fi
     mkdir -p "$(dirname "$dest")"
     rm -rf "$dest"
     ln -sfn "$src" "$dest"
@@ -91,6 +125,14 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/zellij.kdl" ~/.config/zellij/config.kdl
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh
+
+    # Symlink scripts to ~/.local/bin
+    if [ -d "$dotfiles_dir/scripts" ]; then
+        mkdir -p "$HOME/.local/bin"
+        for script in "$dotfiles_dir/scripts"/*; do
+            [ -f "$script" ] && link-dotfile "$script" "$HOME/.local/bin/$(basename "$script")"
+        done
+    fi
 
     echo "Done."
 }

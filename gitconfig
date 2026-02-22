@@ -6,8 +6,10 @@
 [push]
 	default = simple
 	autoSetupRemote = true
+
 [branch]
 	autosetuprebase = always
+
 [alias]
 	lg = log --color --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
 
@@ -15,14 +17,6 @@
 	path = ~/.config/gitconfig.local
 
 [init]
-	defaultBranch = master
+	defaultBranch = main
 
-[user]
-	email = jeremy.clough@gmail.com
-	name = Jeremy Clough
-[credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+# User and credential config loaded from ~/.config/gitconfig.local

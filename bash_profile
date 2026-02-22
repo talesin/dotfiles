@@ -29,4 +29,3 @@ export BASH_PROFILE_LOADED=1
 if [[ -z $FROM_BASHRC ]] && [[ -f $HOME/.bashrc ]]; then
     source $HOME/.bashrc
 fi
-. "$HOME/.cargo/env"

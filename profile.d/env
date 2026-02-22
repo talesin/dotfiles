@@ -13,3 +13,6 @@ export NVM_DIR=$HOME/.nvm
 
 # Rust
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+# Xcode path for VSCode
+export MD_APPLE_SDK_ROOT=/Applications/Xcode.app
