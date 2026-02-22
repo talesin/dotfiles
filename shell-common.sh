@@ -92,5 +92,3 @@ fi
 
 # Update tools
 update-tools
-
-source $HOME/.cargo/env

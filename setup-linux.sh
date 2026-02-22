@@ -7,7 +7,7 @@ pushd "$DIR" >/dev/null
 source "$DIR/setup-common.sh"
 
 OPT=${1:-}
-shift 2>/dev/null || true
+[ $# -gt 0 ] && shift
 
 
 # Install packages via system package manager (pre-built binaries, no compilation)
@@ -46,12 +46,19 @@ function install-zellij() {
 		echo "Installing zellij..."
 		local version
 		version=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | jq -r .tag_name)
+		if [ -z "$version" ] || [ "$version" = "null" ]; then
+			echo "Error: failed to fetch zellij version from GitHub API" >&2
+			return 1
+		fi
 		local arch
 		arch=$(uname -m)
 		if [ "$arch" = "x86_64" ]; then
 			arch="x86_64-unknown-linux-musl"
 		elif [ "$arch" = "aarch64" ]; then
 			arch="aarch64-unknown-linux-musl"
+		else
+			echo "Error: unsupported architecture '$arch' for zellij" >&2
+			return 1
 		fi
 		curl -fsSL "https://github.com/zellij-org/zellij/releases/download/${version}/zellij-${arch}.tar.gz" | tar -xz -C "$HOME/.local/bin"
 	fi
@@ -64,7 +71,17 @@ function setup-config() {
 
 	if [ ! -f "$HOME/.config/gitconfig.local" ]; then
 		mkdir -p "$HOME/.config"
-		touch "$HOME/.config/gitconfig.local"
+		cat > "$HOME/.config/gitconfig.local" <<-'GITCFG'
+		[user]
+			email = jeremy.clough@gmail.com
+			name = Jeremy Clough
+		[credential "https://github.com"]
+			helper =
+			helper = !/usr/bin/gh auth git-credential
+		[credential "https://gist.github.com"]
+			helper =
+			helper = !/usr/bin/gh auth git-credential
+		GITCFG
 	fi
 }
 

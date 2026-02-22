@@ -20,6 +20,10 @@ function install-node() {
         echo "Installing nvm"
         # Use latest stable NVM version
         NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        if [ -z "$NVM_VERSION" ]; then
+            echo "Error: failed to fetch NVM version from GitHub API" >&2
+            return 1
+        fi
         curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
     fi
 
@@ -66,6 +70,10 @@ function install-bash() {
 # Create a symlink, removing any existing file/symlink
 function link-dotfile() {
     local src="$1" dest="$2"
+    if [ -z "$dest" ]; then
+        echo "Error: link-dotfile requires a destination path" >&2
+        return 1
+    fi
     mkdir -p "$(dirname "$dest")"
     rm -rf "$dest"
     ln -sfn "$src" "$dest"

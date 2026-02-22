@@ -17,4 +17,3 @@ fi
 export OS=$(uname)
 
 # echo zshenv end
-. "$HOME/.cargo/env"
