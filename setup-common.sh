@@ -67,6 +67,26 @@ function install-bash() {
     fi
 }
 
+# Seed gitconfig.local with user identity and gh credential helper
+function seed-gitconfig() {
+	if [ ! -f "$HOME/.config/gitconfig.local" ]; then
+		read -rp "Git name: " git_name
+		read -rp "Git email: " git_email
+		mkdir -p "$HOME/.config"
+		cat > "$HOME/.config/gitconfig.local" <<-GITCFG
+		[user]
+			email = $git_email
+			name = $git_name
+		[credential "https://github.com"]
+			helper =
+			helper = !$(which gh) auth git-credential
+		[credential "https://gist.github.com"]
+			helper =
+			helper = !$(which gh) auth git-credential
+		GITCFG
+	fi
+}
+
 # Create a symlink, removing any existing file/symlink
 function link-dotfile() {
     local src="$1" dest="$2"

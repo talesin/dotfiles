@@ -60,20 +60,7 @@ function install-apps() {
 		coursier setup
 	fi
 
-	if [ ! -f "$HOME/.config/gitconfig.local" ]; then
-		mkdir -p "$HOME/.config"
-		cat > "$HOME/.config/gitconfig.local" <<-'GITCFG'
-		[user]
-			email = jeremy.clough@gmail.com
-			name = Jeremy Clough
-		[credential "https://github.com"]
-			helper =
-			helper = !/usr/bin/gh auth git-credential
-		[credential "https://gist.github.com"]
-			helper =
-			helper = !/usr/bin/gh auth git-credential
-		GITCFG
-	fi
+	seed-gitconfig
 }
 
 function install-node-extras() {
