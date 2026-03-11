@@ -1,4 +1,5 @@
 SSH_ENV="$HOME/.ssh/env"
+mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
 while [[ -z $retry ]]; do
     ssh-add -l > /dev/null  2>&1
     ERR=$?
@@ -10,10 +11,10 @@ while [[ -z $retry ]]; do
         fi
 
         PIDS=`pgrep ssh-agent | wc --lines`
-        if [ ! -f $SSH_ENV ] || [ $PIDS -eq 0 ]; then
-            ssh-agent > $SSH_ENV
+        if [ ! -f "$SSH_ENV" ] || [ $PIDS -eq 0 ]; then
+            ssh-agent > "$SSH_ENV"
         fi
-        source $SSH_ENV > /dev/null
+        source "$SSH_ENV" > /dev/null
     fi
     retry=1
 done

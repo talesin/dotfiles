@@ -32,6 +32,20 @@ if [ -d ~/.functions ]; then
   fi
 fi
 
+# Set terminal title to current folder name
+# Overrides OMZ/OMB title since shell-common.sh loads after them
+# Zellij may prepend its session name, which is expected
+set-terminal-title() {
+  printf '\e]0;%s\a' "${PWD##*/}"
+}
+
+if [ -n "$ZSH_VERSION" ]; then
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd set-terminal-title
+elif [ -n "$BASH_VERSION" ]; then
+  PROMPT_COMMAND="set-terminal-title${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+fi
+
 # iTerm integration (works for both shells)
 if is-mac; then
   test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -73,15 +87,20 @@ if is-installed dotnet; then
     complete -f -F _dotnet_bash_complete dotnet
   fi
 fi
-
 # Zellij integration (works for both shells)
 if is-installed zellij; then
-  export ZELLIJ_AUTO_ATTACH=true
-  if [ -n "$ZSH_VERSION" ]; then
-    eval "$(zellij setup --generate-auto-start zsh)"
-  # TODO: Uncomment these lines if you want to enable Zellij auto-start for Bash
-  # elif [ -n "$BASH_VERSION" ]; then
-    # eval "$(zellij setup --generate-auto-start bash)"
+  if [[ -z "$ZELLIJ" ]]; then
+    # Clean up exited sessions
+    zellij ls 2>/dev/null | grep EXITED | awk '{print $1}' | sed -e 's/\x1B\[[0-9;]*[mG]//g' | xargs -I % zellij d % 2>/dev/null
+    # Attach to or create the single session
+    zellij attach --create "💻"
+    exit
+  fi
+
+  # In WSL, the terminal size is sometimes not reported correctly to Zellij
+  # on startup. Sending SIGWINCH forces a resize recalculation.
+  if [ -n "$WSL_DISTRO_NAME" ]; then
+    kill -SIGWINCH "$$"
   fi
 fi
 
