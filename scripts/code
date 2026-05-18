@@ -32,13 +32,21 @@ fi
 rest=("$@")
 abs="$(realpath -m "$target")"
 
-# Repos live on the Windows side at C:\Users\...\Repositories; rewrite before routing.
-if [[ "$abs" == "$REPOS_ROOT" || "$abs" == "$REPOS_ROOT"/* ]]; then
-    abs="${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}"
-fi
-
 # Route by path type.
 case "$abs" in
+    "$REPOS_ROOT" | "$REPOS_ROOT"/*)
+        # Repos are exposed Windows-side at C:\Users\<user>\Repositories. Pass an
+        # explicit folder/file URI: code.exe's own stat fails for this path in a
+        # WSL-spawned process (the C: path resolves via a mapped drive unavailable
+        # to WSL→Windows interop), so a folder would open as a stray file.
+        win="$(wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}")"
+        uri="file:///${win//\\//}"
+        if [[ -d "$abs" ]]; then
+            exec "$WINDOWS_CODE" --folder-uri "$uri" "${rest[@]}"
+        else
+            exec "$WINDOWS_CODE" --file-uri "$uri" "${rest[@]}"
+        fi
+        ;;
     /mnt/[a-zA-Z] | /mnt/[a-zA-Z]/*)
         win="$(wslpath -w "$abs")"
         exec "$WINDOWS_CODE" "$win" "${rest[@]}"
