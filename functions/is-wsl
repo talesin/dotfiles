@@ -1,0 +1,2 @@
+# echo is-wsl
+[[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease

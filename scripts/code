@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
+WINDOWS_CODE="/mnt/c/Users/$WINDOWS_USERNAME/AppData/Local/Programs/Microsoft VS Code/bin/code"
+REPOS_ROOT="$HOME/Repositories"
+WINDOWS_REPOS="/mnt/c/Users/$WINDOWS_USERNAME/Repositories"
+
+# Non-WSL: find the next `code` on PATH that isn't this script, exec it.
+if ! { [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease; }; then
+    self="$(realpath "$0")"
+    while IFS= read -r -d: dir; do
+        cand="$dir/code"
+        if [[ -x "$cand" && "$(realpath "$cand")" != "$self" ]]; then
+            exec "$cand" "$@"
+        fi
+    done <<< "$PATH:"
+    echo "code: no native VS Code found on PATH" >&2
+    exit 1
+fi
+
+# Leading flag: pass everything straight to Windows code, no path routing.
+if [[ "${1-}" == -* ]]; then
+    exec "$WINDOWS_CODE" "$@"
+fi
+
+# Resolve target path and remaining args.
+if [[ $# -gt 0 ]]; then
+    target="$1"; shift
+else
+    target="$(pwd)"
+fi
+rest=("$@")
+abs="$(realpath -m "$target")"
+
+# Repos live on the Windows side at C:\Users\...\Repositories; rewrite before routing.
+if [[ "$abs" == "$REPOS_ROOT" || "$abs" == "$REPOS_ROOT"/* ]]; then
+    abs="${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}"
+fi
+
+# Route by path type.
+case "$abs" in
+    /mnt/[a-zA-Z] | /mnt/[a-zA-Z]/*)
+        win="$(wslpath -w "$abs")"
+        exec "$WINDOWS_CODE" "$win" "${rest[@]}"
+        ;;
+    *)
+        exec "$WINDOWS_CODE" --remote "wsl+${WSL_DISTRO_NAME:-Ubuntu}" "$abs" "${rest[@]}"
+        ;;
+esac

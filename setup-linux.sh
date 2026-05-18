@@ -65,6 +65,27 @@ function install-zellij() {
 }
 
 
+function install-fonts() {
+	# FiraCode
+	if is-installed apt-get; then
+		sudo apt-get install -y fonts-firacode
+	elif is-installed dnf; then
+		sudo dnf install -y fira-code-fonts
+	fi
+
+	# Powerline fonts
+	if ! fc-list | grep -qi powerline; then
+		pushd /tmp >/dev/null
+		git clone https://github.com/powerline/fonts.git --depth=1
+		cd fonts
+		./install.sh
+		cd ..
+		rm -rf fonts
+		popd >/dev/null
+	fi
+}
+
+
 function setup-config() {
 	mkdir -p "$HOME/.local/bin"
 	export PATH="$HOME/.local/bin:$PATH"
@@ -76,6 +97,7 @@ function setup-config() {
 case $OPT in
 "")
 	install-packages
+	install-fonts
 	setup-config
 	install-zellij
 	apply-dotfiles "$DIR"
