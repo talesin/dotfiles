@@ -65,6 +65,30 @@ function install-zellij() {
 }
 
 
+function install-powershell() {
+	if not-installed pwsh; then
+		if is-installed apt-get; then
+			echo "Installing PowerShell..."
+			# shellcheck disable=SC1091
+			source /etc/os-release
+			local deb="/tmp/packages-microsoft-prod.deb"
+			if ! curl -fsSL -o "$deb" \
+				"https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb"; then
+				echo "Error: no Microsoft package repo for ${ID} ${VERSION_ID}" >&2
+				rm -f "$deb"
+				return 1
+			fi
+			sudo dpkg -i "$deb"
+			rm -f "$deb"
+			sudo apt-get update
+			sudo apt-get install -y powershell
+		else
+			echo "Skipping PowerShell: automatic install only supported on apt-based systems"
+		fi
+	fi
+}
+
+
 function install-fonts() {
 	# FiraCode
 	if is-installed apt-get; then
@@ -100,6 +124,7 @@ case $OPT in
 	install-fonts
 	setup-config
 	install-zellij
+	install-powershell
 	apply-dotfiles "$DIR"
 	install-node
 	install-zsh
