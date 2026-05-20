@@ -71,17 +71,45 @@ function install-powershell() {
 			echo "Installing PowerShell..."
 			# shellcheck disable=SC1091
 			source /etc/os-release
-			local deb="/tmp/packages-microsoft-prod.deb"
-			if ! curl -fsSL -o "$deb" \
-				"https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb"; then
-				echo "Error: no Microsoft package repo for ${ID} ${VERSION_ID}" >&2
-				rm -f "$deb"
-				return 1
+			local ms_deb="/tmp/packages-microsoft-prod.deb"
+			local installed_via_apt=false
+			if curl -fsSL -o "$ms_deb" \
+				"https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb" 2>/dev/null; then
+				sudo dpkg -i "$ms_deb"
+				rm -f "$ms_deb"
+				sudo apt-get update
+				if apt-cache show powershell >/dev/null 2>&1; then
+					sudo apt-get install -y powershell
+					installed_via_apt=true
+				fi
+			else
+				rm -f "$ms_deb"
 			fi
-			sudo dpkg -i "$deb"
-			rm -f "$deb"
-			sudo apt-get update
-			sudo apt-get install -y powershell
+			if [ "$installed_via_apt" = false ]; then
+				echo "Microsoft apt repo has no powershell for ${ID} ${VERSION_ID}; falling back to GitHub release..."
+				local arch
+				arch=$(dpkg --print-architecture)
+				if [ "$arch" != "amd64" ] && [ "$arch" != "arm64" ]; then
+					echo "Error: GitHub .deb fallback only supports amd64/arm64 (got '$arch')" >&2
+					return 1
+				fi
+				local tag
+				tag=$(curl -s https://api.github.com/repos/PowerShell/PowerShell/releases/latest | jq -r .tag_name)
+				if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+					echo "Error: failed to fetch PowerShell version from GitHub API" >&2
+					return 1
+				fi
+				local ver="${tag#v}"
+				local gh_deb="/tmp/powershell_${ver}-1.deb_${arch}.deb"
+				if ! curl -fsSL -o "$gh_deb" \
+					"https://github.com/PowerShell/PowerShell/releases/download/${tag}/powershell_${ver}-1.deb_${arch}.deb"; then
+					echo "Error: failed to download PowerShell ${tag} for ${arch}" >&2
+					rm -f "$gh_deb"
+					return 1
+				fi
+				sudo dpkg -i "$gh_deb" || sudo apt-get install -f -y
+				rm -f "$gh_deb"
+			fi
 		else
 			echo "Skipping PowerShell: automatic install only supported on apt-based systems"
 		fi
