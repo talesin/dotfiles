@@ -80,8 +80,8 @@ case "$abs" in
         exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" "$win" "${rest[@]}"
         ;;
     *)
-        dbg "branch=remote  distro=${WSL_DISTRO_NAME:-Ubuntu}  abs=$abs"
-        dbg "exec: $WINDOWS_CODE_BASH --remote wsl+${WSL_DISTRO_NAME:-Ubuntu} $abs ${rest[*]}"
-        exec "$WINDOWS_CODE_BASH" --remote "wsl+${WSL_DISTRO_NAME:-Ubuntu}" "$abs" "${rest[@]}"
+        dbg "branch=remote  abs=$abs  (authority set by wslCode.sh)"
+        dbg "exec: $WINDOWS_CODE_BASH $abs ${rest[*]}"
+        exec "$WINDOWS_CODE_BASH" "$abs" "${rest[@]}"
         ;;
 esac
