@@ -7,6 +7,7 @@ if [[ ! -z $FORCE ]] || [ $UPDATED -lt $YESTERDAY ]; then
   read -q update
   if [ $update = "y" ]; then
     is-installed brew && brew update && brew upgrade
+    is-installed apt && sudo apt update && sudo apt upgrade -y
   fi
   touch $HOME/.updated
 fi

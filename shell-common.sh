@@ -92,15 +92,17 @@ if is-installed zellij; then
   if [[ -z "$ZELLIJ" ]]; then
     # Clean up exited sessions
     zellij ls 2>/dev/null | grep EXITED | awk '{print $1}' | sed -e 's/\x1B\[[0-9;]*[mG]//g' | xargs -I % zellij d % 2>/dev/null
-    # Attach to or create the single session
-    zellij attach --create "💻"
-    exit
-  fi
-
-  # In WSL, the terminal size is sometimes not reported correctly to Zellij
-  # on startup. Sending SIGWINCH forces a resize recalculation.
-  if [ -n "$WSL_DISTRO_NAME" ]; then
-    kill -SIGWINCH "$$"
+    if [ -n "$WSL_DISTRO_NAME" ]; then
+      # On a cold WSL2 start, Windows Terminal hasn't propagated the real
+      # pane size to the pty by the time the shell runs. Wait (up to ~1s)
+      # for the pty to report a non-default size so zellij --create lays
+      # out panes at the real dimensions instead of 80x24.
+      for _ in 1 2 3 4 5 6 7 8 9 10; do
+        [ "$(tput cols 2>/dev/null || echo 0)" -gt 80 ] && break
+        sleep 0.1
+      done
+    fi
+    exec zellij attach --create "💻"
   fi
 fi
 

@@ -1,26 +1,44 @@
 #!/usr/bin/env bash
 
+dbg() { [[ -n "${CODE_DEBUG-}" ]] && printf 'code[dbg] %s\n' "$*" >&2; }
+
 WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
-WINDOWS_CODE="/mnt/c/Users/$WINDOWS_USERNAME/AppData/Local/Programs/Microsoft VS Code/bin/code"
+WINDOWS_VSCODE_BIN="/mnt/c/Users/$WINDOWS_USERNAME/AppData/Local/Programs/Microsoft VS Code/bin"
+# bin/code detects WSL and routes through the Remote-WSL extension (wslCode.sh), which
+# rewrites any --folder-uri to a vscode-remote:// target. Use code.cmd via cmd.exe for
+# branches that want a native Windows window; keep bin/code only for WSL-remote opens.
+WINDOWS_CODE_BASH="$WINDOWS_VSCODE_BIN/code"
+WINDOWS_CODE_CMD_WIN="$(wslpath -w "$WINDOWS_VSCODE_BIN/code.cmd")"
 REPOS_ROOT="$HOME/Repositories"
 WINDOWS_REPOS="/mnt/c/Users/$WINDOWS_USERNAME/Repositories"
 
+dbg "HOME=$HOME PWD=$PWD WSL_DISTRO_NAME=${WSL_DISTRO_NAME:-<unset>}"
+dbg "WINDOWS_USERNAME=$WINDOWS_USERNAME"
+dbg "WINDOWS_CODE_CMD_WIN=$WINDOWS_CODE_CMD_WIN"
+dbg "REPOS_ROOT=$REPOS_ROOT"
+dbg "WINDOWS_REPOS=$WINDOWS_REPOS"
+dbg "argc=$# argv=($*)"
+
 # Non-WSL: find the next `code` on PATH that isn't this script, exec it.
 if ! { [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease; }; then
+    dbg "non-WSL: scanning PATH for native code"
     self="$(realpath "$0")"
     while IFS= read -r -d: dir; do
         cand="$dir/code"
         if [[ -x "$cand" && "$(realpath "$cand")" != "$self" ]]; then
+            dbg "exec native: $cand $*"
             exec "$cand" "$@"
         fi
     done <<< "$PATH:"
     echo "code: no native VS Code found on PATH" >&2
     exit 1
 fi
+dbg "WSL confirmed"
 
 # Leading flag: pass everything straight to Windows code, no path routing.
 if [[ "${1-}" == -* ]]; then
-    exec "$WINDOWS_CODE" "$@"
+    dbg "leading flag passthrough: $*"
+    exec "$WINDOWS_CODE_BASH" "$@"
 fi
 
 # Resolve target path and remaining args.
@@ -31,27 +49,39 @@ else
 fi
 rest=("$@")
 abs="$(realpath -m "$target")"
+dbg "target=$target  abs=$abs"
+
+# cmd.exe prints UNC-path warnings when its working directory is under
+# \\wsl.localhost\... — change to a real Windows path before exec.
+cd /mnt/c
 
 # Route by path type.
 case "$abs" in
     "$REPOS_ROOT" | "$REPOS_ROOT"/*)
+        win="$(wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}")"
+        uri="file:///${win//\\//}"
+        dbg "branch=repos  win=$win  uri=$uri"
         # Repos are exposed Windows-side at C:\Users\<user>\Repositories. Pass an
         # explicit folder/file URI: code.exe's own stat fails for this path in a
         # WSL-spawned process (the C: path resolves via a mapped drive unavailable
         # to WSL→Windows interop), so a folder would open as a stray file.
-        win="$(wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}")"
-        uri="file:///${win//\\//}"
         if [[ -d "$abs" ]]; then
-            exec "$WINDOWS_CODE" --folder-uri "$uri" "${rest[@]}"
+            dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"
         else
-            exec "$WINDOWS_CODE" --file-uri "$uri" "${rest[@]}"
+            dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --file-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --file-uri "$uri" "${rest[@]}"
         fi
         ;;
     /mnt/[a-zA-Z] | /mnt/[a-zA-Z]/*)
         win="$(wslpath -w "$abs")"
-        exec "$WINDOWS_CODE" "$win" "${rest[@]}"
+        dbg "branch=mnt  win=$win"
+        dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN $win ${rest[*]}"
+        exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" "$win" "${rest[@]}"
         ;;
     *)
-        exec "$WINDOWS_CODE" --remote "wsl+${WSL_DISTRO_NAME:-Ubuntu}" "$abs" "${rest[@]}"
+        dbg "branch=remote  distro=${WSL_DISTRO_NAME:-Ubuntu}  abs=$abs"
+        dbg "exec: $WINDOWS_CODE_BASH --remote wsl+${WSL_DISTRO_NAME:-Ubuntu} $abs ${rest[*]}"
+        exec "$WINDOWS_CODE_BASH" --remote "wsl+${WSL_DISTRO_NAME:-Ubuntu}" "$abs" "${rest[@]}"
         ;;
 esac
