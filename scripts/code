@@ -80,8 +80,19 @@ case "$abs" in
         exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" "$win" "${rest[@]}"
         ;;
     *)
-        dbg "branch=remote  abs=$abs  (authority set by wslCode.sh)"
-        dbg "exec: $WINDOWS_CODE_BASH $abs ${rest[*]}"
-        exec "$WINDOWS_CODE_BASH" "$abs" "${rest[@]}"
+        if [[ -z "${WSL_DISTRO_NAME-}" ]]; then
+            echo "code: WSL_DISTRO_NAME unset; cannot build wsl+<distro> authority" >&2
+            exit 1
+        fi
+        authority="wsl+$WSL_DISTRO_NAME"
+        uri="vscode-remote://${authority}${abs}"
+        dbg "branch=remote  authority=$authority  uri=$uri"
+        if [[ -d "$abs" ]]; then
+            dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"
+        else
+            dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --file-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --file-uri "$uri" "${rest[@]}"
+        fi
         ;;
 esac
