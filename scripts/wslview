@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Open a URL or file using the default Windows application
+powershell.exe Start "$1"

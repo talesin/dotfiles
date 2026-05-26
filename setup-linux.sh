@@ -117,6 +117,28 @@ function install-powershell() {
 }
 
 
+function install-wsl-tools() {
+	if ! is-wsl; then
+		return 0
+	fi
+
+	if not-installed wslview; then
+		if is-installed apt-get && apt-cache show wslu >/dev/null 2>&1; then
+			echo "Installing wslu (Windows interop utilities)..."
+			sudo apt-get install -y wslu
+		else
+			echo "wslu not available in apt; installing bundled wslview fallback..."
+			mkdir -p "$HOME/.local/bin"
+			install -m 755 "$DIR/scripts/wslview" "$HOME/.local/bin/wslview"
+		fi
+	fi
+
+	if is-installed wslview && [ ! -e /usr/local/bin/xdg-open ]; then
+		sudo ln -sf "$(command -v wslview)" /usr/local/bin/xdg-open
+	fi
+}
+
+
 function install-fonts() {
 	# FiraCode
 	if is-installed apt-get; then
@@ -153,6 +175,7 @@ case $OPT in
 	setup-config
 	install-zellij
 	install-powershell
+	install-wsl-tools
 	apply-dotfiles "$DIR"
 	install-node
 	install-zsh

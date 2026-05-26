@@ -16,3 +16,8 @@ export NVM_DIR=$HOME/.nvm
 
 # Xcode path for VSCode
 export MD_APPLE_SDK_ROOT=/Applications/Xcode.app
+
+# WSL: use the default Windows browser for URL opening
+if [ -n "$WSL_DISTRO_NAME" ] && command -v wslview >/dev/null 2>&1; then
+    export BROWSER=wslview
+fi
