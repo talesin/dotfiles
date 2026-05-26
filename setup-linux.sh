@@ -136,6 +136,14 @@ function install-wsl-tools() {
 	if is-installed wslview && [ ! -e /usr/local/bin/xdg-open ]; then
 		sudo ln -sf "$(command -v wslview)" /usr/local/bin/xdg-open
 	fi
+
+	# Deploy .wslconfig to Windows user profile (mirrored networking for localhost OAuth flows)
+	local win_home
+	win_home=$(wslpath "$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')")
+	if [ -n "$win_home" ] && [ -d "$win_home" ]; then
+		cp "$DIR/wslconfig" "$win_home/.wslconfig"
+		echo "Deployed .wslconfig to $win_home — restart WSL to apply (wsl --shutdown)"
+	fi
 }
 
 
