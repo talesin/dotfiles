@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+dbg() { [[ -n "${PWSH_DEBUG-}" ]] && printf 'pwsh[dbg] %s\n' "$*" >&2; }
+
+WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
+REPOS_ROOT="$HOME/Repositories"
+WINDOWS_REPOS="/mnt/c/Users/$WINDOWS_USERNAME/Repositories"
+
+dbg "HOME=$HOME PWD=$PWD WSL_DISTRO_NAME=${WSL_DISTRO_NAME:-<unset>}"
+dbg "WINDOWS_USERNAME=$WINDOWS_USERNAME"
+dbg "argc=$# argv=($*)"
+
+# Non-WSL: find the next `pwsh` on PATH that isn't this script, exec it.
+if ! { [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease; }; then
+    dbg "non-WSL: scanning PATH for native pwsh"
+    self="$(realpath "$0")"
+    while IFS= read -r -d: dir; do
+        cand="$dir/pwsh"
+        if [[ -x "$cand" && "$(realpath "$cand")" != "$self" ]]; then
+            dbg "exec native: $cand $*"
+            exec "$cand" "$@"
+        fi
+    done <<< "$PATH:"
+    echo "pwsh: no native pwsh found on PATH" >&2
+    exit 1
+fi
+dbg "WSL confirmed"
+
+# Resolve a WSL path to a Windows path, mirroring scripts/code's case dispatch:
+#   ~/Repositories/...  →  C:\Users\<user>\Repositories\...  (drive-letter, local zone)
+#   /mnt/<letter>/...   →  wslpath -w directly               (drive-letter)
+#   anything else       →  wslpath -w directly               (UNC \\wsl.localhost\...)
+to_windows_path() {
+    local p="$1" abs
+    abs="$(realpath -m "$p" 2>/dev/null)" || { echo "$p"; return; }
+    case "$abs" in
+        "$REPOS_ROOT" | "$REPOS_ROOT"/*)
+            wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}" 2>/dev/null || echo "$p"
+            ;;
+        /mnt/[a-zA-Z] | /mnt/[a-zA-Z]/*)
+            wslpath -w "$abs" 2>/dev/null || echo "$p"
+            ;;
+        *)
+            wslpath -w "$abs" 2>/dev/null || echo "$p"
+            ;;
+    esac
+}
+
+# Translate a single arg to a Windows path if it looks like a WSL path.
+# Returns the original arg unchanged if the shape doesn't match.
+translate_path() {
+    local arg="$1"
+    case "$arg" in
+        /* | ./* | ../* | ~/* | ~)
+            to_windows_path "$arg"
+            ;;
+        *)
+            echo "$arg"
+            ;;
+    esac
+}
+
+# Build translated argv.
+# Flags in this list signal that the *next* arg is a path — translate it unconditionally.
+PATH_FLAGS_RE='^(-[Ff]ile|-[Ff]ile[Pp]ath|-[Ww]orking[Dd]irectory|-[Cc]onfiguration[Ff]ile|-[Pp][Ss][Cc]onsole[Ff]ile|-[Oo]utput[Ff]ile|-[Ll]og[Ff]ile)$'
+# Flags whose next arg must NOT be path-translated (it's a script block or encoded string).
+NONTRANS_FLAGS_RE='^(-[Cc]ommand|-[Cc]|-[Ee]ncodedCommand|-[Ee]ncodedC)$'
+
+new_argv=()
+next_is_path=false
+skip_translate=false
+
+for arg in "$@"; do
+    if $next_is_path; then
+        win="$(to_windows_path "$arg")"
+        dbg "flag-forced path: $arg -> $win"
+        new_argv+=("$win")
+        next_is_path=false
+        skip_translate=false
+        continue
+    fi
+
+    if $skip_translate; then
+        dbg "skip-translate passthrough: $arg"
+        new_argv+=("$arg")
+        skip_translate=false
+        continue
+    fi
+
+    if [[ "$arg" =~ $PATH_FLAGS_RE ]]; then
+        dbg "path-flag: $arg"
+        new_argv+=("$arg")
+        next_is_path=true
+        continue
+    fi
+
+    if [[ "$arg" =~ $NONTRANS_FLAGS_RE ]]; then
+        dbg "nontrans-flag: $arg"
+        new_argv+=("$arg")
+        skip_translate=true
+        continue
+    fi
+
+    translated="$(translate_path "$arg")"
+    [[ "$translated" != "$arg" ]] && dbg "auto-path: $arg -> $translated"
+    new_argv+=("$translated")
+done
+
+dbg "new_argv=(${new_argv[*]})"
+
+# Determine -WorkingDirectory. to_windows_path returns empty string if wslpath fails
+# (e.g. a pure-Linux path like /proc) — omit the flag in that case.
+win_cwd="$(to_windows_path "$PWD")"
+if [[ -n "$win_cwd" ]]; then
+    dbg "WorkingDirectory=$win_cwd"
+    wd_args=(-WorkingDirectory "$win_cwd")
+else
+    dbg "WorkingDirectory: untranslatable ($PWD), omitting"
+    wd_args=()
+fi
+
+# cmd.exe prints UNC-path warnings when its working directory is under
+# \\wsl.localhost\... — change to a real Windows path before exec.
+cd /mnt/c
+
+dbg "exec: pwsh.exe ${wd_args[*]} ${new_argv[*]}"
+exec pwsh.exe "${wd_args[@]}" "${new_argv[@]}"
