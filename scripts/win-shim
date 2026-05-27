@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Shared helpers for WSL→Windows command shims.
+#
+# Usage (from a shim):
+#   WIN_SHIM_DBG_VAR=CODE_DEBUG
+#   WIN_SHIM_DBG_PREFIX='code[dbg]'
+#   source "$(dirname "$(realpath "$0")")/win-shim"
+#
+# Usage (directly):
+#   win-shim to-windows-path <path>
+#   win-shim classify-path   <path>
+#   win-shim is-wsl
+
+WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
+REPOS_ROOT="$HOME/Repositories"
+WINDOWS_REPOS="/mnt/c/Users/$WINDOWS_USERNAME/Repositories"
+
+win_dbg() {
+    local var="${WIN_SHIM_DBG_VAR:-WIN_SHIM_DEBUG}"
+    local pfx="${WIN_SHIM_DBG_PREFIX:-win-shim[dbg]}"
+    [[ -n "${!var}" ]] && printf '%s %s\n' "$pfx" "$*" >&2
+}
+
+is_wsl() {
+    [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
+}
+
+# If not in WSL, find the next <name> on PATH that isn't $0 and exec it.
+# If none found, print an error and exit 1.
+# Returns 0 when running inside WSL so the caller continues.
+native_passthrough_or_die() {
+    local name="$1"; shift
+    if is_wsl; then
+        win_dbg "WSL confirmed"
+        return 0
+    fi
+    win_dbg "non-WSL: scanning PATH for native $name"
+    local self; self="$(realpath "$0")"
+    local dir cand
+    while IFS= read -r -d: dir; do
+        cand="$dir/$name"
+        if [[ -x "$cand" && "$(realpath "$cand")" != "$self" ]]; then
+            win_dbg "exec native: $cand $*"
+            exec "$cand" "$@"
+        fi
+    done <<< "$PATH:"
+    echo "$name: no native $name found on PATH" >&2
+    exit 1
+}
+
+# classify_path <abs-path> → repos | mnt | other
+classify_path() {
+    local abs="$1"
+    case "$abs" in
+        "$REPOS_ROOT" | "$REPOS_ROOT"/*)   echo repos ;;
+        /mnt/[a-zA-Z] | /mnt/[a-zA-Z]/*) echo mnt   ;;
+        *)                                  echo other ;;
+    esac
+}
+
+# to_windows_path <wsl-path> → Windows path string, or empty if untranslatable
+to_windows_path() {
+    local p="$1" abs
+    abs="$(realpath -m "$p" 2>/dev/null)" || { echo "$p"; return; }
+    case "$(classify_path "$abs")" in
+        repos) wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}" 2>/dev/null || echo "$p" ;;
+        mnt)   wslpath -w "$abs" 2>/dev/null || echo "$p" ;;
+        other) wslpath -w "$abs" 2>/dev/null || echo "$p" ;;
+    esac
+}
+
+# CLI mode
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    cmd="${1-}"; shift || true
+    case "$cmd" in
+        to-windows-path) to_windows_path "$1" ;;
+        classify-path)   classify_path "$(realpath -m "$1")" ;;
+        is-wsl)          is_wsl && echo true || echo false ;;
+        *)
+            echo "usage: win-shim <to-windows-path|classify-path|is-wsl> [path]" >&2
+            exit 1
+            ;;
+    esac
+fi
