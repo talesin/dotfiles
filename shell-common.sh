@@ -87,6 +87,47 @@ if is-installed dotnet; then
     complete -f -F _dotnet_bash_complete dotnet
   fi
 fi
+# PowerShell (.ps1) completion — drives native Linux pwsh to introspect script param() blocks
+if [ -x /usr/bin/pwsh ]; then
+  if [ -n "$ZSH_VERSION" ]; then
+    _pwsh_zsh_complete() {
+      local line pos raw
+      line="${(j: :)words[1,-1]}"
+      pos=${#line}
+      raw="$(/usr/bin/pwsh -NoProfile -NonInteractive \
+            -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
+            -InputLine "$line" -CursorPos "$pos" -WorkingDir "$PWD" 2>/dev/null)"
+      [[ -z "$raw" ]] && return
+      compadd -- "${(@f)raw}"
+    }
+    compdef _pwsh_zsh_complete -p '*.ps1'
+  elif [ -n "$BASH_VERSION" ]; then
+    _pwsh_bash_complete() {
+      local line="${COMP_LINE}"
+      local pos="${COMP_POINT}"
+      local IFS=$'\n'
+      read -d '' -ra COMPREPLY < <(
+        /usr/bin/pwsh -NoProfile -NonInteractive \
+          -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
+          -InputLine "$line" -CursorPos "$pos" -WorkingDir "$PWD" 2>/dev/null
+      )
+    }
+    _pwsh_bash_register() {
+      local dir f
+      local old_nullglob; old_nullglob="$(shopt -p nullglob)"
+      shopt -s nullglob
+      while IFS= read -rd: dir; do
+        [[ -d "$dir" ]] || continue
+        for f in "$dir"/*.ps1; do
+          complete -F _pwsh_bash_complete "${f##*/}"
+        done
+      done <<< "${PATH}:"
+      eval "$old_nullglob"
+    }
+    _pwsh_bash_register
+  fi
+fi
+
 # Zellij integration (works for both shells)
 if is-installed zellij; then
   if [[ -z "$ZELLIJ" ]]; then
