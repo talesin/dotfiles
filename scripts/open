@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Open a path in Windows Explorer, mapping the WSL path to its Windows equivalent.
+# With no argument, opens the current directory.
+
+WIN_SHIM_DBG_VAR=OPEN_DEBUG
+WIN_SHIM_DBG_PREFIX='open[dbg]'
+source "$(dirname "$(realpath "$0")")/win-shim"
+
+win_dbg "target=${1:-.} PWD=$PWD"
+
+native_passthrough_or_die open "$@"
+
+target="${1:-.}"
+win="$(to_windows_path "$target")"
+win_dbg "open: $target -> $win"
+
+if [[ -z "$win" ]]; then
+    echo "open: cannot translate '$target' to a Windows path" >&2
+    exit 1
+fi
+
+# explorer.exe exits non-zero even on success; suppress that.
+explorer.exe "$win" || true

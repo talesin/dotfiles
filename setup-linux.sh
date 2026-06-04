@@ -168,6 +168,17 @@ function install-fonts() {
 }
 
 
+function install-dotnet() {
+	echo "Installing .NET SDK (LTS)..."
+	local installer="$HOME/.local/bin/dotnet-install.sh"
+	if [ ! -f "$installer" ]; then
+		mkdir -p "$HOME/.local/bin"
+		curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$installer" && chmod +x "$installer"
+	fi
+	"$installer" --channel LTS --install-dir "$HOME/.dotnet"
+}
+
+
 function setup-config() {
 	mkdir -p "$HOME/.local/bin"
 	export PATH="$HOME/.local/bin:$PATH"
@@ -183,6 +194,7 @@ case $OPT in
 	setup-config
 	install-zellij
 	install-powershell
+	install-dotnet
 	install-wsl-tools
 	apply-dotfiles "$DIR"
 	install-node

@@ -1,5 +1,7 @@
 # Shared PATH management for both zsh and bash
 # This file is sourced by both zprofile and bash_profile
+add-path "$HOME/.dotnet"
+add-path "$HOME/.dotnet/tools"
 add-path "$HOME/.local/bin"
 add-path "$HOME/.cargo/bin"
 add-path "$HOME/.lmstudio/bin"

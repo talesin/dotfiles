@@ -1,0 +1,9 @@
+# echo update-dotnet
+local installer="$HOME/.local/bin/dotnet-install.sh"
+if [ ! -f "$installer" ]; then
+  echo "Downloading dotnet-install.sh..."
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$installer" && chmod +x "$installer"
+fi
+echo "Updating .NET SDK (LTS)..."
+"$installer" --channel LTS --install-dir "$HOME/.dotnet"

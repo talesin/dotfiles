@@ -8,6 +8,7 @@ if [[ ! -z $FORCE ]] || [ $UPDATED -lt $YESTERDAY ]; then
   if [ $update = "y" ]; then
     is-installed brew && brew update && brew upgrade
     is-installed apt && sudo apt update && sudo apt upgrade -y
+    is-installed dotnet && update-dotnet
   fi
   touch $HOME/.updated
 fi

@@ -21,3 +21,9 @@ export MD_APPLE_SDK_ROOT=/Applications/Xcode.app
 if [ -n "$WSL_DISTRO_NAME" ] && command -v wslview >/dev/null 2>&1; then
     export BROWSER=wslview
 fi
+
+export EDITOR=vim
+
+# .NET
+export DOTNET_ROOT="$HOME/.dotnet"
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
