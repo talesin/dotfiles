@@ -40,13 +40,13 @@ cd /mnt/c
 
 case "$(classify_path "$abs")" in
     repos)
-        win="$(wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}")"
+        win="$(repos_to_windows "$abs")"
         uri="file:///${win//\\//}"
         win_dbg "branch=repos  win=$win  uri=$uri"
-        # Repos are exposed Windows-side at C:\Users\<user>\Repositories. Pass an
-        # explicit folder/file URI: code.exe's own stat fails for this path in a
-        # WSL-spawned process (the C: path resolves via a mapped drive unavailable
-        # to WSL→Windows interop), so a folder would open as a stray file.
+        # Repos are on a subst drive (Z:\) that isn't mounted in WSL, so the
+        # path is built by string substitution in repos_to_windows(), not wslpath.
+        # Pass an explicit folder/file URI so code.exe doesn't try to stat the
+        # path itself (stat fails for subst drives in a WSL-spawned process).
         if [[ -d "$abs" ]]; then
             win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
             exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"

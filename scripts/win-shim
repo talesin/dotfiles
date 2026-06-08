@@ -13,7 +13,12 @@
 
 WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
 REPOS_ROOT="$HOME/Repositories"
-WINDOWS_REPOS="/mnt/c/Users/$WINDOWS_USERNAME/Repositories"
+# Repos are exposed on Windows via a subst drive that maps 1:1 to the repos
+# root (e.g. Z:\ == ~/Repositories). The drive is NOT mounted in WSL (no
+# /mnt/z), so the repos branch builds Windows paths by string substitution
+# rather than wslpath. Override per-machine via WINDOWS_REPOS_DRIVE in
+# ~/.config/env.local if the drive letter differs.
+WINDOWS_REPOS_DRIVE="${WINDOWS_REPOS_DRIVE:-Z:}"
 
 win_dbg() {
     local var="${WIN_SHIM_DBG_VAR:-WIN_SHIM_DEBUG}"
@@ -48,6 +53,20 @@ native_passthrough_or_die() {
     exit 1
 }
 
+# repos_to_windows <abs-path-under-REPOS_ROOT> → Windows path on the subst drive
+# ~/Repositories          → Z:\
+# ~/Repositories/foo/bar  → Z:\foo\bar
+repos_to_windows() {
+    local rel="${1#"$REPOS_ROOT"}"   # "" for the root itself, else "/foo/bar"
+    rel="${rel#/}"                   # strip leading slash → "foo/bar" or ""
+    if [[ -z "$rel" ]]; then
+        printf '%s\\' "$WINDOWS_REPOS_DRIVE"
+    else
+        local win_rel="${rel//\//\\}"
+        printf '%s\\%s' "$WINDOWS_REPOS_DRIVE" "$win_rel"
+    fi
+}
+
 # classify_path <abs-path> → repos | mnt | other
 classify_path() {
     local abs="$1"
@@ -63,7 +82,7 @@ to_windows_path() {
     local p="$1" abs
     abs="$(realpath -m "$p" 2>/dev/null)" || { echo "$p"; return; }
     case "$(classify_path "$abs")" in
-        repos) wslpath -w "${WINDOWS_REPOS}${abs#"$REPOS_ROOT"}" 2>/dev/null || echo "$p" ;;
+        repos) repos_to_windows "$abs" ;;
         mnt)   wslpath -w "$abs" 2>/dev/null || echo "$p" ;;
         other) wslpath -w "$abs" 2>/dev/null || echo "$p" ;;
     esac
