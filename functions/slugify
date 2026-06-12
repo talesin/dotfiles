@@ -1,0 +1,2 @@
+# echo slugify
+echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E "s/'//g; s/[^a-z0-9]+/-/g; s/^-+|-+$//g"

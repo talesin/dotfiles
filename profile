@@ -14,3 +14,8 @@ export LS_COLORS="di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30
 if is-installed launchctl; then
   launchctl setenv PATH "$PATH"
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
+# End of LM Studio CLI section
+

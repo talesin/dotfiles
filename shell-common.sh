@@ -14,14 +14,8 @@ if [ -d ~/.functions ]; then
     # Zsh autoload mechanism
     typeset -U fpath
     fdir=$HOME/.functions
-    if [[ -z ${fpath[(r)$fdir]} ]] ; then
-        export fpath=($fdir $fpath)
-        for func_file in $fdir/*; do
-            if [ -f "$func_file" ]; then
-                autoload -Uz $(basename "$func_file")
-            fi
-        done
-    fi
+    fpath=($fdir $fpath)
+    autoload -Uz ${fdir}/*(:t)
   else
     # Bash/other shells manual sourcing
     pushd ~/.functions >/dev/null
@@ -77,6 +71,7 @@ if is-installed dotnet; then
       _values="${(ps:\n:)completions}"
     }
     compdef _dotnet_zsh_complete dotnet
+
   elif [ -n "$BASH_VERSION" ]; then
     _dotnet_bash_complete() {
       local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'

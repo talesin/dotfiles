@@ -42,6 +42,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `refresh-sshkey` - SSH agent startup and key management
 - `is-expired-sshkey` - Check SSH certificate expiration
 - `update-tools` - Interactive daily Homebrew update prompt
+- `slugify` - Convert a string to a lowercase, dash-separated slug
 
 ### Development Tool Configs
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)

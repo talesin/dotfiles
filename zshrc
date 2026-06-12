@@ -4,6 +4,9 @@
 NOW=`date +%s`
 
 
+# Local completions
+fpath=(~/.local/share/zsh/completions $fpath)
+
 # Oh My Zsh (zsh-specific)
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
@@ -14,3 +17,8 @@ source $ZSH/oh-my-zsh.sh
 source ~/.shell-common.sh
 
 # echo "zshenv end"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
+# End of LM Studio CLI section
+
