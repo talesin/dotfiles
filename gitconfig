@@ -2,6 +2,7 @@
 	excludesfile = $HOME/.config/git/ignore
 	autocrlf = input
 	safecrlf = false
+	fileMode = true
 
 [push]
 	default = simple
@@ -20,3 +21,5 @@
 	defaultBranch = main
 
 # User and credential config loaded from ~/.config/gitconfig.local
+[worktree]
+	useRelativePaths = true

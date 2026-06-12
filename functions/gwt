@@ -1,0 +1,31 @@
+# echo gwt
+# Create or switch to a git worktree at <repo-parent>/<repo>-<slugified-branch>
+if [ -z "$1" ]; then
+  echo "usage: gwt <branch>" >&2
+  return 1
+fi
+
+local branch="$1"
+
+# Main worktree root (first porcelain entry) so this works from inside any linked worktree
+local root
+root="$(git worktree list --porcelain 2>/dev/null | head -1 | cut -d' ' -f2-)"
+if [ -z "$root" ]; then
+  echo "gwt: not a git repository" >&2
+  return 1
+fi
+
+local target="${root}-$(slugify "$branch")"
+
+if [ ! -d "$target" ]; then
+  # --relative-paths keeps the worktree<->repo links portable between WSL and Windows git
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git -C "$root" worktree add --relative-paths "$target" "$branch" || return
+  elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+    git -C "$root" worktree add --relative-paths --track -b "$branch" "$target" "origin/$branch" || return
+  else
+    git -C "$root" worktree add --relative-paths -b "$branch" "$target" || return
+  fi
+fi
+
+cd "$target"

@@ -11,11 +11,11 @@ fi
 # Load functions
 if [ -d ~/.functions ]; then
   if [ -n "$ZSH_VERSION" ]; then
-    # Zsh autoload mechanism
+    # Zsh autoload mechanism (eval hides zsh-only glob syntax from bash's parser)
     typeset -U fpath
     fdir=$HOME/.functions
     fpath=($fdir $fpath)
-    autoload -Uz ${fdir}/*(:t)
+    eval 'autoload -Uz ${fdir}/*(:t)'
   else
     # Bash/other shells manual sourcing
     pushd ~/.functions >/dev/null
@@ -82,6 +82,19 @@ if is-installed dotnet; then
     complete -f -F _dotnet_bash_complete dotnet
   fi
 fi
+
+# Git worktree helper (gwt) branch completion
+if [ -n "$ZSH_VERSION" ]; then
+  compdef _gwt gwt
+elif [ -n "$BASH_VERSION" ]; then
+  _gwt_bash_complete() {
+    local branches
+    branches="$({ git for-each-ref --format='%(refname:short)' refs/heads; git for-each-ref --format='%(refname:strip=3)' refs/remotes; } 2>/dev/null | grep -v '^HEAD$' | sort -u)"
+    COMPREPLY=($(compgen -W "$branches" -- "${COMP_WORDS[COMP_CWORD]}"))
+  }
+  complete -F _gwt_bash_complete gwt
+fi
+
 # PowerShell (.ps1) completion — drives native Linux pwsh to introspect script param() blocks
 if [ -x /usr/bin/pwsh ]; then
   if [ -n "$ZSH_VERSION" ]; then
