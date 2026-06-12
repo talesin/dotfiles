@@ -2,10 +2,8 @@
 
 typeset -U fpath
 fdir=$HOME/.functions
-if [[ -z ${fpath[(r)$fdir]} ]] ; then
-    export fpath=($fdir $fpath)
-    autoload -Uz ${fdir}/*(:t)
-fi
+fpath=($fdir $fpath)
+autoload -Uz ${fdir}/*(:t)
 
 if is-installed launchctl; then
   launchctl setenv PATH $PATH

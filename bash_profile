@@ -29,3 +29,8 @@ export BASH_PROFILE_LOADED=1
 if [[ -z $FROM_BASHRC ]] && [[ -f $HOME/.bashrc ]]; then
     source $HOME/.bashrc
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
+# End of LM Studio CLI section
+

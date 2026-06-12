@@ -5,3 +5,4 @@ fish/fishd.*
 fish/fish_variables
 Brewfile.lock.json
 .claude
+.vscode

@@ -19,4 +19,9 @@
 [init]
 	defaultBranch = main
 
-# User and credential config loaded from ~/.config/gitconfig.local
+[credential "https://dev.azure.com"]
+	helper = manager
+	useHttpPath = true
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
