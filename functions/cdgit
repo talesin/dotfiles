@@ -1,0 +1,114 @@
+# cdgit
+# Create or switch to a git worktree at <repo-parent>/<repo>-<slugified-branch>
+# Usage: cdgit [--init] [branch]
+#   --init   After switching, restore project dependencies (dotnet / npm)
+#   (no arg) Interactive fzf picker over existing worktrees (requires fzf)
+#
+# No strict mode (set -e/-u/-o pipefail) — runs in interactive shell context;
+# enabling it here would mutate the calling shell's error-handling state.
+
+local do_init=0 branch=
+
+# Arg parsing
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --init)   do_init=1; shift ;;
+    -h|--help)
+      echo "usage: cdgit [--init] [branch]" >&2
+      echo "  (no branch) interactive fzf picker over existing worktrees" >&2
+      return 0 ;;
+    -*)
+      echo "cdgit: unknown option: $1" >&2
+      echo "usage: cdgit [--init] [branch]" >&2
+      return 1 ;;
+    *)
+      if [ -n "$branch" ]; then
+        echo "cdgit: unexpected argument: $1" >&2
+        return 1
+      fi
+      branch="$1"; shift ;;
+  esac
+done
+
+# Main worktree root — awk avoids the SIGPIPE that head -1 generates on multi-worktree repos.
+# local and assignment are split so the empty-string guard below catches command failures
+# (combining them would suppress the exit status via local's own return 0).
+local root
+root="$(git worktree list --porcelain 2>/dev/null | awk 'NR==1{print $2; exit}')"
+if [ -z "$root" ]; then
+  echo "cdgit: not a git repository" >&2
+  return 1
+fi
+
+# No branch → fzf picker over existing worktrees
+if [ -z "$branch" ]; then
+  if ! is-installed fzf; then
+    echo "usage: cdgit [--init] <branch>" >&2
+    echo "  (install fzf for interactive no-arg picker)" >&2
+    return 1
+  fi
+  # Split local + assignment so the empty-string guard catches user cancels (Ctrl-C / Esc)
+  local picked
+  picked="$(git worktree list | fzf --height=40% --reverse --prompt='worktree> ' | awk '{print $1}')"
+  if [ -z "$picked" ]; then
+    return 0  # cancelled
+  fi
+  cd "$picked" || return 1
+  echo "cdgit: switched to $picked"
+  return 0
+fi
+
+local target="${root}-$(slugify "$branch")"
+local created=0
+
+if [ ! -d "$target" ]; then
+  # --relative-paths keeps the worktree<->repo links portable between WSL and Windows git
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git -C "$root" worktree add --relative-paths "$target" "$branch" || return
+  elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+    git -C "$root" worktree add --relative-paths --track -b "$branch" "$target" "origin/$branch" || return
+  else
+    git -C "$root" worktree add --relative-paths -b "$branch" "$target" || return
+  fi
+  created=1
+
+  # Seed gitignored config from the main worktree into the new one.
+  # Override the list via: CDGIT_COPY=(".env" ".envrc") cdgit <branch>
+  local -a copy_list
+  # ${CDGIT_COPY+set} guards against unbound-variable under set -u in bash
+  if [ -n "${CDGIT_COPY+set}" ] && [ ${#CDGIT_COPY[@]} -gt 0 ]; then
+    copy_list=("${CDGIT_COPY[@]}")
+  else
+    copy_list=(".env" "CLAUDE.md" ".claude")
+  fi
+  local item
+  for item in "${copy_list[@]}"; do
+    if [ -e "$root/$item" ]; then
+      cp -R "$root/$item" "$target/" \
+        || echo "cdgit: warning: failed to copy $item" >&2
+    fi
+  done
+fi
+
+cd "$target" || return 1
+
+if [ "$created" -eq 1 ]; then
+  echo "cdgit: created worktree $target (branch $branch)"
+else
+  echo "cdgit: switched to $target (branch $branch)"
+fi
+
+# Optional dependency restore (--init)
+if [ "$do_init" -eq 1 ]; then
+  if is-installed dotnet; then
+    [ -f .config/dotnet-tools.json ] && dotnet tool restore
+    { [ -f paket.dependencies ] || [ -d .paket ]; } && dotnet paket restore
+    # Loop instead of find | grep -q to avoid SIGPIPE under pipefail
+    local has_project=0
+    for f in ./*.sln ./*.*proj; do
+      [ -f "$f" ] && { has_project=1; break; }
+    done
+    [ "$has_project" -eq 1 ] && dotnet restore
+  fi
+  is-installed npm && [ -f package.json ] && npm install
+fi

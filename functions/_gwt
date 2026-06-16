@@ -1,4 +1,0 @@
-#compdef gwt
-local -a branches
-branches=(${(f)"$({ git for-each-ref --format='%(refname:short)' refs/heads; git for-each-ref --format='%(refname:strip=3)' refs/remotes; } 2>/dev/null | grep -v '^HEAD$' | sort -u)"})
-compadd -a branches

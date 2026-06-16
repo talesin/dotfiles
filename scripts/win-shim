@@ -77,6 +77,10 @@ classify_path() {
     esac
 }
 
+# uri_encode_spaces <string> → string with spaces percent-encoded as %20
+# Needed so cmd.exe /c doesn't see more than one quoted space-containing arg.
+uri_encode_spaces() { printf '%s' "${1// /%20}"; }
+
 # to_windows_path <wsl-path> → Windows path string, or empty if untranslatable
 to_windows_path() {
     local p="$1" abs

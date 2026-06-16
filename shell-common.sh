@@ -83,57 +83,63 @@ if is-installed dotnet; then
   fi
 fi
 
-# Git worktree helper (gwt) branch completion
+# Git worktree helper (cdgit) branch completion
 if [ -n "$ZSH_VERSION" ]; then
-  compdef _gwt gwt
+  compdef _cdgit cdgit
 elif [ -n "$BASH_VERSION" ]; then
-  _gwt_bash_complete() {
-    local branches
-    branches="$({ git for-each-ref --format='%(refname:short)' refs/heads; git for-each-ref --format='%(refname:strip=3)' refs/remotes; } 2>/dev/null | grep -v '^HEAD$' | sort -u)"
-    COMPREPLY=($(compgen -W "$branches" -- "${COMP_WORDS[COMP_CWORD]}"))
+  _cdgit_bash_complete() {
+    local -a branch_arr
+    mapfile -t branch_arr < <(
+      { git for-each-ref --format='%(refname:short)' refs/heads
+        git for-each-ref --format='%(refname:lstrip=3)' refs/remotes
+      } 2>/dev/null | grep -v '^HEAD$' | sort -u
+    )
+    COMPREPLY=($(compgen -W "${branch_arr[*]}" -- "${COMP_WORDS[COMP_CWORD]}"))
   }
-  complete -F _gwt_bash_complete gwt
+  complete -F _cdgit_bash_complete cdgit
 fi
 
-# PowerShell (.ps1) completion — drives native Linux pwsh to introspect script param() blocks
-if [ -x /usr/bin/pwsh ]; then
-  if [ -n "$ZSH_VERSION" ]; then
-    _pwsh_zsh_complete() {
-      local line pos raw
-      line="${(j: :)words[1,-1]}"
-      pos=${#line}
+# PowerShell (.ps1) completion
+# ${(e)...} expands shell variables the user may have typed (e.g. $PROFILE_HOME/...)
+if [ -n "$ZSH_VERSION" ]; then
+  _ps1_zsh_complete() {
+    local script="${(e)words[1]}"
+    [[ -f "$script" ]] || return 1
+    if [[ -x /usr/bin/pwsh ]]; then
+      local line raw
+      line="${(e)${(j: :)words[1,-1]}}"
       raw="$(/usr/bin/pwsh -NoProfile -NonInteractive \
             -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
-            -InputLine "$line" -CursorPos "$pos" -WorkingDir "$PWD" 2>/dev/null)"
-      [[ -z "$raw" ]] && return
-      compadd -- "${(@f)raw}"
-    }
-    compdef _pwsh_zsh_complete -p '*.ps1'
-  elif [ -n "$BASH_VERSION" ]; then
-    _pwsh_bash_complete() {
-      local line="${COMP_LINE}"
-      local pos="${COMP_POINT}"
-      local IFS=$'\n'
-      read -d '' -ra COMPREPLY < <(
-        /usr/bin/pwsh -NoProfile -NonInteractive \
-          -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
-          -InputLine "$line" -CursorPos "$pos" -WorkingDir "$PWD" 2>/dev/null
-      )
-    }
-    _pwsh_bash_register() {
-      local dir f
-      local old_nullglob; old_nullglob="$(shopt -p nullglob)"
-      shopt -s nullglob
-      while IFS= read -rd: dir; do
-        [[ -d "$dir" ]] || continue
-        for f in "$dir"/*.ps1; do
-          complete -F _pwsh_bash_complete "${f##*/}"
-        done
-      done <<< "${PATH}:"
-      eval "$old_nullglob"
-    }
-    _pwsh_bash_register
-  fi
+            -InputLine "$line" -CursorPos "${#line}" -WorkingDir "$PWD" 2>/dev/null)"
+      [[ -n "$raw" ]] && { compadd -- "${(@f)raw}"; return }
+    fi
+    local -a params
+    params=("${(f)$(python3 "${HOME}/.dotfiles/scripts/ps1-params.py" "$script" 2>/dev/null)}")
+    (( ${#params} == 0 )) && return 1
+    compadd -- "${params[@]}"
+  }
+  compdef _ps1_zsh_complete -p '*.ps1'
+elif [ -n "$BASH_VERSION" ]; then
+  _ps1_bash_complete() {
+    local script="${COMP_WORDS[0]}"
+    [[ -f "$script" ]] || return
+    local prefix="${COMP_WORDS[COMP_CWORD]}"
+    local IFS=$'\n'
+    COMPREPLY=($(compgen -W "$(python3 "${HOME}/.dotfiles/scripts/ps1-params.py" "$script" 2>/dev/null)" -- "$prefix"))
+  }
+  _ps1_bash_register() {
+    local dir f
+    local old_nullglob; old_nullglob="$(shopt -p nullglob)"
+    shopt -s nullglob
+    while IFS= read -rd: dir; do
+      [[ -d "$dir" ]] || continue
+      for f in "$dir"/*.ps1; do
+        complete -F _ps1_bash_complete "${f##*/}"
+      done
+    done <<< "${PATH}:"
+    eval "$old_nullglob"
+  }
+  _ps1_bash_register
 fi
 
 # Zellij integration (works for both shells)

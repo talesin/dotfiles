@@ -18,19 +18,37 @@ win_dbg "argc=$# argv=($*)"
 
 native_passthrough_or_die code "$@"
 
-# Leading flag: pass everything straight to Windows code, no path routing.
-if [[ "${1-}" == -* ]]; then
-    win_dbg "leading flag passthrough: $*"
-    exec "$WINDOWS_CODE_BASH" "$@"
-fi
+# Partition argv into flags and path operands.
+# Flags that consume the next token (value flags) are listed here so we don't
+# mistake their argument for a path operand.
+declare -A CODE_VALUE_FLAGS=(
+    [--user-data-dir]=1 [--extensions-dir]=1 [--locale]=1 [--log]=1
+    [--max-memory]=1 [--profile]=1 [--sync]=1 [--remote]=1
+    [--folder-uri]=1 [--file-uri]=1 [--crash-reporter-directory]=1
+)
 
-# Resolve target path and remaining args.
-if [[ $# -gt 0 ]]; then
-    target="$1"; shift
+if [[ $# -eq 0 ]]; then
+    target="$(pwd)"; rest=()
 else
-    target="$(pwd)"
+    flags=(); operands=(); expect_value=0
+    for arg in "$@"; do
+        if [[ $expect_value -eq 1 ]]; then
+            flags+=("$arg"); expect_value=0
+        elif [[ "$arg" == -* ]]; then
+            flags+=("$arg")
+            [[ -n "${CODE_VALUE_FLAGS[$arg]:-}" ]] && expect_value=1
+        else
+            operands+=("$arg")
+        fi
+    done
+    # 0 operands → pure-flag call (--version, --install-extension …); hand off unchanged.
+    # 2+ operands → multi-path call (--diff a b, --merge …); routing is ambiguous, hand off.
+    if [[ ${#operands[@]} -ne 1 ]]; then
+        win_dbg "operands=${#operands[@]}; passthrough: $*"
+        exec "$WINDOWS_CODE_BASH" "$@"
+    fi
+    target="${operands[0]}"; rest=("${flags[@]}")
 fi
-rest=("$@")
 abs="$(realpath -m "$target")"
 win_dbg "target=$target  abs=$abs"
 
@@ -41,7 +59,7 @@ cd /mnt/c
 case "$(classify_path "$abs")" in
     repos)
         win="$(repos_to_windows "$abs")"
-        uri="file:///${win//\\//}"
+        uri="$(uri_encode_spaces "file:///${win//\\//}")"
         win_dbg "branch=repos  win=$win  uri=$uri"
         # Repos are on a subst drive (Z:\) that isn't mounted in WSL, so the
         # path is built by string substitution in repos_to_windows(), not wslpath.
@@ -57,9 +75,15 @@ case "$(classify_path "$abs")" in
         ;;
     mnt)
         win="$(wslpath -w "$abs")"
-        win_dbg "branch=mnt  win=$win"
-        win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN $win ${rest[*]}"
-        exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" "$win" "${rest[@]}"
+        uri="$(uri_encode_spaces "file:///${win//\\//}")"
+        win_dbg "branch=mnt  win=$win  uri=$uri"
+        if [[ -d "$abs" ]]; then
+            win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"
+        else
+            win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --file-uri $uri ${rest[*]}"
+            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --file-uri "$uri" "${rest[@]}"
+        fi
         ;;
     other)
         if [[ -z "${WSL_DISTRO_NAME-}" ]]; then
@@ -67,7 +91,7 @@ case "$(classify_path "$abs")" in
             exit 1
         fi
         authority="wsl+$WSL_DISTRO_NAME"
-        uri="vscode-remote://${authority}${abs}"
+        uri="$(uri_encode_spaces "vscode-remote://${authority}${abs}")"
         win_dbg "branch=remote  authority=$authority  uri=$uri"
         if [[ -d "$abs" ]]; then
             win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
