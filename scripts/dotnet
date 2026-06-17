@@ -65,5 +65,32 @@ DOTNET_EXE='/mnt/c/Program Files/dotnet/dotnet.exe'
     exit 1
 }
 
-win_dbg "exec: $DOTNET_EXE ${win_args[*]}"
+# Switch Windows to the subst-drive (Z:\…) form of the cwd so FSC/MSBuild
+# resolve references against a real drive path, not the UNC \\wsl.localhost\…
+# path that the exec would otherwise inherit. Uses pwsh -WorkingDirectory, the
+# same mechanism the pwsh shim uses.
+DOTNET_EXE_WIN="$(wslpath -w "$DOTNET_EXE")"
+win_cwd="$(to_windows_path "$abs_pwd")"
+
+if [[ -n "$win_cwd" ]]; then
+    # Build a PowerShell command string: & 'exe' @('arg1','arg2',…); exit $LASTEXITCODE
+    # Single-quote each token with ' → '' escaping so spaces/special chars survive.
+    ps_q() { printf "'%s'" "${1//\'/\'\'}"; }
+    ps_cmd="& $(ps_q "$DOTNET_EXE_WIN")"
+    if [[ ${#win_args[@]} -gt 0 ]]; then
+        ps_arr=""
+        for a in "${win_args[@]}"; do ps_arr+="$(ps_q "$a"),"; done
+        ps_cmd+=" @(${ps_arr%,})"
+    fi
+    ps_cmd+="; exit \$LASTEXITCODE"
+    win_dbg "win_cwd=$win_cwd"
+    win_dbg "exec: pwsh.exe -NoProfile -WorkingDirectory $win_cwd -Command $ps_cmd"
+    # cd /mnt/c before exec — avoids cmd/pwsh printing UNC-path warnings when
+    # their own working directory is under \\wsl.localhost\… (same pattern as pwsh shim).
+    cd /mnt/c
+    exec pwsh.exe -NoProfile -WorkingDirectory "$win_cwd" -Command "$ps_cmd"
+fi
+
+# Fallback: win_cwd untranslatable (should not happen in the repos branch).
+win_dbg "exec (no cwd switch): $DOTNET_EXE ${win_args[*]}"
 exec "$DOTNET_EXE" "${win_args[@]}"
