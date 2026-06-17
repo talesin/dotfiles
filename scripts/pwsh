@@ -5,7 +5,7 @@ WIN_SHIM_DBG_PREFIX='pwsh[dbg]'
 source "$(dirname "$(realpath "$0")")/win-shim"
 
 win_dbg "HOME=$HOME PWD=$PWD WSL_DISTRO_NAME=${WSL_DISTRO_NAME:-<unset>}"
-win_dbg "WINDOWS_USERNAME=$WINDOWS_USERNAME"
+win_dbg "WINDOWS_USERNAME=$(get_windows_username)"
 win_dbg "argc=$# argv=($*)"
 
 native_passthrough_or_die pwsh "$@"

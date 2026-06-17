@@ -63,12 +63,11 @@ fi
 if is-installed dotnet; then
   if [ -n "$ZSH_VERSION" ]; then
     _dotnet_zsh_complete() {
-      local completions=("$(dotnet complete "$words")")
-      if [ -z "$completions" ]; then
-        _arguments '*::arguments: _normal'
-        return
-      fi
-      _values="${(ps:\n:)completions}"
+      local cmd="${(j: :)words}"  # join words array into a single command-line string
+      local completions=("${(@f)$("$HOME/.dotnet/dotnet" complete --position "${#cmd}" "$cmd" 2>/dev/null)}")
+      compadd -a completions
+      # dotnet complete never suggests project files — add them for positional args
+      [[ "${words[$CURRENT]}" != -* ]] && _files -g '*.{sln,slnx,csproj,fsproj,vbproj}'
     }
     compdef _dotnet_zsh_complete dotnet
 
@@ -76,7 +75,7 @@ if is-installed dotnet; then
     _dotnet_bash_complete() {
       local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
       local candidates
-      read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
+      read -d '' -ra candidates < <("$HOME/.dotnet/dotnet" complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
       read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
     }
     complete -f -F _dotnet_bash_complete dotnet

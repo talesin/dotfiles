@@ -11,8 +11,18 @@
 #   win-shim classify-path   <path>
 #   win-shim is-wsl
 
-WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
-REPOS_ROOT="$HOME/Repositories"
+# Lazily resolved — only computed on first call to get_windows_username.
+# Avoids spawning cmd.exe on every shim invocation for shims that don't need it.
+_WINDOWS_USERNAME=''
+get_windows_username() {
+    if [[ -z "$_WINDOWS_USERNAME" ]]; then
+        _WINDOWS_USERNAME="$(cmd.exe /c 'echo %USERNAME%' 2>/dev/null | tr -d '\r\n')"
+    fi
+    printf '%s' "$_WINDOWS_USERNAME"
+}
+# Honour $REPOSITORIES if set (see functions/cdgit, functions/git-repos); fall
+# back to the conventional default.
+REPOS_ROOT="${REPOSITORIES:-$HOME/Repositories}"
 # Repos are exposed on Windows via a subst drive that maps 1:1 to the repos
 # root (e.g. Z:\ == ~/Repositories). The drive is NOT mounted in WSL (no
 # /mnt/z), so the repos branch builds Windows paths by string substitution
@@ -30,6 +40,22 @@ is_wsl() {
     [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
 }
 
+# find_native <name> → prints absolute path of the next <name> on PATH that
+# isn't $0 (this shim). Prints nothing and returns 1 if none found. Pure
+# lookup — no exec. Useful when a shim needs the native binary for a fallback
+# branch rather than an unconditional passthrough.
+find_native() {
+    local name="$1" self dir cand
+    self="$(realpath "$0")"
+    while IFS= read -r -d: dir; do
+        cand="$dir/$name"
+        if [[ -x "$cand" && "$(realpath "$cand" 2>/dev/null)" != "$self" ]]; then
+            printf '%s' "$cand"; return 0
+        fi
+    done <<< "$PATH:"
+    return 1
+}
+
 # If not in WSL, find the next <name> on PATH that isn't $0 and exec it.
 # If none found, print an error and exit 1.
 # Returns 0 when running inside WSL so the caller continues.
@@ -40,15 +66,11 @@ native_passthrough_or_die() {
         return 0
     fi
     win_dbg "non-WSL: scanning PATH for native $name"
-    local self; self="$(realpath "$0")"
-    local dir cand
-    while IFS= read -r -d: dir; do
-        cand="$dir/$name"
-        if [[ -x "$cand" && "$(realpath "$cand")" != "$self" ]]; then
-            win_dbg "exec native: $cand $*"
-            exec "$cand" "$@"
-        fi
-    done <<< "$PATH:"
+    local cand
+    if cand="$(find_native "$name")"; then
+        win_dbg "exec native: $cand $*"
+        exec "$cand" "$@"
+    fi
     echo "$name: no native $name found on PATH" >&2
     exit 1
 }
