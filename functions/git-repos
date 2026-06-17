@@ -1,0 +1,8 @@
+# git-repos
+# List primary git repositories under $REPOSITORIES, one relative path per line.
+# Only main worktrees (.git is a directory) — cdgit worktrees and submodules (.git file) are skipped.
+local base="${REPOSITORIES:-$HOME/Repositories}"
+[ -d "$base" ] || return 0
+find "$base" -maxdepth 3 -type d -name .git 2>/dev/null \
+  | sed -e 's|/\.git$||' -e "s|^${base}/||" \
+  | sort

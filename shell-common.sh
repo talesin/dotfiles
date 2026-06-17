@@ -88,13 +88,18 @@ if [ -n "$ZSH_VERSION" ]; then
   compdef _cdgit cdgit
 elif [ -n "$BASH_VERSION" ]; then
   _cdgit_bash_complete() {
-    local -a branch_arr
-    mapfile -t branch_arr < <(
-      { git for-each-ref --format='%(refname:short)' refs/heads
-        git for-each-ref --format='%(refname:lstrip=3)' refs/remotes
-      } 2>/dev/null | grep -v '^HEAD$' | sort -u
-    )
-    COMPREPLY=($(compgen -W "${branch_arr[*]}" -- "${COMP_WORDS[COMP_CWORD]}"))
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local -a items
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      mapfile -t items < <(
+        { git for-each-ref --format='%(refname:short)' refs/heads
+          git for-each-ref --format='%(refname:lstrip=3)' refs/remotes
+        } 2>/dev/null | grep -v '^HEAD$' | sort -u
+      )
+    else
+      mapfile -t items < <(git-repos)
+    fi
+    COMPREPLY=($(compgen -W "${items[*]}" -- "$cur"))
   }
   complete -F _cdgit_bash_complete cdgit
 fi

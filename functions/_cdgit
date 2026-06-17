@@ -1,4 +1,23 @@
 #compdef cdgit
-local -a branches
-branches=(${(f)"$({ git for-each-ref --format='%(refname:short)' refs/heads; git for-each-ref --format='%(refname:lstrip=3)' refs/remotes; } 2>/dev/null | grep -v '^HEAD$' | sort -u)"})
-compadd -a branches
+local -a items
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  local top main
+  top="$(git rev-parse --show-toplevel 2>/dev/null)"
+  main="$(git worktree list --porcelain 2>/dev/null | awk 'NR==1{print $2; exit}')"
+  if [ "$top" = "$main" ]; then
+    # Core repo → complete local branch names
+    items=(${(f)"$(git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null)"})
+  else
+    # Linked worktree → complete existing worktrees by branch name (excluding current)
+    local current_path
+    current_path="$(git rev-parse --show-toplevel 2>/dev/null)"
+    items=(${(f)"$(git worktree list --porcelain 2>/dev/null \
+      | awk -v cur="$current_path" '
+          /^worktree / { path=$2 }
+          /^branch /   { if (path != cur) { sub("refs/heads/",""); print $2 } }
+        ')"})
+  fi
+else
+  items=(${(f)"$(git-repos)"})
+fi
+compadd -a items
