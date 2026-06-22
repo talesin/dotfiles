@@ -15,7 +15,7 @@ if [ -d ~/.functions ]; then
     typeset -U fpath
     fdir=$HOME/.functions
     fpath=($fdir $fpath)
-    autoload -Uz ${fdir}/*(:t)
+    eval 'autoload -Uz ${fdir}/*(:t)'
   else
     # Bash/other shells manual sourcing
     pushd ~/.functions >/dev/null
@@ -54,7 +54,7 @@ if is-installed dotnet; then
         _arguments '*::arguments: _normal'
         return
       fi
-      _values="${(ps:\n:)completions}"
+      eval '_values="${(ps:\n:)completions}"'
     }
     compdef _dotnet_zsh_complete dotnet
 
@@ -72,6 +72,7 @@ fi
 # Zellij integration (works for both shells)
 if is-installed zellij; then
   export ZELLIJ_AUTO_ATTACH=true
+  export ZELLIJ_AUTO_EXIT=true
   if [ -n "$ZSH_VERSION" ]; then
     eval "$(zellij setup --generate-auto-start zsh)"
   # TODO: Uncomment these lines if you want to enable Zellij auto-start for Bash
