@@ -57,22 +57,6 @@ win_dbg "target=$target  abs=$abs"
 cd /mnt/c
 
 case "$(classify_path "$abs")" in
-    repos)
-        win="$(repos_to_windows "$abs")"
-        uri="$(uri_encode_spaces "file:///${win//\\//}")"
-        win_dbg "branch=repos  win=$win  uri=$uri"
-        # Repos are on a subst drive (Z:\) that isn't mounted in WSL, so the
-        # path is built by string substitution in repos_to_windows(), not wslpath.
-        # Pass an explicit folder/file URI so code.exe doesn't try to stat the
-        # path itself (stat fails for subst drives in a WSL-spawned process).
-        if [[ -d "$abs" ]]; then
-            win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
-            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"
-        else
-            win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --file-uri $uri ${rest[*]}"
-            exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --file-uri "$uri" "${rest[@]}"
-        fi
-        ;;
     mnt)
         win="$(wslpath -w "$abs")"
         uri="$(uri_encode_spaces "file:///${win//\\//}")"
@@ -85,14 +69,14 @@ case "$(classify_path "$abs")" in
             exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --file-uri "$uri" "${rest[@]}"
         fi
         ;;
-    other)
+    repos | other)
         if [[ -z "${WSL_DISTRO_NAME-}" ]]; then
             echo "code: WSL_DISTRO_NAME unset; cannot build wsl+<distro> authority" >&2
             exit 1
         fi
         authority="wsl+$WSL_DISTRO_NAME"
         uri="$(uri_encode_spaces "vscode-remote://${authority}${abs}")"
-        win_dbg "branch=remote  authority=$authority  uri=$uri"
+        win_dbg "branch=wsl-remote  authority=$authority  uri=$uri"
         if [[ -d "$abs" ]]; then
             win_dbg "exec: cmd.exe /c $WINDOWS_CODE_CMD_WIN --folder-uri $uri ${rest[*]}"
             exec cmd.exe /c "$WINDOWS_CODE_CMD_WIN" --folder-uri "$uri" "${rest[@]}"

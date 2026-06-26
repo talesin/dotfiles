@@ -10,6 +10,14 @@ win_dbg "argc=$# argv=($*)"
 
 native_passthrough_or_die pwsh "$@"
 
+# cwd under $REPOSITORIES → exec native Linux pwsh (no Windows path translation needed).
+abs_pwd="$(realpath -m "$PWD" 2>/dev/null || printf '%s' "$PWD")"
+if [[ "$(classify_path "$abs_pwd")" == repos ]]; then
+    native="$(find_native pwsh)" || { echo "pwsh: no native Linux pwsh on PATH" >&2; exit 1; }
+    win_dbg "repos cwd → native Linux pwsh: $native"
+    exec "$native" "$@"
+fi
+
 # Translate a single arg to a Windows path if it looks like a WSL path.
 translate_path() {
     local arg="$1"

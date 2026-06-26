@@ -147,7 +147,7 @@ elif [ -n "$BASH_VERSION" ]; then
 fi
 
 # Zellij integration (works for both shells)
-if is-installed zellij; then
+if is-installed zellij && [[ -t 1 ]]; then
   if [[ -z "$ZELLIJ" ]]; then
     # Clean up exited sessions
     zellij ls 2>/dev/null | grep EXITED | awk '{print $1}' | sed -e 's/\x1B\[[0-9;]*[mG]//g' | xargs -I % zellij d % 2>/dev/null

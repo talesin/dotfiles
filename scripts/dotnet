@@ -2,9 +2,8 @@
 # WSL→Windows dotnet shim.
 #
 # Routing:
-#   not WSL                → native passthrough (exec next dotnet on PATH)
-#   WSL, cwd under $REPOS  → exec Windows dotnet.exe with path args translated
-#   WSL, cwd elsewhere     → exec native Linux dotnet (~/.dotnet/dotnet)
+#   not WSL  → native passthrough (exec next dotnet on PATH)
+#   WSL      → exec native Linux dotnet (~/.dotnet/dotnet)
 #
 # Set DOTNET_DEBUG=1 to see routing decisions.
 #
@@ -21,76 +20,15 @@ win_dbg "REPOS_ROOT=$REPOS_ROOT argc=$# argv=($*)"
 # Not in WSL → exec the next dotnet on PATH (native macOS/Linux install).
 native_passthrough_or_die dotnet "$@"
 
-# In WSL — route by cwd.
-abs_pwd="$(realpath -m "$PWD" 2>/dev/null || printf '%s' "$PWD")"
-class="$(classify_path "$abs_pwd")"
-win_dbg "cwd class=$class"
-
-if [[ "$class" != repos ]]; then
-    # cwd not under $REPOSITORIES → use native Linux dotnet.
+# In WSL — always use native Linux dotnet.
+# Try the conventional install location first; VS Code Remote WSL starts with a
+# minimal PATH that may not include ~/.dotnet, so find_native alone isn't enough.
+native="$HOME/.dotnet/dotnet"
+if [[ ! -x "$native" ]]; then
     native="$(find_native dotnet)" || {
-        echo "dotnet: no native dotnet found on PATH (expected $HOME/.dotnet/dotnet)" >&2
+        echo "dotnet: no native dotnet found (tried $HOME/.dotnet/dotnet, then PATH)" >&2
         exit 1
     }
-    win_dbg "native fallback: $native"
-    exec "$native" "$@"
 fi
-
-# cwd is under $REPOSITORIES → delegate to Windows dotnet.exe.
-# Translate path-shaped args that resolve under repos or /mnt to Windows paths.
-# Flags, MSBuild properties, TFMs, and pure-Linux paths are left untouched.
-translate_arg() {
-    local a="$1" abs
-    case "$a" in
-        /*|./*|../*|~/*|~)
-            abs="$(realpath -m "$a" 2>/dev/null)" || { printf '%s' "$a"; return; }
-            case "$(classify_path "$abs")" in
-                repos|mnt) to_windows_path "$abs" ;;
-                *)         printf '%s' "$a" ;;
-            esac ;;
-        *) printf '%s' "$a" ;;
-    esac
-}
-
-win_args=()
-for a in "$@"; do
-    t="$(translate_arg "$a")"
-    [[ "$t" != "$a" ]] && win_dbg "arg: $a -> $t"
-    win_args+=("$t")
-done
-
-DOTNET_EXE='/mnt/c/Program Files/dotnet/dotnet.exe'
-[[ -x "$DOTNET_EXE" ]] || DOTNET_EXE="$(find_native dotnet.exe)" || {
-    echo "dotnet: Windows dotnet.exe not found" >&2
-    exit 1
-}
-
-# Switch Windows to the subst-drive (Z:\…) form of the cwd so FSC/MSBuild
-# resolve references against a real drive path, not the UNC \\wsl.localhost\…
-# path that the exec would otherwise inherit. Uses pwsh -WorkingDirectory, the
-# same mechanism the pwsh shim uses.
-DOTNET_EXE_WIN="$(wslpath -w "$DOTNET_EXE")"
-win_cwd="$(to_windows_path "$abs_pwd")"
-
-if [[ -n "$win_cwd" ]]; then
-    # Build a PowerShell command string: & 'exe' @('arg1','arg2',…); exit $LASTEXITCODE
-    # Single-quote each token with ' → '' escaping so spaces/special chars survive.
-    ps_q() { printf "'%s'" "${1//\'/\'\'}"; }
-    ps_cmd="& $(ps_q "$DOTNET_EXE_WIN")"
-    if [[ ${#win_args[@]} -gt 0 ]]; then
-        ps_arr=""
-        for a in "${win_args[@]}"; do ps_arr+="$(ps_q "$a"),"; done
-        ps_cmd+=" @(${ps_arr%,})"
-    fi
-    ps_cmd+="; exit \$LASTEXITCODE"
-    win_dbg "win_cwd=$win_cwd"
-    win_dbg "exec: pwsh.exe -NoProfile -WorkingDirectory $win_cwd -Command $ps_cmd"
-    # cd /mnt/c before exec — avoids cmd/pwsh printing UNC-path warnings when
-    # their own working directory is under \\wsl.localhost\… (same pattern as pwsh shim).
-    cd /mnt/c
-    exec pwsh.exe -NoProfile -WorkingDirectory "$win_cwd" -Command "$ps_cmd"
-fi
-
-# Fallback: win_cwd untranslatable (should not happen in the repos branch).
-win_dbg "exec (no cwd switch): $DOTNET_EXE ${win_args[*]}"
-exec "$DOTNET_EXE" "${win_args[@]}"
+win_dbg "native: $native"
+exec "$native" "$@"
