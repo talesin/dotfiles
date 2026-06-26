@@ -161,7 +161,11 @@ if is-installed zellij && [[ -t 1 ]]; then
         sleep 0.1
       done
     fi
-    exec zellij attach --create "💻"
+    if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+      exec zellij attach --create "vscode-$(basename "$PWD")"
+    else
+      exec zellij attach --create "💻"
+    fi
   fi
 fi
 
