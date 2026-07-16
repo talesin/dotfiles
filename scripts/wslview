@@ -1,3 +1,27 @@
 #!/usr/bin/env bash
-# Open a URL or file using the default Windows application
-exec rundll32.exe url.dll,FileProtocolHandler "$1"
+# Open a URL or file using the default Windows application.
+# URLs pass straight through; local paths are translated to their Windows
+# equivalent first so Windows doesn't fall back to opening File Explorer.
+WIN_SHIM_DBG_VAR=WSLVIEW_DEBUG
+WIN_SHIM_DBG_PREFIX='wslview[dbg]'
+source "$(dirname "$(realpath "$0")")/win-shim"
+
+arg="${1:-}"
+[[ -z "$arg" ]] && { echo "wslview: no target given" >&2; exit 1; }
+win_dbg "arg=$arg"
+
+case "$arg" in
+    /* | ./* | ../* | ~/* | ~)
+        win="$(to_windows_path "$arg")"
+        win_dbg "path: $arg -> $win"
+        if [[ -z "$win" ]]; then
+            echo "wslview: cannot translate '$arg' to a Windows path" >&2
+            exit 1
+        fi
+        exec rundll32.exe url.dll,FileProtocolHandler "$win"
+        ;;
+    *)
+        win_dbg "url passthrough"
+        exec rundll32.exe url.dll,FileProtocolHandler "$arg"
+        ;;
+esac
