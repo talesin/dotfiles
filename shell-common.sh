@@ -115,7 +115,7 @@ if [ -n "$ZSH_VERSION" ]; then
       raw="$(/usr/bin/pwsh -NoProfile -NonInteractive \
             -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
             -InputLine "$line" -CursorPos "${#line}" -WorkingDir "$PWD" 2>/dev/null)"
-      [[ -n "$raw" ]] && { compadd -- "${(@f)raw}"; return }
+      [[ -n "$raw" ]] && { compadd -- "${(@f)raw}"; return; }
     fi
     local -a params
     params=("${(f)$(python3 "${HOME}/.dotfiles/scripts/ps1-params.py" "$script" 2>/dev/null)}")
