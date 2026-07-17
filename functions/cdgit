@@ -1,0 +1,186 @@
+# cdgit
+# Create or switch to a git worktree at <repo-parent>/<repo>-<slugified-branch>
+# Usage: cdgit [--init] [branch]
+#   --init   After switching, restore project dependencies (dotnet / npm)
+#   (no arg) Interactive fzf picker:
+#              core repo     → pick a local branch, then switch-or-create a worktree
+#              linked worktree → pick an existing worktree and cd there (no creation)
+#
+# No strict mode (set -e/-u/-o pipefail) — runs in interactive shell context;
+# enabling it here would mutate the calling shell's error-handling state.
+
+local do_init=0 branch=
+
+# Arg parsing
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --init)   do_init=1; shift ;;
+    -h|--help)
+      echo "usage: cdgit [--init] [branch]" >&2
+      echo "  (no branch) interactive fzf picker over existing worktrees" >&2
+      return 0 ;;
+    -*)
+      echo "cdgit: unknown option: $1" >&2
+      echo "usage: cdgit [--init] [branch]" >&2
+      return 1 ;;
+    *)
+      if [ -n "$branch" ]; then
+        echo "cdgit: unexpected argument: $1" >&2
+        return 1
+      fi
+      branch="$1"; shift ;;
+  esac
+done
+
+# Main worktree root — awk avoids the SIGPIPE that head -1 generates on multi-worktree repos.
+# local and assignment are split so the empty-string guard below catches command failures
+# (combining them would suppress the exit status via local's own return 0).
+local root
+root="$(git worktree list --porcelain 2>/dev/null | awk 'NR==1{print $2; exit}')"
+
+local dest= created=0
+
+if [ -z "$root" ]; then
+  # ── Repo-navigation mode: not inside a git repo ───────────────────────────
+  local base="${REPOSITORIES:-$HOME/Repositories}"
+
+  if [ -z "$branch" ]; then
+    # No arg → fzf picker over repos under $REPOSITORIES
+    if ! is-installed fzf; then
+      echo "cdgit: not a git repository; pass a repo path (e.g. crane-integrations/crane-services)" >&2
+      echo "  or install fzf for an interactive picker" >&2
+      return 1
+    fi
+    local picked
+    picked="$(git-repos | fzf --height=40% --reverse --prompt='repo> ')"
+    if [ -z "$picked" ]; then
+      return 0  # cancelled
+    fi
+    dest="$base/$picked"
+  else
+    # Arg given → treat it as a repo relative path under $REPOSITORIES
+    dest="$base/$branch"
+    if [ ! -d "$dest/.git" ]; then
+      echo "cdgit: not a git repository, and no repo '$branch' found under $base" >&2
+      return 1
+    fi
+  fi
+
+else
+  # ── Worktree mode: inside a git repo ──────────────────────────────────────
+
+  # Determine whether we are in the core (main) worktree or a linked worktree.
+  local toplevel in_core=0
+  toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"
+  [ "$toplevel" = "$root" ] && in_core=1
+
+  if [ -z "$branch" ]; then
+    if ! is-installed fzf; then
+      echo "usage: cdgit [--init] <branch>" >&2
+      echo "  (install fzf for interactive no-arg picker)" >&2
+      return 1
+    fi
+    local picked
+    if [ "$in_core" -eq 1 ]; then
+      # Core repo → pick a local branch, then fall through to switch-or-create
+      picked="$(git for-each-ref --format='%(refname:short)' refs/heads \
+        | fzf --height=40% --reverse --prompt='branch> ')"
+      [ -z "$picked" ] && return 0
+      branch="$picked"
+    else
+      # Linked worktree → pick an existing worktree (by branch name) and cd there
+      picked="$(git worktree list | fzf --height=40% --reverse --prompt='worktree> ' | awk '{print $1}')"
+      if [ -z "$picked" ]; then
+        return 0  # cancelled
+      fi
+      cd "$picked" || return 1
+      echo "cdgit: switched to $picked"
+      return 0
+    fi
+  fi
+
+  # Look up whether `branch` is already checked out in any existing worktree.
+  local wt_path
+  wt_path="$(git worktree list --porcelain 2>/dev/null \
+    | awk -v b="refs/heads/$branch" '
+        /^worktree / { p=$2 }
+        /^branch /   { if ($2==b) { print p; exit } }')"
+
+  if [ -n "$wt_path" ]; then
+    # Branch already checked out → just switch there (fixes the "already used" fatal)
+    dest="$wt_path"
+  elif [ "$in_core" -eq 1 ]; then
+    # Core repo → create a new linked worktree
+    dest="${root}-$(slugify "$branch")"
+
+    if [ ! -d "$dest" ]; then
+      # --relative-paths keeps the worktree<->repo links portable between WSL and Windows git
+      if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git -C "$root" worktree add --relative-paths "$dest" "$branch" || return
+      elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        git -C "$root" worktree add --relative-paths --track -b "$branch" "$dest" "origin/$branch" || return
+      else
+        git -C "$root" worktree add --relative-paths -b "$branch" "$dest" || return
+      fi
+      created=1
+
+      # Seed gitignored config from the main worktree into the new one, searching
+      # recursively over committed paths only (never ignored dirs like node_modules).
+      # Override the list via: CDGIT_COPY=(".env" ".envrc") cdgit <branch>
+      local -a copy_list
+      # ${CDGIT_COPY+set} guards against unbound-variable under set -u in bash
+      if [ -n "${CDGIT_COPY+set}" ] && [ ${#CDGIT_COPY[@]} -gt 0 ]; then
+        copy_list=("${CDGIT_COPY[@]}")
+      else
+        copy_list=(".env" "CLAUDE.md" ".claude" "CLAUDE.local.md")
+      fi
+      # Build directory list from git so we only walk committed paths.
+      # ls-tree -d -r yields every tracked directory; ignored dirs are absent.
+      local -a dirs
+      dirs=(".")
+      local d
+      while IFS= read -r d; do
+        dirs+=("$d")
+      done < <(git -C "$root" ls-tree -d -r --name-only HEAD 2>/dev/null)
+      local dir item
+      for dir in "${dirs[@]}"; do
+        for item in "${copy_list[@]}"; do
+          if [ -e "$root/$dir/$item" ]; then
+            cp -R "$root/$dir/$item" "$dest/$dir/" \
+              || echo "cdgit: warning: failed to copy $dir/$item" >&2
+          fi
+        done
+      done
+    fi
+  else
+    # Linked worktree and no existing worktree for that branch → refuse
+    echo "cdgit: '$branch' has no worktree; run cdgit from the core repo ($root) to create one" >&2
+    return 1
+  fi
+fi
+
+# ── Shared tail: cd + message + optional --init ───────────────────────────
+cd "$dest" || return 1
+
+if [ -z "$root" ]; then
+  echo "cdgit: switched to $dest"
+elif [ "$created" -eq 1 ]; then
+  echo "cdgit: created worktree $dest (branch $branch)"
+else
+  echo "cdgit: switched to $dest (branch $branch)"
+fi
+
+# Optional dependency restore (--init)
+if [ "$do_init" -eq 1 ]; then
+  if is-installed dotnet; then
+    [ -f .config/dotnet-tools.json ] && dotnet tool restore
+    { [ -f paket.dependencies ] || [ -d .paket ]; } && dotnet paket restore
+    # Loop instead of find | grep -q to avoid SIGPIPE under pipefail
+    local has_project=0
+    for f in ./*.sln ./*.*proj; do
+      [ -f "$f" ] && { has_project=1; break; }
+    done
+    [ "$has_project" -eq 1 ] && dotnet restore
+  fi
+  is-installed npm && [ -f package.json ] && npm install
+fi

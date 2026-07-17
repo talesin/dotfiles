@@ -1,0 +1,4 @@
+[wsl2]
+# Mirrored networking: makes WSL2 localhost reachable from Windows.
+# Required for OAuth localhost-redirect flows (e.g. `claude /login`).
+networkingMode=mirrored

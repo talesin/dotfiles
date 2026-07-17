@@ -65,6 +65,120 @@ function install-zellij() {
 }
 
 
+function install-powershell() {
+	if not-installed pwsh; then
+		if is-installed apt-get; then
+			echo "Installing PowerShell..."
+			# shellcheck disable=SC1091
+			source /etc/os-release
+			local ms_deb="/tmp/packages-microsoft-prod.deb"
+			local installed_via_apt=false
+			if curl -fsSL -o "$ms_deb" \
+				"https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb" 2>/dev/null; then
+				sudo dpkg -i "$ms_deb"
+				rm -f "$ms_deb"
+				sudo apt-get update
+				if apt-cache show powershell >/dev/null 2>&1; then
+					sudo apt-get install -y powershell
+					installed_via_apt=true
+				fi
+			else
+				rm -f "$ms_deb"
+			fi
+			if [ "$installed_via_apt" = false ]; then
+				echo "Microsoft apt repo has no powershell for ${ID} ${VERSION_ID}; falling back to GitHub release..."
+				local arch
+				arch=$(dpkg --print-architecture)
+				if [ "$arch" != "amd64" ] && [ "$arch" != "arm64" ]; then
+					echo "Error: GitHub .deb fallback only supports amd64/arm64 (got '$arch')" >&2
+					return 1
+				fi
+				local tag
+				tag=$(curl -s https://api.github.com/repos/PowerShell/PowerShell/releases/latest | jq -r .tag_name)
+				if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+					echo "Error: failed to fetch PowerShell version from GitHub API" >&2
+					return 1
+				fi
+				local ver="${tag#v}"
+				local gh_deb="/tmp/powershell_${ver}-1.deb_${arch}.deb"
+				if ! curl -fsSL -o "$gh_deb" \
+					"https://github.com/PowerShell/PowerShell/releases/download/${tag}/powershell_${ver}-1.deb_${arch}.deb"; then
+					echo "Error: failed to download PowerShell ${tag} for ${arch}" >&2
+					rm -f "$gh_deb"
+					return 1
+				fi
+				sudo dpkg -i "$gh_deb" || sudo apt-get install -f -y
+				rm -f "$gh_deb"
+			fi
+		else
+			echo "Skipping PowerShell: automatic install only supported on apt-based systems"
+		fi
+	fi
+}
+
+
+function install-wsl-tools() {
+	if ! is-wsl; then
+		return 0
+	fi
+
+	if not-installed wslview; then
+		if is-installed apt-get && apt-cache show wslu >/dev/null 2>&1; then
+			echo "Installing wslu (Windows interop utilities)..."
+			sudo apt-get install -y wslu
+		else
+			echo "wslu not available in apt; installing bundled wslview fallback..."
+			mkdir -p "$HOME/.local/bin"
+			install -m 755 "$DIR/scripts/wslview" "$HOME/.local/bin/wslview"
+		fi
+	fi
+
+	if is-installed wslview && [ ! -e /usr/local/bin/xdg-open ]; then
+		sudo ln -sf "$(command -v wslview)" /usr/local/bin/xdg-open
+	fi
+
+	# Deploy .wslconfig to Windows user profile (mirrored networking for localhost OAuth flows)
+	local win_home
+	win_home=$(wslpath "$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')")
+	if [ -n "$win_home" ] && [ -d "$win_home" ]; then
+		cp "$DIR/wslconfig" "$win_home/.wslconfig"
+		echo "Deployed .wslconfig to $win_home — restart WSL to apply (wsl --shutdown)"
+	fi
+}
+
+
+function install-fonts() {
+	# FiraCode
+	if is-installed apt-get; then
+		sudo apt-get install -y fonts-firacode
+	elif is-installed dnf; then
+		sudo dnf install -y fira-code-fonts
+	fi
+
+	# Powerline fonts
+	if ! fc-list | grep -qi powerline; then
+		pushd /tmp >/dev/null
+		git clone https://github.com/powerline/fonts.git --depth=1
+		cd fonts
+		./install.sh
+		cd ..
+		rm -rf fonts
+		popd >/dev/null
+	fi
+}
+
+
+function install-dotnet() {
+	echo "Installing .NET SDK (LTS)..."
+	local installer="$HOME/.local/bin/dotnet-install.sh"
+	if [ ! -f "$installer" ]; then
+		mkdir -p "$HOME/.local/bin"
+		curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$installer" && chmod +x "$installer"
+	fi
+	"$installer" --channel LTS --install-dir "$HOME/.dotnet"
+}
+
+
 function setup-config() {
 	mkdir -p "$HOME/.local/bin"
 	export PATH="$HOME/.local/bin:$PATH"
@@ -76,8 +190,12 @@ function setup-config() {
 case $OPT in
 "")
 	install-packages
+	install-fonts
 	setup-config
 	install-zellij
+	install-powershell
+	install-dotnet
+	install-wsl-tools
 	apply-dotfiles "$DIR"
 	install-node
 	install-zsh

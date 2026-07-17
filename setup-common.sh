@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Common setup functions shared across platform-specific setup scripts
 
+# Check if running under WSL
+function is-wsl() {
+    [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
+}
+
 # Check if a command is available
 function is-installed() {
     command -v "$1" >/dev/null 2>&1
@@ -123,11 +128,12 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/zprofile" ~/.zprofile
     link-dotfile "$dotfiles_dir/functions" ~/.functions
     link-dotfile "$dotfiles_dir/zellij.kdl" ~/.config/zellij/config.kdl
+    link-dotfile "$dotfiles_dir/direnv.toml" ~/.config/direnv/direnv.toml
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh
 
-    # Symlink scripts to ~/.local/bin
-    if [ -d "$dotfiles_dir/scripts" ]; then
+    # Symlink scripts to ~/.local/bin (WSL only)
+    if is-wsl && [ -d "$dotfiles_dir/scripts" ]; then
         mkdir -p "$HOME/.local/bin"
         for script in "$dotfiles_dir/scripts"/*; do
             [ -f "$script" ] && link-dotfile "$script" "$HOME/.local/bin/$(basename "$script")"

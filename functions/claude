@@ -1,0 +1,27 @@
+# Wrap the claude CLI to switch config profiles via CLAUDE_CONFIG_DIR.
+# Default (no --personal) invokes the CLI normally with CLAUDE_CONFIG_DIR unset so
+# Claude's own default (~/.claude) is used without interference. Pass --personal to
+# explicitly point at ~/.claude-personal and share history + plans from the work profile.
+local personal=0
+local -a args
+local a
+for a in "$@"; do
+  if [ "$a" = "--personal" ]; then
+    personal=1
+  else
+    args+=("$a")
+  fi
+done
+
+if [ "$personal" = 1 ]; then
+  local config_dir="$HOME/.claude-personal"
+  # First-use setup: create the profile folder and share history + plans.
+  if [ ! -d "$config_dir" ]; then
+    mkdir -p "$config_dir"
+    ln -sfn "$HOME/.claude/history.jsonl" "$config_dir/history.jsonl"
+    ln -sfn "$HOME/.claude/plans" "$config_dir/plans"
+  fi
+  CLAUDE_CONFIG_DIR="$config_dir" command claude "${args[@]}"
+else
+  command claude "${args[@]}"
+fi

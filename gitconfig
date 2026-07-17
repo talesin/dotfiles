@@ -1,7 +1,8 @@
 [core]
-	excludesfile = $HOME/.gitignore_global
+	excludesfile = $HOME/.config/git/ignore
 	autocrlf = input
 	safecrlf = false
+	fileMode = true
 
 [push]
 	default = simple
@@ -12,6 +13,9 @@
 
 [alias]
 	lg = log --color --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
+  lg2 = log --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
+  changed = !git log develop..HEAD --name-only --pretty=format: | sort -u
+  
 
 [include]
 	path = ~/.config/gitconfig.local
@@ -19,9 +23,6 @@
 [init]
 	defaultBranch = main
 
-[credential "https://dev.azure.com"]
-	helper = manager
-	useHttpPath = true
-[credential]
-	helper = 
-	helper = /usr/local/share/gcm-core/git-credential-manager
+# User and credential config loaded from ~/.config/gitconfig.local
+[worktree]
+	useRelativePaths = true

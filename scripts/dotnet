@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# WSL→Windows dotnet shim.
+#
+# Routing:
+#   not WSL  → native passthrough (exec next dotnet on PATH)
+#   WSL      → exec native Linux dotnet (~/.dotnet/dotnet)
+#
+# Set DOTNET_DEBUG=1 to see routing decisions.
+#
+# PATH precondition: ~/.local/bin must precede ~/.dotnet in $PATH so this shim
+#   shadows the native dotnet. profile.d/paths adds .local/bin last (→ first).
+
+WIN_SHIM_DBG_VAR=DOTNET_DEBUG
+WIN_SHIM_DBG_PREFIX='dotnet[dbg]'
+source "$(dirname "$(realpath "$0")")/win-shim"
+
+win_dbg "HOME=$HOME PWD=$PWD WSL_DISTRO_NAME=${WSL_DISTRO_NAME:-<unset>}"
+win_dbg "REPOS_ROOT=$REPOS_ROOT argc=$# argv=($*)"
+
+# Not in WSL → exec the next dotnet on PATH (native macOS/Linux install).
+native_passthrough_or_die dotnet "$@"
+
+# In WSL — always use native Linux dotnet.
+# Try the conventional install location first; VS Code Remote WSL starts with a
+# minimal PATH that may not include ~/.dotnet, so find_native alone isn't enough.
+native="$HOME/.dotnet/dotnet"
+if [[ ! -x "$native" ]]; then
+    native="$(find_native dotnet)" || {
+        echo "dotnet: no native dotnet found (tried $HOME/.dotnet/dotnet, then PATH)" >&2
+        exit 1
+    }
+fi
+win_dbg "native: $native"
+exec "$native" "$@"

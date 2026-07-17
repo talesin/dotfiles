@@ -1,0 +1,7 @@
+# Use Windows git for repos on the Windows filesystem to avoid WSL DrvFs stat overhead
+# (inotify doesn't fire on /mnt/c, so WSL git re-stats every tracked file on each command)
+if [[ "$PWD" == /mnt/c/* ]]; then
+  command '/mnt/c/Program Files/Git/cmd/git.exe' "$@"
+else
+  command git "$@"
+fi
