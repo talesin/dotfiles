@@ -11,11 +11,18 @@
 export LSCOLORS=gxfxcxdxbxegedabagacad
 export LS_COLORS="di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;40:st=37;44:mi=05;37;41:or=01;31:ca=30;41:mh=00:cl=00:rs=0"
 
+# Load functions first (needed by other scripts)
+if [ -d ~/.functions ]; then
+    for fn in ~/.functions/*; do
+        if [ -f "$fn" ]; then
+            func_name=$(basename "$fn")
+            eval "function $func_name() { source ~/.functions/$func_name; }"
+        fi
+    done
+fi
+
 if is-installed launchctl; then
   launchctl setenv PATH "$PATH"
 fi
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
-# End of LM Studio CLI section
-
+source $HOME/.profile.d/paths

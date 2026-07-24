@@ -1,5 +1,5 @@
 [core]
-	excludesfile = $HOME/.config/git/ignore
+	excludesfile = ~/.config/git/ignore
 	autocrlf = input
 	safecrlf = false
 	fileMode = true

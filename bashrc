@@ -31,8 +31,3 @@ source "$OSH"/oh-my-bash.sh
 
 # Load shared shell configuration
 source ~/.shell-common.sh
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/jeremy/.lmstudio/bin"
-# End of LM Studio CLI section
-
