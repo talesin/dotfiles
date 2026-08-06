@@ -13,8 +13,21 @@
 
 [alias]
 	lg = log --color --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
-  lg2 = log --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
-  changed = !git log develop..HEAD --name-only --pretty=format: | sort -u
+  lgf = log --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit
+  # Revision this branch diverged from. Takes the boundary of the commits unique to
+  # HEAD (--exclude patterns are namespace-relative, NOT full refnames) and reduces
+  # it to the descendant-most commit -- a merge into this branch yields several
+  # boundary commits, and only the newest excludes the whole base. Falls back to the
+  # remote default branch, then develop. Prints a usable revision either way.
+  forkpoint = "!f() { c=$(git rev-parse --abbrev-ref HEAD); b=; for x in $(git rev-list --boundary HEAD --not --exclude=\"$c\" --branches --exclude=\"origin/$c\" --remotes | sed -n 's/^-//p'); do if [ -z \"$b\" ] || git merge-base --is-ancestor \"$b\" \"$x\"; then b=$x; fi; done; if [ -n \"$b\" ]; then echo \"$b\"; else git symbolic-ref -q --short refs/remotes/origin/HEAD || echo develop; fi; }; f"
+  # Branch name for the forkpoint, preferring a local ref over its origin/ copy.
+  # Only a tip can be named, so this prints the raw revision when the base has
+  # advanced past the fork -- deliberately silent rather than guessing (name-rev
+  # and show-branch will happily name an unrelated branch here).
+  forkbranch = "!f() { fp=$(git forkpoint); n=$(git branch --points-at \"$fp\" --format='%(refname:short)' | head -1); [ -z \"$n\" ] && n=$(git branch -r --points-at \"$fp\" --format='%(refname:short)' | grep -v '^origin/HEAD' | head -1); echo \"${n:-$fp}\"; }; f"
+  changed = "!f() { base=\"${1:-$(git forkpoint)}\"; git log \"$base..HEAD\" --name-only --pretty=format: | sort -u; }; f"
+  lgb = "!f() { base=\"${1:-$(git symbolic-ref -q --short refs/remotes/origin/HEAD || echo develop)}\"; git lgf \"$base..HEAD\"; }; f"
+	stack = "!f() { p=origin/develop; for b in \"$@\"; do printf \"%-34s <- %-34s %3s ahead\\n\" \"$b\" \"${p#origin/}\" \"$(git rev-list --count $p..$b)\"; p=$b; done; }; f"
   
 
 [include]
@@ -26,3 +39,5 @@
 # User and credential config loaded from ~/.config/gitconfig.local
 [worktree]
 	useRelativePaths = true
+[status]
+	showUntrackedFiles = all
