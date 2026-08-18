@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Common setup functions shared across platform-specific setup scripts
 
+DOTFILES_DIR=${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}
+
 # Check if running under WSL
 function is-wsl() {
     [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
@@ -18,9 +20,13 @@ function not-installed() {
 
 # Print the latest release tag for a GitHub repo (e.g. "PowerShell/PowerShell").
 # Returns 1 and prints an error if the API call fails or returns no tag.
+# grep -o anchors on the tag_name key so a `"tag_name": null` release or
+# minified JSON body can't be mistaken for a real tag (both previously slipped
+# past a bare `[ -z ]` check with `curl -s` and a greedy sed).
 function latest-github-tag() {
     local repo="$1" tag
-    tag=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    tag=$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+        | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"([^"]*)"$/\1/')
     if [ -z "$tag" ]; then
         echo "Error: failed to fetch latest release tag for ${repo} from GitHub API" >&2
         return 1
@@ -29,21 +35,10 @@ function latest-github-tag() {
 }
 
 # Print the path to a real (non-shim) pwsh interpreter, or return 1 if none.
-# Deliberately does NOT consult $PATH/command -v: under WSL, ~/.local/bin/pwsh
-# (highest PATH precedence, see profile.d/paths) is the scripts/pwsh shim that
-# execs Windows pwsh.exe — using it here would make install-powershell think
-# a native interpreter is already present. Probe the fixed locations the
-# .deb/tarball/Homebrew installs actually use instead. Keep this list in sync
-# with the candidates in shell-common.sh's PowerShell completion block.
+# Canonical implementation lives in functions/native-pwsh so the interactive
+# shell (shell-common.sh) and setup share one copy.
 function native-pwsh() {
-    local candidate
-    for candidate in /usr/bin/pwsh /usr/local/bin/pwsh /opt/homebrew/bin/pwsh /opt/microsoft/powershell/7/pwsh; do
-        if [ -x "$candidate" ]; then
-            printf '%s' "$candidate"
-            return 0
-        fi
-    done
-    return 1
+    source "$DOTFILES_DIR/functions/native-pwsh"
 }
 
 # Install Node.js via NVM
@@ -55,7 +50,7 @@ function install-node() {
         echo "Installing nvm"
         # Use latest stable NVM version
         NVM_VERSION=$(latest-github-tag nvm-sh/nvm) || return 1
-        curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
+        curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
     fi
 
     # Load NVM

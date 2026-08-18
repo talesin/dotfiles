@@ -104,21 +104,17 @@ elif [ -n "$BASH_VERSION" ]; then
 fi
 
 # PowerShell (.ps1) completion
-# Resolve the real pwsh once at load time. Deliberately not `command -v pwsh`:
-# under WSL, ~/.local/bin/pwsh (highest PATH precedence) is the scripts/pwsh
-# shim, which would spawn a Windows pwsh.exe (plus path translation) on every
-# Tab press. Keep this candidate list in sync with native-pwsh in
-# setup-common.sh.
-for _ps1_candidate in /usr/bin/pwsh /usr/local/bin/pwsh /opt/homebrew/bin/pwsh /opt/microsoft/powershell/7/pwsh; do
-  [[ -x "$_ps1_candidate" ]] && { _ps1_pwsh="$_ps1_candidate"; break; }
-done
-unset _ps1_candidate
-
 # ${(e)...} expands shell variables the user may have typed (e.g. $PROFILE_HOME/...)
 if [ -n "$ZSH_VERSION" ]; then
   _ps1_zsh_complete() {
     local script="${(e)words[1]}"
     [[ -f "$script" ]] || return 1
+    # Resolve on first use, and re-resolve if the cached path stops being
+    # executable, so running install-powershell takes effect in an
+    # already-running shell. native-pwsh skips the WSL scripts/pwsh shim,
+    # which would otherwise spawn a Windows pwsh.exe (plus path translation)
+    # on every Tab press.
+    [[ -x "$_ps1_pwsh" ]] || _ps1_pwsh="$(native-pwsh)"
     if [[ -n "$_ps1_pwsh" ]]; then
       local line raw
       line="${(e)${(j: :)words[1,-1]}}"
