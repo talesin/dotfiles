@@ -21,6 +21,18 @@ if [ "$personal" = 1 ]; then
     ln -sfn "$HOME/.claude/history.jsonl" "$config_dir/history.jsonl"
     ln -sfn "$HOME/.claude/plans" "$config_dir/plans"
   fi
+  # Seed a magenta "PERSONAL" status line so this profile is visually
+  # distinct from the work profile. Never overwrites an existing settings.json.
+  if [ ! -f "$config_dir/settings.json" ]; then
+    cat > "$config_dir/settings.json" <<'EOF'
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.dotfiles/claude-statusline.sh personal"
+  }
+}
+EOF
+  fi
   CLAUDE_CONFIG_DIR="$config_dir" command claude "${args[@]}"
 else
   command claude "${args[@]}"
