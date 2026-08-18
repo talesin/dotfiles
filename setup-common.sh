@@ -16,6 +16,36 @@ function not-installed() {
     ! is-installed "$1"
 }
 
+# Print the latest release tag for a GitHub repo (e.g. "PowerShell/PowerShell").
+# Returns 1 and prints an error if the API call fails or returns no tag.
+function latest-github-tag() {
+    local repo="$1" tag
+    tag=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -z "$tag" ]; then
+        echo "Error: failed to fetch latest release tag for ${repo} from GitHub API" >&2
+        return 1
+    fi
+    printf '%s' "$tag"
+}
+
+# Print the path to a real (non-shim) pwsh interpreter, or return 1 if none.
+# Deliberately does NOT consult $PATH/command -v: under WSL, ~/.local/bin/pwsh
+# (highest PATH precedence, see profile.d/paths) is the scripts/pwsh shim that
+# execs Windows pwsh.exe — using it here would make install-powershell think
+# a native interpreter is already present. Probe the fixed locations the
+# .deb/tarball/Homebrew installs actually use instead. Keep this list in sync
+# with the candidates in shell-common.sh's PowerShell completion block.
+function native-pwsh() {
+    local candidate
+    for candidate in /usr/bin/pwsh /usr/local/bin/pwsh /opt/homebrew/bin/pwsh /opt/microsoft/powershell/7/pwsh; do
+        if [ -x "$candidate" ]; then
+            printf '%s' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Install Node.js via NVM
 function install-node() {
     export NVM_DIR="$HOME/.nvm"
@@ -24,11 +54,7 @@ function install-node() {
     if [ ! -s "$NVM_DIR/nvm.sh" ]; then
         echo "Installing nvm"
         # Use latest stable NVM version
-        NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-        if [ -z "$NVM_VERSION" ]; then
-            echo "Error: failed to fetch NVM version from GitHub API" >&2
-            return 1
-        fi
+        NVM_VERSION=$(latest-github-tag nvm-sh/nvm) || return 1
         curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
     fi
 
