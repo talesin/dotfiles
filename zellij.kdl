@@ -37,6 +37,7 @@ keybinds {
         bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "Normal"; }
         bind "c" { SwitchToMode "RenamePane"; PaneNameInput 0;}
         bind "b" { Run "bash" { close_on_exit true; }; SwitchToMode "Normal"; }
+        bind "v" { Run "pwsh" { close_on_exit true; }; SwitchToMode "Normal"; }
         bind "s" { Run "ssh" "windows-11"; SwitchToMode "Normal"; }
     }
     move {
