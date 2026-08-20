@@ -15,17 +15,44 @@ brew "fish"
 brew "bash"
 brew "zsh"
 brew "zellij"
+brew "fzf"
+brew "neovim"
+brew "jandedobbeleer/oh-my-posh/oh-my-posh"
+
+# document conversion — required by the PowerShell profile's Convert-ToMarkdown.ps1
+# (.docx/.odt via pandoc, .pdf via poppler's pdftohtml)
+brew "pandoc"
+brew "poppler"
 
 # dev
 cask "corretto"
 brew "coursier"
 brew "dotnet"
+brew "powershell"
+
+# infrastructure as code — tenv shims terraform/terragrunt/tofu and switches versions
+# per-directory from .terraform-version/.terragrunt-version and required_version constraints.
+# The shims are inert until a version is installed:
+#   tenv tf install latest && tenv tf use latest
+#   tenv tg install latest && tenv tg use latest
+brew "tenv"
+
+# tenv verifies Terragrunt downloads against their cosign signature when this is present;
+# without it those installs fall back to a SHA256SUMS checksum alone. (Terraform is verified
+# against HashiCorp's PGP key either way — tenv checks that itself.)
+brew "cosign"
 
 # apps
 cask "google-chrome"
 cask "iterm2"
-cask "visual-studio-code" 
+cask "visual-studio-code"
 mas "xcode", id: 497799835
+
+# The oh-my-posh prompt (PowerShell repo's omp.json) uses 15 Nerd Font glyphs across the
+# Powerline Extra, Devicons, Codicon and Font Awesome ranges. A merely Powerline-patched
+# font only covers U+E0A0-E0B3 and renders the rest as tofu — set the terminal font to
+# "MesloLGM Nerd Font Mono" after installing.
+cask "font-meslo-lg-nerd-font"
 
 #amazon
 brew "awscli"

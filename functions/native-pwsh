@@ -1,0 +1,30 @@
+# native-pwsh
+# Print the path to a real (non-shim) pwsh interpreter, or return 1 if none.
+#
+# Deliberately not `command -v pwsh`: under WSL, ~/.local/bin/pwsh (highest PATH
+# precedence, see profile.d/paths) is the scripts/pwsh shim that execs Windows
+# pwsh.exe. Walk PATH the way scripts/win-shim's find_native does, skipping
+# anything that resolves to the shim, then fall back to the fixed locations
+# packages install into — setup-linux.sh calls this before apply-dotfiles has
+# put ~/.local/bin on PATH at all.
+local shim candidate resolved
+shim=$(realpath "$HOME/.dotfiles/scripts/pwsh" 2>/dev/null) || shim="$HOME/.dotfiles/scripts/pwsh"
+
+while IFS= read -r -d: candidate; do
+    [ -n "$candidate" ] || continue
+    candidate="$candidate/pwsh"
+    [ -x "$candidate" ] || continue
+    resolved=$(realpath "$candidate" 2>/dev/null) || resolved="$candidate"
+    [ "$resolved" = "$shim" ] && continue
+    printf '%s' "$candidate"
+    return 0
+done <<< "$PATH:"
+
+for candidate in /usr/bin/pwsh /usr/local/bin/pwsh /opt/homebrew/bin/pwsh \
+                 /opt/microsoft/powershell/7/pwsh; do
+    if [ -x "$candidate" ]; then
+        printf '%s' "$candidate"
+        return 0
+    fi
+done
+return 1

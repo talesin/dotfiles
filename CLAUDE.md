@@ -43,6 +43,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `is-expired-sshkey` - Check SSH certificate expiration
 - `update-tools` - Interactive daily Homebrew update prompt
 - `slugify` - Convert a string to a lowercase, dash-separated slug
+- `claude` - Wraps the `claude` CLI to switch config profiles via `CLAUDE_CONFIG_DIR`. Default invokes it normally (`~/.claude`, work profile). `--personal` points at `~/.claude-personal`, sharing `history.jsonl` and `plans/` with the work profile via symlink but keeping settings, MCP servers, and permissions separate. First use seeds `~/.claude-personal/settings.json` with a status line so the profile is visually distinguishable (see `claude-statusline.sh`).
 
 ### Development Tool Configs
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
@@ -53,6 +54,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings
+- `claude-statusline.sh` - Claude Code status line, shared by the work and personal profiles (see `functions/claude`). Takes the profile name (`work`/`personal`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
 
 ### Symlinks (`apply-dotfiles` in setup-common.sh)
 Creates symlinks from repo to home directory:

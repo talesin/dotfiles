@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Common setup functions shared across platform-specific setup scripts
 
+DOTFILES_DIR=${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}
+
 # Check if running under WSL
 function is-wsl() {
     [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
@@ -16,6 +18,29 @@ function not-installed() {
     ! is-installed "$1"
 }
 
+# Print the latest release tag for a GitHub repo (e.g. "PowerShell/PowerShell").
+# Returns 1 and prints an error if the API call fails or returns no tag.
+# grep -o anchors on the tag_name key so a `"tag_name": null` release or
+# minified JSON body can't be mistaken for a real tag (both previously slipped
+# past a bare `[ -z ]` check with `curl -s` and a greedy sed).
+function latest-github-tag() {
+    local repo="$1" tag
+    tag=$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+        | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"([^"]*)"$/\1/')
+    if [ -z "$tag" ]; then
+        echo "Error: failed to fetch latest release tag for ${repo} from GitHub API" >&2
+        return 1
+    fi
+    printf '%s' "$tag"
+}
+
+# Print the path to a real (non-shim) pwsh interpreter, or return 1 if none.
+# Canonical implementation lives in functions/native-pwsh so the interactive
+# shell (shell-common.sh) and setup share one copy.
+function native-pwsh() {
+    source "$DOTFILES_DIR/functions/native-pwsh"
+}
+
 # Install Node.js via NVM
 function install-node() {
     export NVM_DIR="$HOME/.nvm"
@@ -24,12 +49,8 @@ function install-node() {
     if [ ! -s "$NVM_DIR/nvm.sh" ]; then
         echo "Installing nvm"
         # Use latest stable NVM version
-        NVM_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-        if [ -z "$NVM_VERSION" ]; then
-            echo "Error: failed to fetch NVM version from GitHub API" >&2
-            return 1
-        fi
-        curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
+        NVM_VERSION=$(latest-github-tag nvm-sh/nvm) || return 1
+        curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | bash
     fi
 
     # Load NVM

@@ -108,15 +108,25 @@ fi
 if [ -n "$ZSH_VERSION" ]; then
   _ps1_zsh_complete() {
     local script="${(e)words[1]}"
-    [[ -f "$script" ]] || return 1
-    if [[ -x /usr/bin/pwsh ]]; then
+    # Bare names resolve off PATH ($commands is zsh's command hash). pwsh does
+    # its own PATH lookup, so this is only here to give the python fallback
+    # below something to parse.
+    [[ -f "$script" ]] || script="${commands[$script]}"
+    # Resolve on first use, and re-resolve if the cached path stops being
+    # executable, so running install-powershell takes effect in an
+    # already-running shell. native-pwsh skips the WSL scripts/pwsh shim,
+    # which would otherwise spawn a Windows pwsh.exe (plus path translation)
+    # on every Tab press.
+    [[ -x "$_ps1_pwsh" ]] || _ps1_pwsh="$(native-pwsh)"
+    if [[ -n "$_ps1_pwsh" ]]; then
       local line raw
       line="${(e)${(j: :)words[1,-1]}}"
-      raw="$(/usr/bin/pwsh -NoProfile -NonInteractive \
+      raw="$("$_ps1_pwsh" -NoProfile -NonInteractive \
             -File "${HOME}/.dotfiles/scripts/pwsh-complete.ps1" \
             -InputLine "$line" -CursorPos "${#line}" -WorkingDir "$PWD" 2>/dev/null)"
       [[ -n "$raw" ]] && { compadd -- "${(@f)raw}"; return; }
     fi
+    [[ -f "$script" ]] || return 1
     local -a params
     params=("${(f)$(python3 "${HOME}/.dotfiles/scripts/ps1-params.py" "$script" 2>/dev/null)}")
     (( ${#params} == 0 )) && return 1
