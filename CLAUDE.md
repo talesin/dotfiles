@@ -54,6 +54,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings
+- `zellij-layouts/` - Named zellij layouts (`default.kdl`), resolved by bare name via `zellij --layout <name>`; holds the swap layouts cycled by `next-swap-layout`
 - `claude-statusline.sh` - Claude Code status line, shared by the work and personal profiles (see `functions/claude`). Takes the profile name (`work`/`personal`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
 
 ### Symlinks (`apply-dotfiles` in setup-common.sh)
@@ -61,7 +62,7 @@ Creates symlinks from repo to home directory:
 - Shell configs → `~/.zshrc`, `~/.bashrc`, etc.
 - Functions → `~/.functions/`
 - Profile.d → `~/.profile.d/`
-- Zellij → `~/.config/zellij/config.kdl`
+- Zellij → `~/.config/zellij/config.kdl`, `~/.config/zellij/layouts`
 
 ## Key Features
 

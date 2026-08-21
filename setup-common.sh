@@ -149,6 +149,7 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/zprofile" ~/.zprofile
     link-dotfile "$dotfiles_dir/functions" ~/.functions
     link-dotfile "$dotfiles_dir/zellij.kdl" ~/.config/zellij/config.kdl
+    link-dotfile "$dotfiles_dir/zellij-layouts" ~/.config/zellij/layouts
     link-dotfile "$dotfiles_dir/direnv.toml" ~/.config/direnv/direnv.toml
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh
