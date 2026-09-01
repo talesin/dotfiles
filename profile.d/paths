@@ -1,5 +1,8 @@
 # Shared PATH management for both zsh and bash
 # This file is sourced by both zprofile and bash_profile
+add-path /usr/local/bin
+add-path /opt/homebrew/bin
+add-path /opt/podman/bin
 add-path "$HOME/.dotnet"
 add-path "$HOME/.dotnet/tools"
 add-path "$HOME/.cargo/bin"
@@ -7,6 +10,4 @@ add-path "$HOME/.lmstudio/bin"
 add-path "$HOME/.claude/local"
 add-path "$HOME/Library/Application Support/Coursier/bin"
 add-path "$HOME/Documents/PowerShell/Scripts"
-add-path /opt/homebrew/bin
-add-path /usr/local/bin
 add-path "$HOME/.local/bin"   # last → first in $PATH, highest precedence
