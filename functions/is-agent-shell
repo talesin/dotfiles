@@ -1,0 +1,8 @@
+# True when this shell was spawned by an AI agent or CI, not by a human terminal.
+# Agent runners give their shells a real pty, so tty checks alone can't tell them
+# apart - these env markers can.
+[ -n "$CLAUDECODE$CLAUDE_CODE_ENTRYPOINT$AI_AGENT$CLAUDE_CODE_SESSION_ID$CI" ] && return 0
+[ "$TERM" = "dumb" ] && return 0
+# Claude Desktop's integrated terminal identifies itself (app 1.40609 and later).
+[ "$TERM_PROGRAM" = "claude-desktop" ] && return 0
+return 1

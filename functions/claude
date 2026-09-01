@@ -1,34 +1,39 @@
 # Wrap the claude CLI to switch config profiles via CLAUDE_CONFIG_DIR.
-# Default (no --personal) invokes the CLI normally with CLAUDE_CONFIG_DIR unset so
-# Claude's own default (~/.claude) is used without interference. Pass --personal to
-# explicitly point at ~/.claude-personal and share history + plans from the work profile.
-local personal=0
+# Default (no --secondary) invokes the CLI normally with CLAUDE_CONFIG_DIR unset so
+# Claude's own default (~/.claude) is used without interference. Pass --secondary to
+# explicitly point at ~/.claude-secondary and share history + plans from the primary profile.
+local secondary=0
 local -a args
 local a
 for a in "$@"; do
-  if [ "$a" = "--personal" ]; then
-    personal=1
+  if [ "$a" = "--secondary" ]; then
+    secondary=1
   else
     args+=("$a")
   fi
 done
 
-if [ "$personal" = 1 ]; then
-  local config_dir="$HOME/.claude-personal"
+if [ "$secondary" = 1 ]; then
+  local config_dir="$HOME/.claude-secondary"
   # First-use setup: create the profile folder and share history + plans.
   if [ ! -d "$config_dir" ]; then
     mkdir -p "$config_dir"
     ln -sfn "$HOME/.claude/history.jsonl" "$config_dir/history.jsonl"
     ln -sfn "$HOME/.claude/plans" "$config_dir/plans"
   fi
-  # Seed a magenta "PERSONAL" status line so this profile is visually
-  # distinct from the work profile. Never overwrites an existing settings.json.
+  # Seed a magenta "SECONDARY" status line so this profile is visually
+  # distinct from the primary profile. NO_ZELLIJ keeps Claude-spawned shells out
+  # of the human's zellij session (see functions/zellij-autostart-wanted).
+  # Never overwrites an existing settings.json.
   if [ ! -f "$config_dir/settings.json" ]; then
     cat > "$config_dir/settings.json" <<'EOF'
 {
+  "env": {
+    "NO_ZELLIJ": "1"
+  },
   "statusLine": {
     "type": "command",
-    "command": "~/.dotfiles/claude-statusline.sh personal"
+    "command": "~/.dotfiles/claude-statusline.sh secondary"
   }
 }
 EOF

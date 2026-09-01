@@ -16,6 +16,9 @@ Personal dotfiles repository managing shell configuration, development tools, an
 ### Package Management
 - `brew bundle --file=Brewfile.macos` - Install macOS packages
 
+### Diagnostics
+- `./check-claude-desktop-terminal.sh` - Confirms Claude Desktop's integrated terminal would not auto-attach to zellij; prints the app version and the spawn env it uses, so a marker change after an app update is visible
+
 ## Architecture
 
 ### Setup Scripts
@@ -39,11 +42,13 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `add-path` - Add directory to PATH if exists and not already present
 - `is-installed` - Check if command exists
 - `is-mac` / `is-linux` - OS detection
+- `is-agent-shell` - True when the shell was spawned by an AI agent or CI (`CLAUDECODE`, `CLAUDE_CODE_ENTRYPOINT`, `AI_AGENT`, `CLAUDE_CODE_SESSION_ID`, `CI`, `TERM=dumb`, `TERM_PROGRAM=claude-desktop`) rather than by a human
+- `zellij-autostart-wanted` - Gates the zellij auto-attach in `shell-common.sh`. Requires an interactive shell with a tty on all three descriptors, no `ZELLIJ*` vars already set, `NO_ZELLIJ` unset, `is-agent-shell` false, and a recognised terminal emulator (`TERM_PROGRAM`, `LC_TERMINAL`, `WT_SESSION`, `SSH_TTY`/`SSH_CONNECTION`, or a Linux emulator marker). Claude Desktop's integrated terminal spawns `$SHELL -l` on a real pty with the GUI env and identifies itself only through `TERM_PROGRAM=claude-desktop`, which `is-agent-shell` catches; run `./check-claude-desktop-terminal.sh` after a Desktop update to confirm the gate still holds. Set `ZELLIJ_AUTOSTART=1` in `~/.config/env.local` for a real terminal that sets no emulator marker
 - `refresh-sshkey` - SSH agent startup and key management
 - `is-expired-sshkey` - Check SSH certificate expiration
 - `update-tools` - Interactive daily Homebrew update prompt
 - `slugify` - Convert a string to a lowercase, dash-separated slug
-- `claude` - Wraps the `claude` CLI to switch config profiles via `CLAUDE_CONFIG_DIR`. Default invokes it normally (`~/.claude`, work profile). `--personal` points at `~/.claude-personal`, sharing `history.jsonl` and `plans/` with the work profile via symlink but keeping settings, MCP servers, and permissions separate. First use seeds `~/.claude-personal/settings.json` with a status line so the profile is visually distinguishable (see `claude-statusline.sh`).
+- `claude` - Wraps the `claude` CLI to switch config profiles via `CLAUDE_CONFIG_DIR`. Default invokes it normally (`~/.claude`, primary profile). `--secondary` points at `~/.claude-secondary`, sharing `history.jsonl` and `plans/` with the primary profile via symlink but keeping settings, MCP servers, and permissions separate. First use seeds `~/.claude-secondary/settings.json` with a status line so the profile is visually distinguishable (see `claude-statusline.sh`).
 
 ### Development Tool Configs
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
@@ -55,7 +60,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings
 - `zellij-layouts/` - Named zellij layouts (`default.kdl`), resolved by bare name via `zellij --layout <name>`; holds the swap layouts cycled by `next-swap-layout`
-- `claude-statusline.sh` - Claude Code status line, shared by the work and personal profiles (see `functions/claude`). Takes the profile name (`work`/`personal`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
+- `claude-statusline.sh` - Claude Code status line, shared by the primary and secondary profiles (see `functions/claude`). Takes the profile name (`primary`/`secondary`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
 
 ### Symlinks (`apply-dotfiles` in setup-common.sh)
 Creates symlinks from repo to home directory:
@@ -70,5 +75,5 @@ Creates symlinks from repo to home directory:
 - **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
 - **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
 - **SSH key management**: Auto-start ssh-agent, certificate expiration checks
-- **Zellij integration**: Auto-attach, custom keybindings, `cls` alias
+- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias
 - **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET
