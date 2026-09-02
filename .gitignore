@@ -6,3 +6,4 @@ fish/fish_variables
 Brewfile.lock.json
 .claude
 .vscode
+zellij-plugins/*/target/

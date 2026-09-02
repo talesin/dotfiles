@@ -196,6 +196,16 @@ plugins {
     session-manager { path "session-manager"; }
 }
 
+// Background plugin that keeps each tab's name in sync with the title of that
+// tab's focused pane. The bare filename resolves against zellij's plugin dir,
+// where apply-dotfiles symlinks the committed wasm, so this line is portable
+// across machines. max_length caps the name in characters.
+load_plugins {
+    "file:zellij-tab-title.wasm" {
+        max_length "24"
+    }
+}
+
 // Choose what to do when zellij receives SIGTERM, SIGINT, SIGQUIT or SIGHUP
 // eg. when terminal window with an active zellij session is closed
 // Options:

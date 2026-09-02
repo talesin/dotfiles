@@ -1,0 +1,4 @@
+# Bare `cargo build` produces the plugin. wasm has no test runner, so test runs
+# pass --target for the host triple instead (see build.sh).
+[build]
+target = "wasm32-wasip1"
