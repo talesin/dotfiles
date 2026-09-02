@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# Status line for Claude Code, shared by the work (~/.claude) and personal
-# (~/.claude-personal) profiles set up by functions/claude. The profile
+# Status line for Claude Code, shared by the primary (~/.claude) and secondary
+# (~/.claude-secondary) profiles set up by functions/claude. The profile
 # label is passed as $1 rather than sniffed from the environment, since the
-# work profile deliberately leaves CLAUDE_CONFIG_DIR unset.
+# primary profile deliberately leaves CLAUDE_CONFIG_DIR unset.
 #
 # Wired in via settings.json:
-#   "statusLine": { "type": "command", "command": "~/.dotfiles/claude-statusline.sh work" }
-#   "statusLine": { "type": "command", "command": "~/.dotfiles/claude-statusline.sh personal" }
+#   "statusLine": { "type": "command", "command": "~/.dotfiles/claude-statusline.sh primary" }
+#   "statusLine": { "type": "command", "command": "~/.dotfiles/claude-statusline.sh secondary" }
 #
 # Must always exit 0: Claude Code discards the status line output on a
 # non-zero exit and leaves the previous line on screen.
 
-profile="${1:-work}"
+profile="${1:-primary}"
 payload="$(cat)"
 
 case "$profile" in
-  personal)
-    label=" PERSONAL "
+  secondary)
+    label=" SECONDARY "
     # reverse video + magenta background, bold
     badge_style=$'\033[7;35;1m'
     ;;
   *)
-    label=" WORK "
+    label=" PRIMARY "
     # reverse video + cyan background, bold
     badge_style=$'\033[7;36;1m'
     ;;

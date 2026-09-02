@@ -1,0 +1,21 @@
+# True when this shell should auto-attach to zellij: a genuinely interactive
+# human terminal session that isn't already inside zellij.
+is-installed zellij || return 1
+[ -n "$NO_ZELLIJ" ] && return 1
+# Already inside zellij. Check all three: a child can inherit ZELLIJ_SESSION_NAME
+# and ZELLIJ_PANE_ID while ZELLIJ itself is dropped from the env.
+[ -n "$ZELLIJ$ZELLIJ_SESSION_NAME$ZELLIJ_PANE_ID" ] && return 1
+# Interactive shell, with a real tty on all three descriptors.
+case $- in *i*) ;; *) return 1 ;; esac
+[ -t 0 ] && [ -t 1 ] && [ -t 2 ] || return 1
+is-agent-shell && return 1
+# Escape hatch for a real terminal that sets none of the markers below
+# (bare Linux console, an emulator not listed). Set it in ~/.config/env.local.
+[ -n "$ZELLIJ_AUTOSTART" ] && return 0
+# Require a recognisable terminal emulator. Agent runners that spawn `$SHELL -l`
+# on a real pty with the bare GUI env are interactive, fully tty and carry no
+# agent markers, so an emulator ID is the only remaining signal. Claude Desktop's
+# integrated terminal sets TERM_PROGRAM=claude-desktop, which is-agent-shell
+# rejects above; this line is the fallback for a runner that sets nothing.
+[ -n "$TERM_PROGRAM$LC_TERMINAL$WT_SESSION$SSH_TTY$SSH_CONNECTION$KONSOLE_VERSION$GNOME_TERMINAL_SCREEN$VTE_VERSION$ALACRITTY_SOCKET$KITTY_WINDOW_ID$WEZTERM_PANE" ] || return 1
+return 0

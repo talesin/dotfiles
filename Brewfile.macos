@@ -53,6 +53,7 @@ mas "xcode", id: 497799835
 # font only covers U+E0A0-E0B3 and renders the rest as tofu — set the terminal font to
 # "MesloLGM Nerd Font Mono" after installing.
 cask "font-meslo-lg-nerd-font"
+cask "font-fira-code"
 
 #amazon
 brew "awscli"

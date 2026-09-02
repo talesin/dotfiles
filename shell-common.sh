@@ -164,25 +164,27 @@ elif [ -n "$BASH_VERSION" ]; then
 fi
 
 # Zellij integration (works for both shells)
-if is-installed zellij && [[ -t 1 ]]; then
-  if [[ -z "$ZELLIJ" && -z "$NO_ZELLIJ" ]]; then
-    # Clean up exited sessions
-    zellij ls 2>/dev/null | grep EXITED | awk '{print $1}' | sed -e 's/\x1B\[[0-9;]*[mG]//g' | xargs -I % zellij d % 2>/dev/null
-    if [ -n "$WSL_DISTRO_NAME" ]; then
-      # On a cold WSL2 start, Windows Terminal hasn't propagated the real
-      # pane size to the pty by the time the shell runs. Wait (up to ~1s)
-      # for the pty to report a non-default size so zellij --create lays
-      # out panes at the real dimensions instead of 80x24.
-      for _ in 1 2 3 4 5 6 7 8 9 10; do
-        [ "$(tput cols 2>/dev/null || echo 0)" -gt 80 ] && break
-        sleep 0.1
-      done
-    fi
-    if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-      exec zellij attach --create "vscode-$(basename "$PWD")"
-    else
-      exec zellij attach --create "💻"
-    fi
+# Agent runners (Claude Desktop, Claude Code, CI) get a plain shell. They spawn
+# their shells on a pty, so a tty check alone lets them through - and since
+# `attach --create` joins the existing session rather than making a new one,
+# they'd redraw the human's panes to the smallest attached client.
+if zellij-autostart-wanted; then
+  # Clean up exited sessions
+  zellij ls 2>/dev/null | grep EXITED | awk '{print $1}' | sed -e 's/\x1B\[[0-9;]*[mG]//g' | xargs -I % zellij d % 2>/dev/null
+  if [ -n "$WSL_DISTRO_NAME" ]; then
+    # On a cold WSL2 start, Windows Terminal hasn't propagated the real
+    # pane size to the pty by the time the shell runs. Wait (up to ~1s)
+    # for the pty to report a non-default size so zellij --create lays
+    # out panes at the real dimensions instead of 80x24.
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+      [ "$(tput cols 2>/dev/null || echo 0)" -gt 80 ] && break
+      sleep 0.1
+    done
+  fi
+  if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    exec zellij attach --create "vscode-$(basename "$PWD")"
+  else
+    exec zellij attach --create "💻"
   fi
 fi
 
@@ -192,4 +194,6 @@ if type refresh-sshkey >/dev/null 2>&1; then
 fi
 
 # Update tools
-update-tools
+# Skipped for agent shells: their pty passes update-tools' own `[[ -t 0 ]]`
+# guard, so the "Update tools? [y/n]" prompt would block on `read`.
+is-agent-shell || update-tools
