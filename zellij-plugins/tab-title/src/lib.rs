@@ -25,7 +25,7 @@ impl PaneView<'_> {
     /// and the tiled layer both report a focused pane; only the visible one
     /// counts. Plugin panes (tab-bar, status-bar, session-manager) and
     /// suppressed panes never qualify.
-    fn names_the_tab(&self, floating_layer_visible: bool) -> bool {
+    pub fn names_the_tab(&self, floating_layer_visible: bool) -> bool {
         !self.is_plugin
             && !self.is_suppressed
             && self.is_focused
@@ -215,5 +215,32 @@ mod tests {
     #[test]
     fn leaves_the_tab_alone_when_no_pane_offers_a_title() {
         assert_eq!(rename_for("Tab #1", TILED, [pane("unfocused")], 24), None);
+    }
+
+    #[test]
+    fn names_the_tab_follows_the_visible_layer() {
+        let tiled_pane = focused("tiled");
+        let floating_pane = PaneView {
+            is_floating: true,
+            ..focused("floating")
+        };
+        assert!(tiled_pane.names_the_tab(TILED));
+        assert!(!tiled_pane.names_the_tab(FLOATING));
+        assert!(floating_pane.names_the_tab(FLOATING));
+        assert!(!floating_pane.names_the_tab(TILED));
+
+        let plugin_pane = PaneView {
+            is_plugin: true,
+            ..focused("tab-bar")
+        };
+        assert!(!plugin_pane.names_the_tab(TILED));
+        assert!(!plugin_pane.names_the_tab(FLOATING));
+
+        let suppressed_pane = PaneView {
+            is_suppressed: true,
+            ..focused("hidden")
+        };
+        assert!(!suppressed_pane.names_the_tab(TILED));
+        assert!(!suppressed_pane.names_the_tab(FLOATING));
     }
 }

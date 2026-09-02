@@ -50,6 +50,24 @@ to the source in `tab-title/`.
 multi-byte titles such as the `✳` Claude Code prefix aren't cut mid-character.
 A truncated name ends in an ellipsis.
 
+`poll_interval_ms` (default `250`) sets how often the plugin re-reads the
+naming pane's title, in milliseconds; see the next section. `0` turns the
+poll off.
+
+## Polling for title changes
+
+Zellij 0.45.1 sends plugins a pane update only on structural changes such as
+a focus change or a new pane. A title a pane sets for itself through an OSC
+escape (the shell's cwd at each prompt, the running command, a program's own
+status line) is stored but never pushed, so a tab named from its pane's first
+update would keep reading `Pane #1` until the next focus change. This is
+zellij-org/zellij#5482; a fix is pending in PR #5399.
+
+To cover the gap the plugin polls: on a timer it re-reads, for every tab, the
+title of the pane that names the tab and renames the tab when the title has
+changed. Each tick costs one synchronous pane query per tab. Once zellij
+pushes title changes itself, set `poll_interval_ms` to `0` or drop the poll.
+
 ## Development
 
 A rebuilt wasm is picked up when a session starts, so after `build.sh` kill

@@ -50,6 +50,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
 - `vscode.extensions.lst` - VS Code extensions (Scala, Java, .NET, Copilot)
 - `vscode.user.settings.json` - VS Code settings
+- `.vscode/settings.json` - Workspace VS Code settings; points rust-analyzer at the nested `zellij-plugins/tab-title` crate via `linkedProjects`, since the repo root is not a Cargo workspace
 
 ### Application Configs
 - `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
