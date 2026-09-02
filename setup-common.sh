@@ -8,6 +8,16 @@ function is-wsl() {
     [[ -r /proc/sys/kernel/osrelease ]] && grep -qi microsoft /proc/sys/kernel/osrelease
 }
 
+# Print zellij's plugin directory for this OS. Does not require zellij to be
+# installed, so it is safe to call before install-zellij has run.
+function zellij-plugin-dir() {
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        printf '%s' "$HOME/Library/Application Support/org.Zellij-Contributors.Zellij/plugins"
+    else
+        printf '%s' "${XDG_DATA_HOME:-$HOME/.local/share}/zellij/plugins"
+    fi
+}
+
 # Check if a command is available
 function is-installed() {
     command -v "$1" >/dev/null 2>&1
@@ -150,6 +160,7 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/functions" ~/.functions
     link-dotfile "$dotfiles_dir/zellij.kdl" ~/.config/zellij/config.kdl
     link-dotfile "$dotfiles_dir/zellij-layouts" ~/.config/zellij/layouts
+    link-dotfile "$dotfiles_dir/zellij-plugins/zellij-tab-title.wasm" "$(zellij-plugin-dir)/zellij-tab-title.wasm"
     link-dotfile "$dotfiles_dir/direnv.toml" ~/.config/direnv/direnv.toml
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh

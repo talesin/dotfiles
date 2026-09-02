@@ -1,0 +1,5 @@
+{
+  "rust-analyzer.linkedProjects": [
+    "zellij-plugins/tab-title/Cargo.toml"
+  ]
+}

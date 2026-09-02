@@ -12,6 +12,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `./setup.sh` - Main entry point; detects OS and runs platform-specific setup
 - `./setup-macos.sh` - macOS setup (Homebrew, apps, symlinks)
 - `./setup-linux.sh` - Linux setup (apt/dnf/yum packages, symlinks)
+- `zellij-plugins/tab-title/build.sh` - Rebuilds the plugin and refreshes the committed `.wasm`
 
 ### Package Management
 - `brew bundle --file=Brewfile.macos` - Install macOS packages
@@ -25,7 +26,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `setup.sh` - OS detection, delegates to platform scripts
 - `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts
 - `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
-- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`
 
 ### Shell Configuration
 - `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash
@@ -54,12 +55,14 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
 - `vscode.extensions.lst` - VS Code extensions (Scala, Java, .NET, Copilot)
 - `vscode.user.settings.json` - VS Code settings
+- `.vscode/settings.json` - Workspace VS Code settings; points rust-analyzer at the nested `zellij-plugins/tab-title` crate via `linkedProjects`, since the repo root is not a Cargo workspace
 
 ### Application Configs
 - `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings
 - `zellij-layouts/` - Named zellij layouts (`default.kdl`), resolved by bare name via `zellij --layout <name>`; holds the swap layouts cycled by `next-swap-layout`
+- `zellij-plugins/` - `tab-title/` is a Rust crate compiled to `wasm32-wasip1`; the committed `zellij-tab-title.wasm` renames each tab to its focused pane's title; loaded by the `load_plugins` block in `zellij.kdl`; committed so machines without Rust need no build step
 - `claude-statusline.sh` - Claude Code status line, shared by the primary and secondary profiles (see `functions/claude`). Takes the profile name (`primary`/`secondary`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
 
 ### Symlinks (`apply-dotfiles` in setup-common.sh)
@@ -68,6 +71,7 @@ Creates symlinks from repo to home directory:
 - Functions → `~/.functions/`
 - Profile.d → `~/.profile.d/`
 - Zellij → `~/.config/zellij/config.kdl`, `~/.config/zellij/layouts`
+- Zellij tab-title plugin → the OS-specific zellij plugin dir
 
 ## Key Features
 
@@ -75,5 +79,5 @@ Creates symlinks from repo to home directory:
 - **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
 - **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
 - **SSH key management**: Auto-start ssh-agent, certificate expiration checks
-- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias
+- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles
 - **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET

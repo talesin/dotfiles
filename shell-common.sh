@@ -26,16 +26,23 @@ if [ -d ~/.functions ]; then
   fi
 fi
 
-# Set terminal title to current folder name
-# Overrides OMZ/OMB title since shell-common.sh loads after them
-# Zellij may prepend its session name, which is expected
+# Set the terminal title to the current folder name; while a command runs (zsh
+# only), it shows the command name instead, reverting at the next prompt.
+# Zellij exposes this as the pane title, which the zellij-tab-title plugin
+# mirrors into the tab name. Overrides OMZ/OMB title since shell-common.sh
+# loads after them. Zellij may prepend its session name to the terminal title,
+# which is expected.
 set-terminal-title() {
   printf '\e]0;%s\a' "${PWD##*/}"
 }
 
 if [ -n "$ZSH_VERSION" ]; then
+  set-terminal-title-preexec() {
+    printf '\e]0;%s\a' "${1%% *}"
+  }
   autoload -Uz add-zsh-hook
   add-zsh-hook precmd set-terminal-title
+  add-zsh-hook preexec set-terminal-title-preexec
 elif [ -n "$BASH_VERSION" ]; then
   PROMPT_COMMAND="set-terminal-title${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 fi

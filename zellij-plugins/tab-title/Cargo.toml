@@ -1,0 +1,22 @@
+# The committed artifact at ../zellij-tab-title.wasm is produced only by
+# ./build.sh. Rebuild and commit it in the same change as any source edit so the
+# binary other machines load matches this source.
+[package]
+name = "zellij-tab-title"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Zellij background plugin that mirrors the focused pane's title into its tab name"
+
+# Standalone package: keeps cargo from adopting a future repo-root workspace,
+# which would silently ignore the release profile below.
+[workspace]
+
+[dependencies]
+zellij-tile = "0.45.1"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
