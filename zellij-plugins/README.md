@@ -21,6 +21,28 @@ its plugin directory:
 `apply-dotfiles` symlinks the committed wasm into that directory, so the
 `load_plugins` line works unmodified on every machine.
 
+## Permissions
+
+The plugin needs the `ReadApplicationState` and `ChangeApplicationState`
+permissions. Zellij renders a grant prompt inside the requesting plugin's
+pane, and a background plugin loaded from `load_plugins` has no pane, so the
+request is cached against a pane that never exists and the user is never
+asked; the plugin waits for the grant forever. Granting by loading the plugin
+in a foreground pane (`zellij plugin -- file:...`) does not help either: the
+CLI resolves the `file:` path against its own working directory, so the grant
+is cached under a different key than the background instance checks.
+
+`apply-dotfiles` therefore seeds the grant directly into zellij's permission
+cache (`seed-zellij-plugin-permissions` in `../setup-common.sh`):
+
+- macOS: `~/Library/Caches/org.Zellij-Contributors.Zellij/permissions.kdl`
+- Linux: `${XDG_CACHE_HOME:-~/.cache}/zellij/permissions.kdl`
+
+The cache key is the `load_plugins` path verbatim (`zellij-tab-title.wasm`),
+which zellij stores unresolved, so the seeded entry is identical on every
+machine. Zellij reads the cache when a session starts; after seeding, kill
+the session and open a new terminal.
+
 ## Why the artifact is committed
 
 The compiled `.wasm` is committed to the repo rather than built on each

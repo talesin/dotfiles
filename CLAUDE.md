@@ -26,7 +26,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `setup.sh` - OS detection, delegates to platform scripts
 - `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts
 - `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
-- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`
 
 ### Shell Configuration
 - `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash
@@ -62,7 +62,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings
 - `zellij-layouts/` - Named zellij layouts (`default.kdl`), resolved by bare name via `zellij --layout <name>`; holds the swap layouts cycled by `next-swap-layout`
-- `zellij-plugins/` - `tab-title/` is a Rust crate compiled to `wasm32-wasip1`; the committed `zellij-tab-title.wasm` renames each tab to its focused pane's title; loaded by the `load_plugins` block in `zellij.kdl`; committed so machines without Rust need no build step
+- `zellij-plugins/` - `tab-title/` is a Rust crate compiled to `wasm32-wasip1`; the committed `zellij-tab-title.wasm` renames each tab to its focused pane's title; loaded by the `load_plugins` block in `zellij.kdl`; committed so machines without Rust need no build step. Its permissions are seeded into zellij's permission cache by `apply-dotfiles` (`seed-zellij-plugin-permissions`), because zellij's grant prompt cannot surface for a pane-less background plugin - see `zellij-plugins/README.md`
 - `claude-statusline.sh` - Claude Code status line, shared by the primary and secondary profiles (see `functions/claude`). Takes the profile name (`primary`/`secondary`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).
 
 ### Symlinks (`apply-dotfiles` in setup-common.sh)

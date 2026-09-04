@@ -18,6 +18,34 @@ function zellij-plugin-dir() {
     fi
 }
 
+# Grant the tab-title plugin its permissions by seeding zellij's permission
+# cache. The grant prompt renders in a plugin's pane, and a background plugin
+# loaded from load_plugins has no pane, so the prompt never reaches the user
+# and the plugin waits forever. The cache key is the config's file: path
+# verbatim (zellij never resolves it), so it is the same on every machine.
+# Skipped when the key is already present, whether seeded or granted live.
+function seed-zellij-plugin-permissions() {
+    local cache_file
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        cache_file="$HOME/Library/Caches/org.Zellij-Contributors.Zellij/permissions.kdl"
+    else
+        cache_file="${XDG_CACHE_HOME:-$HOME/.cache}/zellij/permissions.kdl"
+    fi
+
+    if [[ -f "$cache_file" ]] && grep -q "zellij-tab-title.wasm" "$cache_file"; then
+        return 0
+    fi
+
+    mkdir -p "$(dirname "$cache_file")"
+    cat >> "$cache_file" <<'EOF'
+"zellij-tab-title.wasm" {
+    ReadApplicationState
+    ChangeApplicationState
+}
+EOF
+    echo "  granted zellij-tab-title.wasm permissions in $cache_file"
+}
+
 # Check if a command is available
 function is-installed() {
     command -v "$1" >/dev/null 2>&1
@@ -161,6 +189,7 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/zellij.kdl" ~/.config/zellij/config.kdl
     link-dotfile "$dotfiles_dir/zellij-layouts" ~/.config/zellij/layouts
     link-dotfile "$dotfiles_dir/zellij-plugins/zellij-tab-title.wasm" "$(zellij-plugin-dir)/zellij-tab-title.wasm"
+    seed-zellij-plugin-permissions
     link-dotfile "$dotfiles_dir/direnv.toml" ~/.config/direnv/direnv.toml
     link-dotfile "$dotfiles_dir/profile.d" ~/.profile.d
     link-dotfile "$dotfiles_dir/shell-common.sh" ~/.shell-common.sh
