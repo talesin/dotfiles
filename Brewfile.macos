@@ -51,7 +51,7 @@ mas "xcode", id: 497799835
 # The oh-my-posh prompt (PowerShell repo's omp.json) uses 15 Nerd Font glyphs across the
 # Powerline Extra, Devicons, Codicon and Font Awesome ranges. A merely Powerline-patched
 # font only covers U+E0A0-E0B3 and renders the rest as tofu — set the terminal font to
-# "MesloLGM Nerd Font Mono" after installing.
+# "MesloLGMDZ Nerd Font Mono" after installing.
 cask "font-meslo-lg-nerd-font"
 cask "font-fira-code"
 
