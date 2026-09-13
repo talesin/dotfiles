@@ -10,7 +10,7 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 if [ -d ~/.functions ]; then
     for fn in ~/.functions/*; do
         if [ -f "$fn" ]; then
-            func_name=$(basename "$fn")
+            func_name=${fn##*/}
             eval "function $func_name() { source ~/.functions/$func_name; }"
         fi
     done

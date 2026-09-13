@@ -36,8 +36,8 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `aliases` - Shared aliases (`cls`, `zka`)
 
 ### Profile Configuration (`profile.d/`)
-- `env` - Environment variables, loads `~/.config/env.local` for local overrides
-- `paths` - PATH management via `add-path` function
+- `env` - Environment variables, loads `~/.config/env.local` for local overrides. Runs first in `zshenv`/`bash_profile`, so it starts by restoring the system PATH directories (`path_helper` on macOS, the conventional set elsewhere) when the inherited PATH lacks them; `nvm.sh` and everything after it need `tr` and friends
+- `paths` - PATH management via `add-path` function. Sourced by the login profiles and re-sourced by `shell-common.sh`, so an interactive non-login shell (zellij pane, editor terminal) rebuilds the user-level entries; `add-path` skips entries already present
 
 ### Shell Functions (`functions/`)
 - `add-path` - Add directory to PATH if exists and not already present
@@ -79,5 +79,5 @@ Creates symlinks from repo to home directory:
 - **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
 - **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
 - **SSH key management**: Auto-start ssh-agent, certificate expiration checks
-- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles
+- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles. Panes are non-login shells (no `zprofile`), so their PATH comes from `profile.d/env` restoring the system directories and `shell-common.sh` re-sourcing `profile.d/paths`
 - **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET

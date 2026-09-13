@@ -26,6 +26,12 @@ if [ -d ~/.functions ]; then
   fi
 fi
 
+# Interactive shells rebuild the user-level PATH entries here as well as in the
+# login profile: a shell spawned by a multiplexer or an editor is not a login
+# shell, and the PATH it inherits may have been stripped by whatever spawned it.
+# add-path skips entries already present, so this is a no-op otherwise.
+source "$HOME/.profile.d/paths"
+
 # Set the terminal title to the current folder name; while a command runs (zsh
 # only), it shows the command name instead, reverting at the next prompt.
 # Zellij exposes this as the pane title, which the zellij-tab-title plugin

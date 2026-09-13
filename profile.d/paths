@@ -1,5 +1,5 @@
 # Shared PATH management for both zsh and bash
-# This file is sourced by both zprofile and bash_profile
+# This file is sourced by zprofile, bash_profile, profile and shell-common.sh
 add-path /usr/local/bin
 add-path /opt/homebrew/bin
 add-path /opt/podman/bin

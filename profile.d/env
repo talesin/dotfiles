@@ -1,6 +1,21 @@
 # Shared environment variables for both zsh and bash
 # This file is sourced by both zshenv and bash_profile
 
+# A non-login shell inherits PATH verbatim, and a parent can hand it one without
+# the system directories (an editor extension injecting a project .env, say).
+# Everything below needs them, so restore them first: path_helper on macOS, the
+# conventional set elsewhere.
+case ":$PATH:" in
+    *:/usr/bin:*) ;;
+    *)
+        if [ -x /usr/libexec/path_helper ]; then
+            eval "$(/usr/libexec/path_helper -s)"
+        else
+            export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin${PATH:+:$PATH}"
+        fi
+        ;;
+esac
+
 # Load local environment overrides
 if [ -f $HOME/.config/env.local ]; then
     source $HOME/.config/env.local

@@ -15,7 +15,7 @@ export LS_COLORS="di=36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30
 if [ -d ~/.functions ]; then
     for fn in ~/.functions/*; do
         if [ -f "$fn" ]; then
-            func_name=$(basename "$fn")
+            func_name=${fn##*/}
             eval "function $func_name() { source ~/.functions/$func_name; }"
         fi
     done
