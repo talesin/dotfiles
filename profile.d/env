@@ -42,3 +42,8 @@ export EDITOR=vim
 # .NET
 export DOTNET_ROOT="$HOME/.dotnet"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+# Zellij: macOS caps Unix socket paths at 103 bytes and the per-user $TMPDIR is
+# long, so a long session name (a worktree folder in VS Code, say) overflows it.
+# Every client and server must agree on this directory.
+export ZELLIJ_SOCKET_DIR="${ZELLIJ_SOCKET_DIR:-/tmp/zellij}"
