@@ -3,6 +3,7 @@
 add-path /usr/local/bin
 add-path /opt/homebrew/bin
 add-path /opt/podman/bin
+add-path "$HOME/.maestro/bin"
 add-path "$HOME/.dotnet"
 add-path "$HOME/.dotnet/tools"
 add-path "$HOME/.cargo/bin"
