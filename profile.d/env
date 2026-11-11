@@ -16,6 +16,24 @@ case ":$PATH:" in
         ;;
 esac
 
+# A non-interactive shell (sshd running a remote command, say) reads this file
+# but never profile.d/paths, and sshd's default PATH stops at the system
+# directories. Give it /usr/local/bin, where docker and other installed CLIs
+# live. Interactive shells get it from profile.d/paths.
+case $- in
+    *i*) ;;
+    *)
+        case ":$PATH:" in
+            *:/usr/local/bin:*) ;;
+            *)
+                if [ -d /usr/local/bin ]; then
+                    export PATH="/usr/local/bin:$PATH"
+                fi
+                ;;
+        esac
+        ;;
+esac
+
 # Load local environment overrides
 if [ -f $HOME/.config/env.local ]; then
     source $HOME/.config/env.local

@@ -36,7 +36,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `aliases` - Shared aliases (`cls`, `zka`)
 
 ### Profile Configuration (`profile.d/`)
-- `env` - Environment variables, loads `~/.config/env.local` for local overrides. Runs first in `zshenv`/`bash_profile`, so it starts by restoring the system PATH directories (`path_helper` on macOS, the conventional set elsewhere) when the inherited PATH lacks them; `nvm.sh` and everything after it need `tr` and friends
+- `env` - Environment variables, loads `~/.config/env.local` for local overrides. Runs first in `zshenv`/`bash_profile`, so it starts by restoring the system PATH directories (`path_helper` on macOS, the conventional set elsewhere) when the inherited PATH lacks them; `nvm.sh` and everything after it need `tr` and friends. A non-interactive shell (sshd running a remote command such as `docker system dial-stdio`) never sources `paths`, so `env` also prepends `/usr/local/bin` there when it is missing
 - `paths` - PATH management via `add-path` function. Sourced by the login profiles and re-sourced by `shell-common.sh`, so an interactive non-login shell (zellij pane, editor terminal) rebuilds the user-level entries; `add-path` skips entries already present
 
 ### Shell Functions (`functions/`)
