@@ -372,3 +372,11 @@ pane_frame_style "full"
 // Default: true
 //
 // styled_underlines false
+
+// Settings for the Zellij terminal window (`zellij terminal`).
+// A family that is not installed falls back to the font built into Zellij.
+//
+terminal {
+    font "MesloLGS Nerd Font Mono"
+    font_size 11
+}

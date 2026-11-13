@@ -24,7 +24,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 
 ### Setup Scripts
 - `setup.sh` - OS detection, delegates to platform scripts
-- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts
+- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`)
 - `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
 - `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`
 
@@ -60,7 +60,8 @@ Personal dotfiles repository managing shell configuration, development tools, an
 ### Application Configs
 - `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
-- `zellij.kdl` - Zellij terminal multiplexer keybindings
+- `zellij.kdl` - Zellij terminal multiplexer keybindings, plus the `terminal` block (font) for the Zellij terminal window
+- `zellij-launcher/` - Sources of `~/Applications/Zellij 💻.app` (macOS): an `Info.plist` and a `launcher` script that runs `open -n -a ~/Applications/Zellij.app --args terminal --create 💻`. Zellij.app takes no session name and ignores `session_name` in the config, so launching it directly always starts a session with a generated name; the launcher opens the Zellij terminal on the same `💻` session the shell auto-attach uses. `install-zellij-launcher` in `setup-macos.sh` copies the bundle into place (a symlinked bundle is not treated as an app by Spotlight or the Dock), borrows Zellij.app's icon, and first runs `zellij setup --install-desktop-entry` when Zellij.app is missing. Re-run `./setup-macos.sh install-zellij-launcher` after editing the sources
 - `zellij-layouts/` - Named zellij layouts (`default.kdl`), resolved by bare name via `zellij --layout <name>`; holds the swap layouts cycled by `next-swap-layout`
 - `zellij-plugins/` - `tab-title/` is a Rust crate compiled to `wasm32-wasip1`; the committed `zellij-tab-title.wasm` renames each tab to its focused pane's title; loaded by the `load_plugins` block in `zellij.kdl`; committed so machines without Rust need no build step. Its permissions are seeded into zellij's permission cache by `apply-dotfiles` (`seed-zellij-plugin-permissions`), because zellij's grant prompt cannot surface for a pane-less background plugin - see `zellij-plugins/README.md`
 - `claude-statusline.sh` - Claude Code status line, shared by the primary and secondary profiles (see `functions/claude`). Takes the profile name (`primary`/`secondary`) as `$1`; renders a colored badge plus cwd, git branch, and model. Wired in via each profile's `~/.claude*/settings.json` `statusLine` key (not managed by `apply-dotfiles` - set up manually per machine).

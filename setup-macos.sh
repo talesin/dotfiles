@@ -93,11 +93,33 @@ function install-powerline() {
 	popd >/dev/null
 }
 
+# Install "Zellij 💻.app": a launcher that opens the Zellij terminal on the "💻"
+# session (see zellij-launcher/launcher). It is copied rather than symlinked because
+# Spotlight and the Dock do not treat a symlinked bundle as an app.
+function install-zellij-launcher() {
+	local zellij_app="$HOME/Applications/Zellij.app"
+	local launcher_app="$HOME/Applications/Zellij 💻.app"
+
+	if [ ! -d "$zellij_app" ]; then
+		echo "Installing Zellij.app"
+		zellij setup --install-desktop-entry
+	fi
+
+	echo "Installing $launcher_app"
+	rm -rf "$launcher_app"
+	mkdir -p "$launcher_app/Contents/MacOS" "$launcher_app/Contents/Resources"
+	cp "$DIR/zellij-launcher/Info.plist" "$launcher_app/Contents/Info.plist"
+	cp "$DIR/zellij-launcher/launcher" "$launcher_app/Contents/MacOS/launcher"
+	chmod +x "$launcher_app/Contents/MacOS/launcher"
+	cp "$zellij_app/Contents/Resources/zellij.icns" "$launcher_app/Contents/Resources/zellij.icns"
+}
+
 case $OPT in
 "")
 	install-brew
 	install-apps
 	apply-dotfiles "$DIR"
+	install-zellij-launcher
 	install-xcode
 	install-node
 	install-node-extras

@@ -1,0 +1,19 @@
+#!/bin/bash
+# Executable of "Zellij 💻.app". Opens a Zellij terminal window on the "💻" session,
+# creating the session when it does not exist. Zellij.app itself takes no session
+# name and ignores `session_name` in the config, so a Dock or Spotlight launch of it
+# always starts a session with a generated name.
+#
+# `open -n` starts Zellij.app through LaunchServices, so the window belongs to the
+# signed app (tray icon, desktop notifications) and gets the login shell environment.
+# When Zellij is already running, the new instance hands its window over and exits.
+
+SESSION="💻"
+ZELLIJ_APP="$HOME/Applications/Zellij.app"
+
+if [ ! -d "$ZELLIJ_APP" ]; then
+	/usr/bin/osascript -e 'display alert "Zellij.app is not installed" message "Run: zellij setup --install-desktop-entry"'
+	exit 1
+fi
+
+exec /usr/bin/open -n -a "$ZELLIJ_APP" --args terminal --create "$SESSION"
