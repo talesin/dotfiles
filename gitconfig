@@ -41,14 +41,18 @@
 	useRelativePaths = true
 [status]
 	showUntrackedFiles = all
+# Helpers are scoped per host rather than set globally, so a machine without a
+# given tool only fails for the hosts that need it. An empty `helper =` clears
+# every helper collected so far, which would erase the system default.
 [credential "https://github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper =
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
-[credential]
-	helper = 
-	helper = /usr/local/share/gcm-core/git-credential-manager
+	helper =
+	helper = !gh auth git-credential
+# Azure DevOps: Git Credential Manager (brew cask git-credential-manager).
+# useHttpPath keeps a separate credential per organisation.
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+	helper =
+	helper = manager
