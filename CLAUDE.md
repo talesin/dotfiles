@@ -24,9 +24,9 @@ Personal dotfiles repository managing shell configuration, development tools, an
 
 ### Setup Scripts
 - `setup.sh` - OS detection, delegates to platform scripts
-- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`)
+- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`). Every step runs through `run-step`, so a failure is recorded and the rest still run; the script ends with one summary of what needs attention, each item with a retry command, and exits 1 if there was any. `install-brew-packages` verifies the Brewfile with `brew bundle check` afterwards, because `brew bundle` reports a failed download mid-output and can skip an entry silently. `install-coursier` runs `coursier setup` with the JVM trusting the macOS Keychain (Java's own trust store rejects the certificate of a TLS-inspecting proxy, which curl accepts), the Coursier bin directory on `PATH` (otherwise coursier offers to edit the profile files, which are symlinks into this repo), and Java stack frames kept off the screen; the full output is kept in a log when it fails
 - `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
-- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`, and the failure tracking `run-step`, `note-problem`, `report-problems`
 
 ### Shell Configuration
 - `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash. `zshrc` also holds the zellij resurrect hook for shell functions (see Zellij integration)

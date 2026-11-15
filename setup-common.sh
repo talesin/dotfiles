@@ -56,6 +56,58 @@ function not-installed() {
     ! is-installed "$1"
 }
 
+# Problems found while a setup script runs. A failed step is recorded and the
+# script carries on, so one flaky download does not strand the steps after it;
+# report-problems prints them together at the end, where they are not buried in
+# the output of the steps that worked.
+SETUP_PROBLEMS=()
+
+# Record a problem: note-problem <summary> [<detail line>...]. The summary is
+# echoed now; the detail lines appear only in the final report.
+function note-problem() {
+    SETUP_PROBLEMS+=("$(printf '%s\n' "$@")")
+    echo "  ! $1" >&2
+}
+
+# Run a setup step (a function or command). A non-zero exit is recorded as a
+# problem with a retry command; the script's functions are all runnable by name.
+function run-step() {
+    local status
+    "$@"
+    status=$?
+    if [ "$status" -ne 0 ]; then
+        note-problem "$1 failed (exit status $status)" \
+            "The output above has the details." \
+            "Retry: $0 $1"
+    fi
+}
+
+# Print every recorded problem and return 1, or return 0 when there are none.
+function report-problems() {
+    local count=${#SETUP_PROBLEMS[@]} entry line first
+    [ "$count" -eq 0 ] && return 0
+
+    echo
+    if [ "$count" -eq 1 ]; then
+        echo "Setup finished, but 1 step needs attention:"
+    else
+        echo "Setup finished, but $count steps need attention:"
+    fi
+    for entry in "${SETUP_PROBLEMS[@]}"; do
+        echo
+        first=1
+        while IFS= read -r line; do
+            if [ "$first" -eq 1 ]; then
+                echo "  * $line"
+                first=0
+            else
+                echo "      $line"
+            fi
+        done <<<"$entry"
+    done
+    return 1
+}
+
 # Print the latest release tag for a GitHub repo (e.g. "PowerShell/PowerShell").
 # Returns 1 and prints an error if the API call fails or returns no tag.
 # grep -o anchors on the tag_name key so a `"tag_name": null` release or
