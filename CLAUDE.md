@@ -29,7 +29,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`
 
 ### Shell Configuration
-- `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash
+- `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash. `zshrc` also holds the zellij resurrect hook for shell functions (see Zellij integration)
 - `shell-common.sh` - Shared config loaded by both shells (aliases, functions, integrations)
 - `profile` / `zprofile` / `bash_profile` - Login shell setup
 - `zshenv` - Zsh environment (NVM, Rust, SSH key detection)
@@ -80,5 +80,5 @@ Creates symlinks from repo to home directory:
 - **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
 - **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
 - **SSH key management**: Auto-start ssh-agent, certificate expiration checks
-- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles. Panes are non-login shells (no `zprofile`), so their PATH comes from `profile.d/env` restoring the system directories and `shell-common.sh` re-sourcing `profile.d/paths`
+- **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles, resurrection of panes running shell functions. Zellij saves a pane by the argv of its foreground process, so a pane running the `claude` function would be saved as bare `claude`, without `--secondary` and outside the shell that defines the function. In zsh inside zellij, a `preexec` hook in `zshrc` registers `$SHELL -ic '<typed line>'` through `zellij action set-resurrect-command` when the first word of the line is a function listed in `ZELLIJ_RESURRECT_FUNCTIONS` (default `(claude)`; set the array in `~/.config/env.local` to extend it), and a `precmd` hook clears it once the pane is back at its prompt. Lines where the function is not the first word (`FOO=1 claude`, `cd x && claude`) keep zellij's default discovery, and bash has no hook. `shell-common.sh` skips `update-tools` for a shell started with a command string, so the resurrected `zsh -ic` pane does not stop at the update prompt. Panes are non-login shells (no `zprofile`), so their PATH comes from `profile.d/env` restoring the system directories and `shell-common.sh` re-sourcing `profile.d/paths`
 - **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET

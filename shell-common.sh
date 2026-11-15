@@ -201,5 +201,9 @@ fi
 
 # Update tools
 # Skipped for agent shells: their pty passes update-tools' own `[[ -t 0 ]]`
-# guard, so the "Update tools? [y/n]" prompt would block on `read`.
-is-agent-shell || update-tools
+# guard, so the "Update tools? [y/n]" prompt would block on `read`. Skipped
+# for a shell started to run a command string (`-ic`, as a resurrected zellij
+# pane is - see zshrc), where the prompt would hold up that command.
+if [[ -z "${ZSH_EXECUTION_STRING}${BASH_EXECUTION_STRING}" ]] && ! is-agent-shell; then
+  update-tools
+fi
