@@ -9,9 +9,9 @@ Personal dotfiles repository managing shell configuration, development tools, an
 ## Common Commands
 
 ### Setup and Installation
-- `./setup.sh` - Main entry point; detects OS and runs platform-specific setup
-- `./setup-macos.sh` - macOS setup (Homebrew, apps, symlinks)
-- `./setup-linux.sh` - Linux setup (apt/dnf/yum packages, symlinks)
+- `./setup.sh` - Main entry point; detects OS and runs platform-specific setup. No arguments shows a checklist of steps (done steps start unticked); `--yes` runs all, `--skip a,b` excludes, `--list` shows done/pending, `--dry-run` prints what would run, `<name> [args]` runs one step or function. Without a terminal and without `--yes` it exits 2
+- `./setup-macos.sh` - macOS setup (Homebrew, apps, symlinks); same options as `setup.sh`
+- `./setup-linux.sh` - Linux setup (apt/dnf/yum packages, symlinks); same options as `setup.sh`
 - `zellij-plugins/tab-title/build.sh` - Rebuilds the plugin and refreshes the committed `.wasm`
 
 ### Package Management
@@ -24,9 +24,9 @@ Personal dotfiles repository managing shell configuration, development tools, an
 
 ### Setup Scripts
 - `setup.sh` - OS detection, delegates to platform scripts
-- `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`). Every step runs through `run-step`, so a failure is recorded and the rest still run; the script ends with one summary of what needs attention, each item with a retry command, and exits 1 if there was any. `install-brew-packages` verifies the Brewfile with `brew bundle check` afterwards, because `brew bundle` reports a failed download mid-output and can skip an entry silently. `install-coursier` runs `coursier setup` with the JVM trusting the macOS Keychain (Java's own trust store rejects the certificate of a TLS-inspecting proxy, which curl accepts), the Coursier bin directory on `PATH` (otherwise coursier offers to edit the profile files, which are symlinks into this repo), and Java stack frames kept off the screen; the full output is kept in a log when it fails
-- `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
-- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `link-gitconfig`, `seed-gitconfig`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`, and the failure tracking `run-step`, `note-problem`, `report-problems`
+- `setup-macos.sh` - Homebrew, Coursier, iTerm2, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`). Steps, in order: `install-brew`, `install-brew-packages`, `register-brew-shells`, `install-iterm-integration`, `install-coursier`, `apply-dotfiles`, `seed-gitconfig`, `install-zellij-launcher`, `install-xcode`, `install-node`, `install-node-extras`, `install-powerline`, `use-brew-zsh` (the `chsh`), `install-zsh`, `install-bash`. `DIR` is resolved from the script path. Every step runs through `run-step`, so a failure is recorded and the rest still run; the script ends with one summary of what needs attention, each item with a retry command, and exits 1 if there was any. `install-brew-packages` verifies the Brewfile with `brew bundle check` afterwards, because `brew bundle` reports a failed download mid-output and can skip an entry silently. `install-coursier` runs `coursier setup` with the JVM trusting the macOS Keychain (Java's own trust store rejects the certificate of a TLS-inspecting proxy, which curl accepts), the Coursier bin directory on `PATH` (otherwise coursier offers to edit the profile files, which are symlinks into this repo), and Java stack frames kept off the screen; the full output is kept in a log when it fails
+- `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells. Steps: `install-packages`, `install-fonts`, `install-zellij`, `install-powershell`, `install-dotnet`, `install-wsl-tools` (WSL only), `apply-dotfiles`, `seed-gitconfig`, `install-node`, `install-zsh`, `install-bash`; helpers such as `pwsh-arch` and `download-pwsh-asset` are not steps but run by name. Steps go through the same `run-step`/`report-problems` failure tracking as macOS, so a failed step is summarised and the script exits 1
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles` (defaults to `$DOTFILES_DIR`, set by each platform script), `link-gitconfig`, `seed-gitconfig`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`, and the failure tracking `run-step`, `note-problem`, `report-problems`. `seed-gitconfig` gates on `user.name`/`user.email` being unset in `~/.gitconfig` (the file itself always exists after `link-gitconfig`), and records a problem instead of prompting when there is no terminal or `--yes` is set. The step registry: `add-step <function> <description> [<done-check>]` (parallel arrays `STEP_FUNCS`/`STEP_DESCS`/`STEP_CHECKS`; the done-check is a cheap, side-effect-free function returning 0 when nothing is left to do), `parse-setup-args`, `select-steps`, `step-menu` (dispatcher: `step-menu-tui`, a full-screen checklist on the alternate screen with arrows/`j`/`k`/space/SGR mouse, raw ANSI plus `stty`, with INT/TERM/HUP/EXIT traps restoring the terminal, when `TERM` is not dumb and the window fits the rows and widest line; else `step-menu-lines`, print/read/reprint; `SETUP_MENU=lines` forces the latter; bash 3.2, no UI tools), and `run-setup <platform>` which each platform script calls after registering its steps. A step whose prerequisite was unticked fails normally and appears in the summary with its retry command; there is no dependency graph
 
 ### Shell Configuration
 - `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash. `zshrc` also holds the zellij resurrect hook for shell functions (see Zellij integration)
@@ -53,7 +53,6 @@ Personal dotfiles repository managing shell configuration, development tools, an
 
 ### Development Tool Configs
 - `Brewfile.macos` - macOS Homebrew packages (casks, mas apps, dev tools)
-- `vscode.extensions.lst` - VS Code extensions (Scala, Java, .NET, Copilot)
 - `vscode.user.settings.json` - VS Code settings
 - `.vscode/settings.json` - Workspace VS Code settings; points rust-analyzer at the nested `zellij-plugins/tab-title` crate via `linkedProjects`, since the repo root is not a Cargo workspace
 

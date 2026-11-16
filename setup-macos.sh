@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
-DIR=$HOME/.dotfiles
-mkdir -p $DIR 2>/dev/null
-pushd $DIR >/dev/null
+DIR=$(cd "$(dirname "$0")" && pwd)
+DOTFILES_DIR=$DIR
+pushd "$DIR" >/dev/null
 
 # Load shared setup functions
 source "$DIR/setup-common.sh"
-
-OPT=$1
-shift
 
 function install-brew() {
 	if not-installed brew; then
@@ -96,9 +93,7 @@ function install-coursier() {
 		"Retry: $0 install-coursier"
 }
 
-function install-apps() {
-	install-brew-packages
-
+function register-brew-shells() {
     grep -sq /opt/homebrew/bin/bash /etc/shells
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /opt/homebrew/bin/bash >> /etc/shells"
@@ -108,29 +103,24 @@ function install-apps() {
     if [ $? -eq 1 ]; then
         sudo sh -c "echo /opt/homebrew/bin/zsh >> /etc/shells"
     fi
+}
 
+function install-iterm-integration() {
 	if [ ! -f $HOME/.iterm2_shell_integration.zsh ]; then
 		echo "Configuring iterm shell integration"
 		curl -sL https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh | bash
 	fi
-
-	install-coursier
-
-	seed-gitconfig
 }
 
 function install-node-extras() {
 	npm install -g typescript cdk
 }
 
-function install-zsh-macos() {
+function use-brew-zsh() {
 	if [ "$SHELL" != "/opt/homebrew/bin/zsh" ]; then
 		echo "Change shell to zsh"
 		sudo chsh -s /opt/homebrew/bin/zsh 
 	fi
-	
-	# Call shared zsh installation
-	install-zsh
 }
 
 
@@ -172,24 +162,35 @@ function install-zellij-launcher() {
 	cp "$zellij_app/Contents/Resources/zellij.icns" "$launcher_app/Contents/Resources/zellij.icns"
 }
 
-case $OPT in
-"")
-	run-step install-brew
-	run-step install-apps
-	run-step apply-dotfiles "$DIR"
-	run-step install-zellij-launcher
-	run-step install-xcode
-	run-step install-node
-	run-step install-node-extras
-	run-step install-powerline
-	run-step install-zsh-macos
-	run-step install-bash
-	;;
+# Done-checks: return 0 when the step has nothing to do. Cheap, no side effects.
+function brew-installed() { is-installed brew; }
+function brew-shells-registered() {
+	grep -sq /opt/homebrew/bin/bash /etc/shells && grep -sq /opt/homebrew/bin/zsh /etc/shells
+}
+function iterm-integration-installed() { [ -f "$HOME/.iterm2_shell_integration.zsh" ]; }
+function coursier-installed() { is-installed cs; }
+function xcode-installed() { xcode-select -p >/dev/null 2>&1; }
+function node-extras-installed() { is-installed tsc && is-installed cdk; }
+function powerline-installed() { find "$HOME/Library/Fonts" -iname '*powerline*' 2>/dev/null | grep -q .; }
+function brew-zsh-in-use() { [ "$SHELL" = "/opt/homebrew/bin/zsh" ]; }
 
-*)
-	run-step "$OPT" "$@"
-	;;
-esac
+add-step install-brew              "Homebrew"                                  brew-installed
+add-step install-brew-packages     "Brewfile.macos: install and upgrade"
+add-step register-brew-shells      "Add Homebrew bash and zsh to /etc/shells"  brew-shells-registered
+add-step install-iterm-integration "iTerm2 shell integration"                  iterm-integration-installed
+add-step install-coursier          "Scala tooling (coursier setup)"            coursier-installed
+add-step apply-dotfiles            "Symlink the dotfiles into place"
+add-step seed-gitconfig            "Git name and email in ~/.gitconfig"        git-identity-set
+add-step install-zellij-launcher   "Zellij launcher app"
+add-step install-xcode             "Xcode command line tools"                  xcode-installed
+add-step install-node              "Node.js via nvm"                           node-installed
+add-step install-node-extras       "Global npm packages (typescript, cdk)"     node-extras-installed
+add-step install-powerline         "Powerline fonts"                           powerline-installed
+add-step use-brew-zsh              "Make Homebrew zsh the login shell"         brew-zsh-in-use
+add-step install-zsh               "zsh and Oh My Zsh"                         zsh-installed
+add-step install-bash              "Oh My Bash"                                bash-installed
 
+run-setup macOS "$@"
+status=$?
 popd >/dev/null
-report-problems
+exit $status

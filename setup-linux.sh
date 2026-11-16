@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 DIR=$(cd "$(dirname "$0")" && pwd)
+DOTFILES_DIR=$DIR
 pushd "$DIR" >/dev/null
 
 # Load shared setup functions
 source "$DIR/setup-common.sh"
 
-OPT=${1:-}
-[ $# -gt 0 ] && shift
-
+mkdir -p "$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Install packages via system package manager (pre-built binaries, no compilation)
 function install-packages() {
@@ -354,32 +354,29 @@ function install-dotnet() {
 }
 
 
-function setup-config() {
-	mkdir -p "$HOME/.local/bin"
-	export PATH="$HOME/.local/bin:$PATH"
-
-	seed-gitconfig
+# Done-checks: return 0 when the step has nothing to do. Cheap, no side effects.
+function fonts-installed() {
+	is-installed fc-list && fc-list | grep -qi 'fira *code' && fc-list | grep -qi powerline
 }
+function zellij-installed() { is-installed zellij; }
+function powershell-installed() { native-pwsh >/dev/null 2>&1; }
+function dotnet-installed() { [ -e "$HOME/.dotnet/dotnet" ]; }
 
+add-step install-packages   "System packages (apt/dnf/yum)"
+add-step install-fonts      "FiraCode and Powerline fonts"        fonts-installed
+add-step install-zellij     "zellij"                              zellij-installed
+add-step install-powershell "PowerShell"                          powershell-installed
+add-step install-dotnet     ".NET SDK (LTS)"                      dotnet-installed
+if is-wsl; then
+	add-step install-wsl-tools "WSL interop tools and .wslconfig"
+fi
+add-step apply-dotfiles     "Symlink the dotfiles into place"
+add-step seed-gitconfig     "Git name and email in ~/.gitconfig"  git-identity-set
+add-step install-node       "Node.js via nvm"                     node-installed
+add-step install-zsh        "zsh and Oh My Zsh"                   zsh-installed
+add-step install-bash       "Oh My Bash"                          bash-installed
 
-case $OPT in
-"")
-	install-packages
-	install-fonts
-	setup-config
-	install-zellij
-	install-powershell
-	install-dotnet
-	install-wsl-tools
-	apply-dotfiles "$DIR"
-	install-node
-	install-zsh
-	install-bash
-	;;
-
-*)
-	$OPT "$@"
-	;;
-esac
-
+run-setup Linux "$@"
+status=$?
 popd >/dev/null
+exit $status
