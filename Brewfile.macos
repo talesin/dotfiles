@@ -26,8 +26,8 @@ brew "poppler"
 
 # dev
 cask "corretto"
-# Git Credential Manager: signs in to Azure DevOps remotes; installs to /usr/local/share/gcm-core
-# (the path the credential helper in gitconfig points at)
+# Git Credential Manager: signs in to Azure DevOps remotes; gitconfig calls it
+# by name (`helper = manager`) through /usr/local/bin/git-credential-manager
 cask "git-credential-manager"
 brew "coursier"
 brew "dotnet"

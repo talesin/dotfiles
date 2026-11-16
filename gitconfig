@@ -30,13 +30,9 @@
 	stack = "!f() { p=origin/develop; for b in \"$@\"; do printf \"%-34s <- %-34s %3s ahead\\n\" \"$b\" \"${p#origin/}\" \"$(git rev-list --count $p..$b)\"; p=$b; done; }; f"
   
 
-[include]
-	path = ~/.config/gitconfig.local
-
 [init]
 	defaultBranch = main
 
-# User and credential config loaded from ~/.config/gitconfig.local
 [worktree]
 	useRelativePaths = true
 [status]
@@ -44,6 +40,8 @@
 # Helpers are scoped per host rather than set globally, so a machine without a
 # given tool only fails for the hosts that need it. An empty `helper =` clears
 # every helper collected so far, which would erase the system default.
+# The user identity and any per-machine override live in ~/.gitconfig, which
+# git reads after this file.
 [credential "https://github.com"]
 	helper =
 	helper = !gh auth git-credential

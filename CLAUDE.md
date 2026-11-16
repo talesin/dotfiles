@@ -26,7 +26,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `setup.sh` - OS detection, delegates to platform scripts
 - `setup-macos.sh` - Homebrew, Coursier, iTerm2, VS Code extensions, fonts, the `Zellij 💻.app` launcher (`install-zellij-launcher`). Every step runs through `run-step`, so a failure is recorded and the rest still run; the script ends with one summary of what needs attention, each item with a retry command, and exits 1 if there was any. `install-brew-packages` verifies the Brewfile with `brew bundle check` afterwards, because `brew bundle` reports a failed download mid-output and can skip an entry silently. `install-coursier` runs `coursier setup` with the JVM trusting the macOS Keychain (Java's own trust store rejects the certificate of a TLS-inspecting proxy, which curl accepts), the Coursier bin directory on `PATH` (otherwise coursier offers to edit the profile files, which are symlinks into this repo), and Java stack frames kept off the screen; the full output is kept in a log when it fails
 - `setup-linux.sh` - System packages (apt/dnf/yum), zellij, shells
-- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`, and the failure tracking `run-step`, `note-problem`, `report-problems`
+- `setup-common.sh` - Shared functions: `install-node`, `install-zsh`, `install-bash`, `apply-dotfiles`, `link-gitconfig`, `seed-gitconfig`, `zellij-plugin-dir`, `seed-zellij-plugin-permissions`, and the failure tracking `run-step`, `note-problem`, `report-problems`
 
 ### Shell Configuration
 - `zshrc` / `bashrc` - Shell-specific config with Oh My Zsh/Bash. `zshrc` also holds the zellij resurrect hook for shell functions (see Zellij integration)
@@ -58,7 +58,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 - `.vscode/settings.json` - Workspace VS Code settings; points rust-analyzer at the nested `zellij-plugins/tab-title` crate via `linkedProjects`, since the repo root is not a Cargo workspace
 
 ### Application Configs
-- `gitconfig` - Git config with `lg` alias, includes `~/.config/gitconfig.local`
+- `gitconfig` - Shared git config with the `lg` alias and per-host credential helpers (`gh` for GitHub, Git Credential Manager for Azure DevOps). Linked to `~/.config/git/config`; `~/.gitconfig` is an untracked per-machine file holding the user identity and local overrides. Git reads `~/.gitconfig` second, so it wins, and `git config --global` writes land there - Git Credential Manager records per-organisation settings that way. `link-gitconfig` in `setup-common.sh` sets this up and moves a `~/.config/gitconfig.local` from the earlier layout into `~/.gitconfig`
 - `vimrc` - Vim config with syntax highlighting, 2-space tabs
 - `zellij.kdl` - Zellij terminal multiplexer keybindings, plus the `terminal` block (font) for the Zellij terminal window
 - `zellij-launcher/` - Sources of `~/Applications/Zellij 💻.app` (macOS): an `Info.plist` and a `launcher` script that runs `open -n -a ~/Applications/Zellij.app --args terminal --create 💻`. Zellij.app takes no session name and ignores `session_name` in the config, so launching it directly always starts a session with a generated name; the launcher opens the Zellij terminal on the same `💻` session the shell auto-attach uses. `install-zellij-launcher` in `setup-macos.sh` copies the bundle into place (a symlinked bundle is not treated as an app by Spotlight or the Dock), borrows Zellij.app's icon, and first runs `zellij setup --install-desktop-entry` when Zellij.app is missing. Re-run `./setup-macos.sh install-zellij-launcher` after editing the sources
@@ -69,6 +69,7 @@ Personal dotfiles repository managing shell configuration, development tools, an
 ### Symlinks (`apply-dotfiles` in setup-common.sh)
 Creates symlinks from repo to home directory:
 - Shell configs → `~/.zshrc`, `~/.bashrc`, etc.
+- Git → `~/.config/git/config`
 - Functions → `~/.functions/`
 - Profile.d → `~/.profile.d/`
 - Zellij → `~/.config/zellij/config.kdl`, `~/.config/zellij/layouts`
@@ -78,7 +79,7 @@ Creates symlinks from repo to home directory:
 
 - **Cross-platform**: macOS (Homebrew) and Linux (apt/dnf/yum)
 - **Dual shell support**: Zsh (primary) and Bash with Oh My Zsh/Bash
-- **Local overrides**: `~/.config/env.local`, `~/.config/gitconfig.local`
+- **Local overrides**: `~/.config/env.local`, `~/.gitconfig`
 - **SSH key management**: Auto-start ssh-agent, certificate expiration checks
 - **Zellij integration**: Auto-attach (interactive human terminals only - see `zellij-autostart-wanted`; agent runners like Claude Desktop get a plain shell, since `attach --create` would join the human's live session rather than make a new one), custom keybindings, `cls` alias, automatic tab names from pane titles, resurrection of panes running shell functions. Zellij saves a pane by the argv of its foreground process, so a pane running the `claude` function would be saved as bare `claude`, without `--secondary` and outside the shell that defines the function. In zsh inside zellij, a `preexec` hook in `zshrc` registers `$SHELL -ic '<typed line>'` through `zellij action set-resurrect-command` when the first word of the line is a function listed in `ZELLIJ_RESURRECT_FUNCTIONS` (default `(claude)`; set the array in `~/.config/env.local` to extend it), and a `precmd` hook clears it once the pane is back at its prompt. Lines where the function is not the first word (`FOO=1 claude`, `cd x && claude`) keep zellij's default discovery, and bash has no hook. `shell-common.sh` skips `update-tools` for a shell started with a command string, so the resurrected `zsh -ic` pane does not stop at the update prompt. Panes are non-login shells (no `zprofile`), so their PATH comes from `profile.d/env` restoring the system directories and `shell-common.sh` re-sourcing `profile.d/paths`
 - **Development**: Node.js (NVM), Rust, Scala/Java (Coursier), .NET

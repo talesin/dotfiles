@@ -183,9 +183,9 @@ function install-bash() {
     fi
 }
 
-# Seed gitconfig.local with user identity and gh credential helper
+# Seed the per-machine ~/.gitconfig with the user identity
 function seed-gitconfig() {
-    if [ ! -f "$HOME/.config/gitconfig.local" ]; then
+    if [ ! -e "$HOME/.gitconfig" ]; then
         local git_name git_email
         while [ -z "$git_name" ]; do
             read -rp "Git name: " git_name
@@ -194,18 +194,8 @@ function seed-gitconfig() {
             read -rp "Git email: " git_email
         done
 
-        mkdir -p "$HOME/.config"
-        local cfg="$HOME/.config/gitconfig.local"
-
-        git config --file "$cfg" user.name "$git_name"
-        git config --file "$cfg" user.email "$git_email"
-
-        if is-installed gh; then
-            git config --file "$cfg" 'credential.https://github.com.helper' ''
-            git config --file "$cfg" 'credential.https://github.com.helper' '!gh auth git-credential'
-            git config --file "$cfg" 'credential.https://gist.github.com.helper' ''
-            git config --file "$cfg" 'credential.https://gist.github.com.helper' '!gh auth git-credential'
-        fi
+        git config --file "$HOME/.gitconfig" user.name "$git_name"
+        git config --file "$HOME/.gitconfig" user.email "$git_email"
     fi
 }
 
@@ -222,6 +212,30 @@ function link-dotfile() {
     echo "  $dest -> $src"
 }
 
+# Link the shared git config to the XDG location and keep ~/.gitconfig as an
+# untracked per-machine file. Git reads ~/.gitconfig after the XDG file, so its
+# settings win, and `git config --global` writes there whenever it exists; Git
+# Credential Manager records per-organisation settings that way, which must stay
+# out of the repo.
+function link-gitconfig() {
+    local dotfiles_dir="$1"
+    local legacy="$HOME/.config/gitconfig.local"
+
+    link-dotfile "$dotfiles_dir/gitconfig" "${XDG_CONFIG_HOME:-$HOME/.config}/git/config"
+
+    # Earlier layout: ~/.gitconfig was the symlink into the repo and the
+    # per-machine settings lived in ~/.config/gitconfig.local.
+    if [ -L "$HOME/.gitconfig" ]; then
+        rm "$HOME/.gitconfig"
+    fi
+    if [ -f "$legacy" ] && [ ! -e "$HOME/.gitconfig" ]; then
+        mv "$legacy" "$HOME/.gitconfig"
+        echo "  moved $legacy to $HOME/.gitconfig"
+    fi
+
+    [ -e "$HOME/.gitconfig" ] || touch "$HOME/.gitconfig"
+}
+
 # Apply dotfile symlinks
 function apply-dotfiles() {
     local dotfiles_dir="${1:-$(pwd)}"
@@ -232,7 +246,7 @@ function apply-dotfiles() {
     link-dotfile "$dotfiles_dir/vimrc" ~/.vimrc
     link-dotfile "$dotfiles_dir/bashrc" ~/.bashrc
     link-dotfile "$dotfiles_dir/bash_profile" ~/.bash_profile
-    link-dotfile "$dotfiles_dir/gitconfig" ~/.gitconfig
+    link-gitconfig "$dotfiles_dir"
     link-dotfile "$dotfiles_dir/profile" ~/.profile
     link-dotfile "$dotfiles_dir/zshenv" ~/.zshenv
     link-dotfile "$dotfiles_dir/zshrc" ~/.zshrc
