@@ -17,7 +17,11 @@ brew "zsh"
 brew "zellij"
 brew "fzf"
 brew "neovim"
-brew "jandedobbeleer/oh-my-posh/oh-my-posh"
+# From the author's tap, which gets releases first. Homebrew refuses to load a
+# formula or cask from a non-official tap until it is trusted; `trusted: true`
+# records that trust during `brew bundle`. Any entry written as "user/tap/name"
+# needs it.
+brew "jandedobbeleer/oh-my-posh/oh-my-posh", trusted: true
 
 # document conversion — required by the PowerShell profile's Convert-ToMarkdown.ps1
 # (.docx/.odt via pandoc, .pdf via poppler's pdftohtml)
@@ -49,7 +53,10 @@ brew "cosign"
 cask "google-chrome"
 cask "iterm2"
 cask "visual-studio-code"
-mas "xcode", id: 497799835
+# Only when no Xcode is present: a copy installed outside the App Store (a .xip from
+# developer.apple.com) is invisible to mas, which then tries to download Xcode again
+# through sudo and fails.
+mas "xcode", id: 497799835 unless File.exist?("/Applications/Xcode.app")
 
 # The oh-my-posh prompt (PowerShell repo's omp.json) uses 15 Nerd Font glyphs across the
 # Powerline Extra, Devicons, Codicon and Font Awesome ranges. A merely Powerline-patched
