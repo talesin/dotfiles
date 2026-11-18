@@ -56,7 +56,10 @@ keybinds {
         bind "l" "Right" "Down" "j" { GoToNextTab; }
         bind "<" { MoveTab "Left"; }
         bind ">" { MoveTab "Right"; }
-        bind "n" { NewTab; SwitchToMode "Normal"; }
+        // A bare NewTab builds the tab from the session's new-tab template, which
+        // carries the directory the session started in. Naming the layout drops
+        // that cwd, so the tab opens in the focused pane's directory like NewPane.
+        bind "n" { NewTab { layout "default"; }; SwitchToMode "Normal"; }
         bind "x" { CloseTab; SwitchToMode "Normal"; }
         bind "s" { ToggleActiveSyncTab; SwitchToMode "Normal"; }
         bind "b" { BreakPane; SwitchToMode "Normal"; }
@@ -132,7 +135,7 @@ keybinds {
         bind "\"" { NewPane "Down"; SwitchToMode "Normal"; }
         bind "%" { NewPane "Right"; SwitchToMode "Normal"; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
-        bind "c" { NewTab; SwitchToMode "Normal"; }
+        bind "c" { NewTab { layout "default"; }; SwitchToMode "Normal"; }
         bind "," { SwitchToMode "RenameTab"; }
         bind "p" { GoToPreviousTab; SwitchToMode "Normal"; }
         bind "n" { GoToNextTab; SwitchToMode "Normal"; }
@@ -203,6 +206,19 @@ plugins {
 load_plugins {
     "file:zellij-tab-title.wasm" {
         max_length "24"
+    }
+}
+
+// Right-click "New tab" items name the default layout for the same reason as the
+// NewTab keybinds: a bare NewTab would open in the directory the session started
+// in. Without clear-defaults, an item replaces the default item with that label
+// and leaves the rest of the menu alone.
+context_menu {
+    tab {
+        item "New tab" { NewTab { layout "default"; }; }
+    }
+    bar {
+        item "New tab" { NewTab { layout "default"; }; }
     }
 }
 
