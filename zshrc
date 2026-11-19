@@ -10,7 +10,9 @@ fpath=(~/.local/share/zsh/completions $fpath)
 # Oh My Zsh (zsh-specific)
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
-plugins=(git vi-mode)
+# Set ZSH_PLUGINS in ~/.config/env.local to change the plugin list
+(( ${+ZSH_PLUGINS} )) || ZSH_PLUGINS=(git vi-mode)
+plugins=($ZSH_PLUGINS)
 source $ZSH/oh-my-zsh.sh
 
 # Load shared shell configuration
