@@ -7,13 +7,21 @@
 # `open -n` starts Zellij.app through LaunchServices, so the window belongs to the
 # signed app (tray icon, desktop notifications) and gets the login shell environment.
 # When Zellij is already running, the new instance hands its window over and exits.
+#
+# Zellij.app starts without the shell profile, so its server would listen in the
+# per-user $TMPDIR while every shell pane, which gets ZELLIJ_SOCKET_DIR from
+# profile.d/env, looks for the server in /tmp/zellij; `zellij action` in a pane
+# then waits forever on a socket that does not exist. Passing the same directory
+# keeps the app's server and its panes in agreement. Keep it in step with
+# profile.d/env.
 
 SESSION="💻"
 ZELLIJ_APP="$HOME/Applications/Zellij.app"
+SOCKET_DIR="${ZELLIJ_SOCKET_DIR:-/tmp/zellij}"
 
 if [ ! -d "$ZELLIJ_APP" ]; then
 	/usr/bin/osascript -e 'display alert "Zellij.app is not installed" message "Run: zellij setup --install-desktop-entry"'
 	exit 1
 fi
 
-exec /usr/bin/open -n -a "$ZELLIJ_APP" --args terminal --create "$SESSION"
+exec /usr/bin/open -n --env "ZELLIJ_SOCKET_DIR=$SOCKET_DIR" -a "$ZELLIJ_APP" --args terminal --create "$SESSION"
