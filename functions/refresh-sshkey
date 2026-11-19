@@ -10,8 +10,7 @@ while [[ -z $retry ]]; do
             killall -9 ssh-agent > /dev/null 2>&1
         fi
 
-        PIDS=`pgrep ssh-agent | wc --lines`
-        if [ ! -f "$SSH_ENV" ] || [ $PIDS -eq 0 ]; then
+        if [ ! -f "$SSH_ENV" ] || ! pgrep -u "$(id -u)" ssh-agent > /dev/null; then
             ssh-agent > "$SSH_ENV"
         fi
         source "$SSH_ENV" > /dev/null

@@ -63,6 +63,19 @@ if is-installed brew; then
   eval "$(brew shellenv)"
 fi
 
+# brew shellenv prepends /opt/homebrew/bin, which would put a Homebrew or
+# npm-global binary ahead of the same tool in ~/.local/bin (the native claude
+# install lives there). Move ~/.local/bin back to the front, as profile.d/paths
+# intends.
+if [ -d "$HOME/.local/bin" ]; then
+  _local_bin="$HOME/.local/bin"
+  _path=":$PATH:"
+  _path="${_path//:$_local_bin:/:}"
+  _path="${_path#:}"
+  export PATH="$_local_bin:${_path%:}"
+  unset _local_bin _path
+fi
+
 # Direnv integration
 if is-installed direnv; then
   if [ -n "$ZSH_VERSION" ]; then
